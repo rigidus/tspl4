@@ -1,0 +1,2437 @@
+#
+# NuINu <don't@send.my>, 2018.
+#
+#. extracted from binding.html
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-08-21 08:56+0300\n"
+"PO-Revision-Date: 2018-10-19 14:01+0300\n"
+"Last-Translator: NuINu <don't@send.my>\n"
+"Language-Team: Russian <don't@send.my>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Gtranslator 2.91.7\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
+"4;\n"
+
+#: binding.html:10
+msgid ""
+"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://"
+"www.w3.org/TR/html4/loose.dtd\">\n"
+"<!-- saved from url=(0050)https://scheme.com/tspl4/binding.html#./binding:h0 "
+"-->\n"
+"<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
+"charset=windows-1252\">\n"
+"<title>Procedures and Variable Bindings</title>\n"
+"<link href=\"./binding_files/tspl.css\" rel=\"stylesheet\" type=\"text/css"
+"\">\n"
+"</head>\n"
+"<body>\n"
+"<a name=\"g88\"></a>\n"
+"<a name=\"./binding:h0\"></a>"
+msgstr ""
+"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://"
+"www.w3.org/TR/html4/loose.dtd\">\n"
+"<!-- saved from url=(0050)https://scheme.com/tspl4/binding.html#./binding:h0 "
+"-->\n"
+"<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
+"charset=utf8\">\n"
+"<title>Процедуры и Связывание Переменных</title>\n"
+"<link href=\"./binding_files/tspl.css\" rel=\"stylesheet\" type=\"text/css"
+"\">\n"
+"</head>\n"
+"<body>\n"
+"<a name=\"g88\"></a>\n"
+"<a name=\"./binding:h0\"></a>"
+
+#: binding.html:15
+msgid ""
+"<div style=\"font-size: 12px; width: 500px; height: 500px; border: solid thin"
+"\">\n"
+"<img style=\"padding: 20px 10px 20px 20px\" src=\"./binding_files/ch4.png"
+"\"><img src=\"./binding_files/jph.png\">\n"
+"</div>\n"
+"<h1>Chapter 4. Procedures and Variable Bindings<a name=\"CHPTBINDING\"></a></"
+"h1>"
+msgstr ""
+"<div>\n"
+"<img  src=\"./binding_files/ch4.png\">\n"
+"</div>\n"
+"<h1>Глава 4. Процедуры и Связывание Переменных<a name=\"CHPTBINDING\"></a></"
+"h1>"
+
+#: binding.html:31
+msgid ""
+"<p>\n"
+"<a name=\"./binding:s0\"></a><a name=\"./binding:s1\"></a>Procedures and "
+"variable\n"
+"bindings are the fundamental building blocks of Scheme programs.\n"
+"This chapter describes the small set of syntactic forms whose\n"
+"primary purpose is to create procedures and manipulate variable\n"
+"bindings.\n"
+"It begins with the two most fundamental building blocks of Scheme\n"
+"programs: variable references and <tt>lambda</tt> expressions,\n"
+"and continues with descriptions of\n"
+"the variable binding and assignment forms such as <tt>define</tt>,\n"
+"<tt>letrec</tt>, <tt>let-values</tt>, and <tt>set!</tt>."
+msgstr ""
+"<p>\n"
+"<a name=\"./binding:s0\"></a><a name=\"./binding:s1\"></a>Процедуры и "
+"Связывание\n"
+"Переменных являются основными строительными блоками программ Scheme.\n"
+"В этой главе описывается небольшой набор синтаксических форм, основным \n"
+"назначением которых является создание процедур и управление связыванием\n"
+"переменных.\n"
+"Она начинается с двух наиболее фундаментальных строительных блоков\n"
+"программ Scheme: ссылочных переменных(variable references) и "
+"<tt>лямбда(lambda)</tt> выражений,\n"
+"и продолжается описанием форм связывания переменных и присваивания,\n"
+"такими как <tt>define</tt>,\n"
+"<tt>letrec</tt>, <tt>let-values</tt>, and <tt>set!</tt>."
+
+#: binding.html:36
+msgid ""
+"</p><p>\n"
+"Various other forms that bind or assign variables for which the binding or\n"
+"assignment is not the primary purpose (such as named <tt>let</tt>) are "
+"found\n"
+"in Chapter&nbsp;<a href=\"https://scheme.com/tspl4/control.html#g96\">5</a>."
+msgstr ""
+"</p><p>\n"
+"Различные другие формы, которые связывают или присваивают переменные, для "
+"которых\n"
+"связывание или присвоение не являются основной целью(например именованный "
+"<tt>let</tt>)\n"
+"можно найти в главе &nbsp;<a href=\"https://scheme.com/tspl4/control."
+"html#g96\">5</a>."
+
+#: binding.html:38
+msgctxt "binding.html:38"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:40
+msgid ""
+"</p><h3><a name=\"g89\"></a><a name=\"./binding:h1\"></a>Section 4.1. "
+"Variable References<a name=\"SECTVARREF\"></a></h3>"
+msgstr ""
+"</p><h3><a name=\"g89\"></a><a name=\"./binding:h1\"></a>Section 4.1. "
+"Переменные Ссылки<a name=\"SECTVARREF\"></a></h3>"
+
+#: binding.html:47
+msgid ""
+"<p>\n"
+"<a name=\"./binding:s2\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt><i>variable</i></tt></span>\n"
+"<br>\n"
+"<b>returns: </b>the value of <tt><i>variable</i></tt>"
+msgstr ""
+"<p>\n"
+"<a name=\"./binding:s2\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt><i>variable</i></tt></span>\n"
+"<br>\n"
+"<b>returns: </b>значение переменной <tt><i>variable</i></tt>"
+
+#: binding.html:52
+msgid ""
+"</p><p>Any identifier appearing as an expression in a program is a variable\n"
+"if a visible variable binding for the identifier exists, e.g., the\n"
+"identifier appears within the scope of a binding created by <tt>define</"
+"tt>,\n"
+"<tt>lambda</tt>, <tt>let</tt>, or some other variable-binding construct."
+msgstr ""
+"</p><p>Любой идентификатор, являющийся выражением в программе, является "
+"переменной,\n"
+"если существует видимая связанная переменная для используемого "
+"идентификатора,\n"
+"например, идентификатора появляющегося в пределах области привязки "
+"создаваемой <tt>define</tt>,\n"
+"<tt>lambda</tt>, <tt>let</tt>, или другой конструкции связывающей переменную "
+"со значением."
+
+#: binding.html:54
+msgctxt "binding.html:54"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:56
+msgid ""
+"</p><p><tt>list&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;graphic&gt;"
+"\">&nbsp;#&lt;procedure&gt;<br>"
+msgstr ""
+
+#: binding.html:58
+msgid "(define&nbsp;x&nbsp;'a)<br>"
+msgstr ""
+
+#: binding.html:60
+msgid ""
+"(list&nbsp;x&nbsp;x)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;"
+"graphic&gt;\">&nbsp;(a&nbsp;a)<br>"
+msgstr ""
+
+#: binding.html:62
+msgid "(let&nbsp;([x&nbsp;'b])<br>"
+msgstr ""
+
+#: binding.html:64
+msgid ""
+"&nbsp;&nbsp;(list&nbsp;x&nbsp;x))&nbsp;<img src=\"./binding_files/0.gif\" "
+"alt=\"&lt;graphic&gt;\">&nbsp;(b&nbsp;b)<br>"
+msgstr ""
+
+#: binding.html:76
+msgid ""
+"(let&nbsp;([let&nbsp;'let])&nbsp;let)&nbsp;<img src=\"./binding_files/0.gif"
+"\" alt=\"&lt;graphic&gt;\">&nbsp;let</tt>\n"
+"</p><p>It is a syntax violation for an identifier reference to appear within "
+"a\n"
+"<tt>library</tt> form or top-level program if it is not bound as a "
+"variable,\n"
+"keyword, record name, or other entity.\n"
+"Since the scope of the definitions in a <tt>library</tt>, top-level\n"
+"program, <tt>lambda</tt>, or other local body is the entire body, it\n"
+"is not necessary for the definition of a variable to appear before\n"
+"its first reference appears, as long as the reference is not actually\n"
+"evaluated until the definition has been completed.\n"
+"So, for example, the reference to <tt>g</tt> within the definition of\n"
+"<tt>f</tt> below"
+msgstr ""
+"(let&nbsp;([let&nbsp;'let])&nbsp;let)&nbsp;<img src=\"./binding_files/0.gif"
+"\" alt=\"&lt;graphic&gt;\">&nbsp;let</tt>\n"
+"</p><p>Будет нарушением синтаксиса для ссылочного идентификатора, который "
+"появляется\n"
+"в форме <tt>library</tt> или в программе верхнего уровня, если этот "
+"идентификатор\n"
+"не связан как переменная, ключевое слово, имя записи, или другой сущности.\n"
+"Поскольку область определения в <tt>library</tt>, программе верхнего "
+"уровня,\n"
+"<tt>lambda</tt>, или другом локальном теле это все внутренне тело, нет "
+"необходимости\n"
+"чтобы  определение переменной появлялось до первой  ссылки на него, если "
+"ссылка\n"
+"по факту не вычисляется до тех пор, пока определение не будет завершено.\n"
+"Как, например, ссылка на <tt>g</tt> в определении <tt>f</tt> ниже"
+
+#: binding.html:78
+msgctxt "binding.html:78"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:80
+msgctxt "binding.html:80"
+msgid "</p><p><tt>(define&nbsp;f<br>"
+msgstr ""
+
+#: binding.html:82
+msgctxt "binding.html:82"
+msgid "&nbsp;&nbsp;(lambda&nbsp;(x)<br>"
+msgstr ""
+
+#: binding.html:84
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;(g&nbsp;x)))<br>"
+msgstr ""
+
+#: binding.html:86
+msgctxt "binding.html:86"
+msgid "(define&nbsp;g<br>"
+msgstr ""
+
+#: binding.html:88
+msgctxt "binding.html:88"
+msgid "&nbsp;&nbsp;(lambda&nbsp;(x)<br>"
+msgstr ""
+
+#: binding.html:92
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;x)))</tt>\n"
+"</p><p>is okay, but the reference to <tt>g</tt> in the definition of\n"
+"<tt>q</tt> below is not."
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;x)))</tt>\n"
+"</p><p>все в порядке, но ссылка на <tt>g</tt> в определении\n"
+"<tt>q</tt> ниже, не правильна."
+
+#: binding.html:94
+msgctxt "binding.html:94"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:96
+msgid "</p><p><tt>(define&nbsp;q&nbsp;(g&nbsp;3))<br>"
+msgstr ""
+
+#: binding.html:98
+msgctxt "binding.html:98"
+msgid "(define&nbsp;g<br>"
+msgstr ""
+
+#: binding.html:100
+msgctxt "binding.html:100"
+msgid "&nbsp;&nbsp;(lambda&nbsp;(x)<br>"
+msgstr ""
+
+#: binding.html:104
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;x)))</tt>\n"
+"</p><p>\n"
+"</p><h3><a name=\"g90\"></a><a name=\"./binding:h2\"></a>Section 4.2. "
+"Lambda<a name=\"SECTLAMBDA\"></a></h3>"
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;x)))</tt>\n"
+"</p><p>\n"
+"</p><h3><a name=\"g90\"></a><a name=\"./binding:h2\"></a>Section 4.2. "
+"Лямбда(Lambda)<a name=\"SECTLAMBDA\"></a></h3>"
+
+#: binding.html:113
+msgid ""
+"<p>\n"
+"<a name=\"./binding:s3\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(lambda&nbsp;<i>formals</i>&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>a procedure\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+msgstr ""
+"<p>\n"
+"<a name=\"./binding:s3\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(lambda&nbsp;<i>formals</i>&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b> процедуру\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+
+#: binding.html:118
+msgid ""
+"</p><p>The <tt>lambda</tt> syntactic form is used to create <a name=\"./"
+"binding:s4\"></a>procedures.\n"
+"Any operation that creates a procedure or establishes local variable\n"
+"bindings is ultimately defined in terms of <tt>lambda</tt> or\n"
+"<tt>case-lambda</tt>."
+msgstr ""
+"</p><p>Синтаксическая форма <tt>lambda</tt> используется для создания\n"
+"процедур<a name=\"./binding:s4\"></a>.\n"
+"Любая операция, которая создает процедуру или устанавливает привязки\n"
+"локальных переменных, в конечном счете определяется в терминах\n"
+"лямбда <tt>lambda</tt> или <tt>case-lambda</tt>."
+
+#: binding.html:123
+msgid ""
+"</p><p>\n"
+"The variables in <tt><i>formals</i></tt> are the <a name=\"./binding:s5\"></"
+"a>formal parameters of the\n"
+"procedure, and the sequence of subforms\n"
+"<tt><i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...</tt> is "
+"its body."
+msgstr ""
+"</p><p>\n"
+"Переменные в <tt><i>formals</i></tt> являются <a name=\"./binding:s5\"></"
+"a>формальными\n"
+"параметрами процедуры, а последовательность подчиненных форм\n"
+"<tt><i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...</tt> "
+"является ее\n"
+"телом."
+
+#: binding.html:135
+msgid ""
+"</p><p>\n"
+"<a name=\"./binding:s6\"></a>The body may begin with a sequence of\n"
+"definitions, in which case the bindings created by the definitions are\n"
+"local to the body.\n"
+"If definitions are present, the keyword bindings are used and discarded\n"
+"while expanding the body, and the body is expanded into a\n"
+"<tt>letrec*</tt> expression formed from the variable definitions and the\n"
+"remaining expressions, as described on page&nbsp;<a href=\"syntax.html#body-"
+"expansion\">292</a>.\n"
+"The remainder of this description of <tt>lambda</tt> assumes that this\n"
+"transformation has taken place, if necessary, so that the body is a\n"
+"sequence of expressions without definitions."
+msgstr ""
+"</p><p>\n"
+"<a name=\"./binding:s6\"></a>Тело может начнаться с последовательности\n"
+"определений, и в этом случаее привязки, созданные определениями являются\n"
+"локальными для тела.\n"
+"Если определения присутствуют, привязки ключевых слов используются и\n"
+"отбрасываются при расширении тела, а тело расширяется в выражение\n"
+"<tt>letrec*</tt>, сформированное из определений переменных и остальных\n"
+"выражений, как описано на странице&nbsp;<a href=\"syntax.html#body-expansion"
+"\">292</a>.\n"
+"Остальная часть этого описания <tt>lambda</tt> предполагает, что это\n"
+"преобразование имело место, если это необходимо, так что тело представляет\n"
+"собой последовательность выражений без определений."
+
+#: binding.html:144
+msgid ""
+"</p><p>\n"
+"When the procedure is created, the bindings of all variables occurring\n"
+"free within the body, excluding the formal parameters, are retained with\n"
+"the procedure.\n"
+"Subsequently, whenever the procedure is applied to a sequence of\n"
+"<a name=\"./binding:s7\"></a>actual parameters, the formal parameters are "
+"bound to the actual\n"
+"parameters, the retained bindings are restored, and the body is\n"
+"evaluated."
+msgstr ""
+"</p><p>\n"
+"Когда процедура создается, привязки всех переменных, входящих в тело,\n"
+"исключая формальные параметры, сохраняются с процедурой.\n"
+"Впоследствии, всякий раз, когда процедура применяется к последовательности\n"
+"фактических параметров <a name=\"./binding:s7\"></a>, формальные параметры\n"
+"привязываются к фактическим параметрам, сохраненные привязки "
+"востанавливаются и\n"
+"тело вычисляется."
+
+#: binding.html:148
+msgid ""
+"</p><p>\n"
+"Upon application, the <a name=\"./binding:s8\"></a>formal parameters defined "
+"by <tt><i>formals</i></tt> are\n"
+"bound to the actual parameters as follows."
+msgstr ""
+"</p><p>\n"
+"При применении формальные параметры <a name=\"./binding:s8\"></a>, "
+"определенные в <tt><i>formals</i></tt> \n"
+"связываюся с фактическими параметрами следующим образом."
+
+#: binding.html:155
+msgid ""
+"</p><p>\n"
+"</p><ul>\n"
+"<li>If <tt><i>formals</i></tt> is a proper list of variables, e.g., "
+"<tt>(x&nbsp;y&nbsp;z)</tt>, each\n"
+"variable is bound to the corresponding actual parameter.\n"
+"An exception with condition type <tt>&amp;assertion</tt> is raised\n"
+"if too few or too many actual parameters are supplied."
+msgstr ""
+"</p><p>\n"
+"</p><ul>\n"
+"<li>Если <tt><i>formals</i></tt> является правильным списком переменных, "
+"например\n"
+"<tt>(x&nbsp;y&nbsp;z)</tt>, каждая переменная привязывается к "
+"соответствующему\n"
+"фактическому параметру. Исключение с типом условия <tt>&amp;assertion</tt> "
+"возникает,\n"
+"если задано слишком мало или слишком много фактических параметров."
+
+#: binding.html:159
+msgid ""
+"<p>\n"
+"</p></li><li>If <tt><i>formals</i></tt> is a single variable (not in a "
+"list), e.g., <tt>z</tt>, it\n"
+"is bound to a list of the actual parameters."
+msgstr ""
+"<p>\n"
+"</p></li><li>Если <tt><i>formals</i></tt> это единственная переменная (не в "
+"списке), например, <tt>z</tt>, \n"
+"она связывается со списком фактических параметров."
+
+#: binding.html:169
+msgid ""
+"<p>\n"
+"</p></li><li>If <tt><i>formals</i></tt> is an improper list of variables "
+"terminated by a\n"
+"variable, e.g., <tt>(x&nbsp;y&nbsp;.&nbsp;z)</tt>, each variable but the "
+"last is bound\n"
+"to the corresponding actual parameter.\n"
+"The last variable is bound to a list of the remaining actual parameters.\n"
+"An exception with condition type <tt>&amp;assertion</tt> is raised\n"
+"if too few actual parameters are supplied.\n"
+"</li></ul>\n"
+"<p>"
+msgstr ""
+"<p>\n"
+"</p></li><li>Если <tt><i>formals</i></tt> является неправильным списком "
+"переменных,\n"
+"заканчивающийся переменной, например <tt>(x&nbsp;y&nbsp;.&nbsp;z)</tt>, "
+"каждая переменная\n"
+"кроме последней связывается с фактическим параметром.\n"
+"Последняя переменная связывается со списком оставшихся фактических "
+"параметров.\n"
+"Исключение с условием типа <tt>&amp;assertion</tt> возникает, если задано\n"
+"слишком мало фактических параметров.\n"
+"</li></ul>\n"
+"<p>"
+
+#: binding.html:173
+msgid ""
+"</p><p>\n"
+"When the body is evaluated, the expressions in the body are evaluated in "
+"sequence,\n"
+"and the procedure returns the values of the last expression."
+msgstr ""
+"</p><p>\n"
+"Когда тело вычисляется, выражения в теле вычисляются последовательно, и "
+"процедура\n"
+"возвращает значение последнего выражения."
+
+#: binding.html:178
+msgid ""
+"</p><p>\n"
+"Procedures do not have a printed representation in the usual sense.\n"
+"Scheme systems print procedures in different ways; this book uses the\n"
+"notation <tt>#&lt;procedure&gt;</tt>."
+msgstr ""
+"</p><p>\n"
+"Процедуры не имеют печатного представления в обычном смысле.\n"
+"Ситемы Scheme печатают процедуры по разному; в этой книге испльзуется "
+"обозначение\n"
+"<tt>#&lt;procedure&gt;</tt>."
+
+#: binding.html:180
+msgctxt "binding.html:180"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:182
+msgid ""
+"</p><p><tt>(lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;3))&nbsp;<img src=\"./"
+"binding_files/0.gif\" alt=\"&lt;graphic&gt;\">&nbsp;#&lt;procedure&gt;<br>"
+msgstr ""
+
+#: binding.html:184
+msgid ""
+"((lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;3))&nbsp;7)&nbsp;<img src=\"./"
+"binding_files/0.gif\" alt=\"&lt;graphic&gt;\">&nbsp;10<br>"
+msgstr ""
+
+#: binding.html:186
+msgid ""
+"((lambda&nbsp;(x&nbsp;y)&nbsp;(*&nbsp;x&nbsp;(+&nbsp;x&nbsp;"
+"y)))&nbsp;7&nbsp;13)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;"
+"graphic&gt;\">&nbsp;140<br>"
+msgstr ""
+
+#: binding.html:188
+msgid ""
+"((lambda&nbsp;(f&nbsp;x)&nbsp;(f&nbsp;x&nbsp;x))&nbsp;+&nbsp;11)&nbsp;<img "
+"src=\"./binding_files/0.gif\" alt=\"&lt;graphic&gt;\">&nbsp;22<br>"
+msgstr ""
+
+#: binding.html:193
+msgid ""
+"((lambda&nbsp;()&nbsp;(+&nbsp;3&nbsp;4)))&nbsp;<img src=\"./binding_files/0."
+"gif\" alt=\"&lt;graphic&gt;\">&nbsp;7\n"
+"<br>\n"
+"<br>\n"
+"((lambda&nbsp;(x&nbsp;.&nbsp;y)&nbsp;(list&nbsp;x&nbsp;y))<br>"
+msgstr ""
+
+#: binding.html:195
+msgid ""
+"&nbsp;28&nbsp;37)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;"
+"graphic&gt;\">&nbsp;(28&nbsp;(37))<br>"
+msgstr ""
+
+#: binding.html:197
+msgid "((lambda&nbsp;(x&nbsp;.&nbsp;y)&nbsp;(list&nbsp;x&nbsp;y))<br>"
+msgstr ""
+
+#: binding.html:199
+msgid ""
+"&nbsp;28&nbsp;37&nbsp;47&nbsp;28)&nbsp;<img src=\"./binding_files/0.gif\" "
+"alt=\"&lt;graphic&gt;\">&nbsp;(28&nbsp;(37&nbsp;47&nbsp;28))<br>"
+msgstr ""
+
+#: binding.html:201
+msgid ""
+"((lambda&nbsp;(x&nbsp;y&nbsp;.&nbsp;z)&nbsp;(list&nbsp;x&nbsp;y&nbsp;z))<br>"
+msgstr ""
+
+#: binding.html:203
+msgid ""
+"&nbsp;1&nbsp;2&nbsp;3&nbsp;4)&nbsp;<img src=\"./binding_files/0.gif\" alt="
+"\"&lt;graphic&gt;\">&nbsp;(1&nbsp;2&nbsp;(3&nbsp;4))<br>"
+msgstr ""
+
+#: binding.html:207
+msgid ""
+"((lambda&nbsp;x&nbsp;x)&nbsp;7&nbsp;13)&nbsp;<img src=\"./binding_files/0.gif"
+"\" alt=\"&lt;graphic&gt;\">&nbsp;(7&nbsp;13)</tt>\n"
+"</p><p>\n"
+"</p><h3><a name=\"g91\"></a><a name=\"./binding:h3\"></a>Section 4.3. Case-"
+"Lambda<a name=\"SECTOPTARGS\"></a></h3>"
+msgstr ""
+
+#: binding.html:216
+msgid ""
+"<p>\n"
+"A Scheme <a name=\"./binding:s9\"></a><tt>lambda</tt> expression always\n"
+"produces a procedure with a fixed number of arguments or with an\n"
+"indefinite number of arguments greater than or equal to a certain\n"
+"number.\n"
+"In particular,"
+msgstr ""
+"<p>\n"
+"Scheme <a name=\"./binding:s9\"></a><tt>lambda</tt> выражение всегда\n"
+"выдает процедуру с фиксированным числом аргументов или с неопределенным\n"
+"числом аргументов, большим или равным определенному числу. В частности,"
+
+#: binding.html:218
+msgctxt "binding.html:218"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:221
+msgid ""
+"</p><p><tt>(lambda&nbsp;(<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</"
+"sub></i>)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></"
+"i>&nbsp;...)</tt>\n"
+"</p><p>accepts exactly <tt><i>n</i></tt> arguments,"
+msgstr ""
+"</p><p><tt>(lambda&nbsp;(<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</"
+"sub></i>)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></"
+"i>&nbsp;...)</tt>\n"
+"</p><p>принимает ровно <tt><i>n</i></tt> аргументов,"
+
+#: binding.html:223
+msgctxt "binding.html:223"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:226
+msgid ""
+"</p><p><tt>(lambda&nbsp;<i>r</i>&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt>\n"
+"</p><p>accepts zero or more arguments, and"
+msgstr ""
+"</p><p><tt>(lambda&nbsp;<i>r</i>&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt>\n"
+"</p><p>принимает ноль или больше аргументов, и"
+
+#: binding.html:228
+msgctxt "binding.html:228"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:231
+msgid ""
+"</p><p><tt>(lambda&nbsp;(<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</"
+"sub></i>&nbsp;.&nbsp;<i>r</i>)&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt>\n"
+"</p><p>accepts <tt><i>n</i></tt> or more arguments."
+msgstr ""
+"</p><p><tt>(lambda&nbsp;(<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</"
+"sub></i>&nbsp;.&nbsp;<i>r</i>)&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt>\n"
+"</p><p>принимает <tt><i>n</i></tt> или больше аргументов."
+
+#: binding.html:241
+msgid ""
+"</p><p>\n"
+"<tt>lambda</tt> cannot directly produce, however, a procedure that accepts,\n"
+"say, either two or three arguments.\n"
+"In particular, procedures that accept <a name=\"./binding:s10\"></a>optional "
+"arguments are not\n"
+"supported directly by <tt>lambda</tt>.\n"
+"The latter form of <tt>lambda</tt> shown above can be used, in conjunction\n"
+"with length checks and compositions of <tt>car</tt> and <tt>cdr</tt>, to "
+"implement\n"
+"procedures with optional arguments, though at the cost of clarity and\n"
+"efficiency."
+msgstr ""
+"</p><p>\n"
+"Однако <tt>lambda</tt> не может напрямую создать процедуру, которая "
+"принимает, скажем, два или\n"
+"три аргумента.\n"
+"В частности, процедуры, которые принимают <a name=\"./binding:s10\"></"
+"a>необязательные аргументы,\n"
+"напрямую не поддерживаются <tt>lambda</tt>.\n"
+"Последняя форма <tt>lambda</tt> показанная выше, может использоваться вместе "
+"с проверкою длины,\n"
+"и композицией <tt>car</tt> и <tt>cdr</tt>, для реализации процедур с "
+"необязательными аргументами,\n"
+"хотя это и ухудшает ясность и эффективность кода."
+
+#: binding.html:250
+msgid ""
+"</p><p>\n"
+"The <a name=\"./binding:s11\"></a><tt>case-lambda</tt> syntactic form "
+"directly supports\n"
+"procedures with optional arguments as well as procedures with\n"
+"fixed or indefinite numbers of arguments.\n"
+"<tt>case-lambda</tt> is based on\n"
+"the <a name=\"./binding:s12\"></a><tt>lambda*</tt> syntactic form "
+"introduced\n"
+"in the article \"A New Approach to Procedures with Variable\n"
+"Arity\"&nbsp;[<a class=\"citation\" href=\"bibliography.html#g229\">11</a>]."
+msgstr ""
+"</p><p>\n"
+"Синтаксическая форма <a name=\"./binding:s11\"></a><tt>case-lambda</tt> "
+"напрямую поддерживает\n"
+"процедуры с необязательными аргументами, а также процедуры с фиксированным "
+"или неопределенным\n"
+"числом аргументов.\n"
+"<tt>case-lambda</tt> основана на синтаксической форме <a name=\"./binding:"
+"s12\"></a><tt>lambda*</tt>\n"
+"введенной в статье \"Новый подход к процедурам с переменной арностью\"(A New "
+"Approach to Procedures with Variable\n"
+"Arity)&nbsp;[<a class=\"citation\" href=\"bibliography.html#g229\">11</a>]."
+
+#: binding.html:257
+msgid ""
+"</p><p>\n"
+"<a name=\"./binding:s13\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(case-lambda&nbsp;<i>clause</i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>a procedure\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;control)</tt>, <tt>(rnrs)</tt>"
+msgstr ""
+"</p><p>\n"
+"<a name=\"./binding:s13\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(case-lambda&nbsp;<i>clause</i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>процедуру\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;control)</tt>, <tt>(rnrs)</tt>"
+
+#: binding.html:261
+msgid ""
+"</p><p>A <tt>case-lambda</tt> expression consists of a set of clauses, each\n"
+"resembling a <tt>lambda</tt> expression.\n"
+"Each <tt><i>clause</i></tt> has the form below."
+msgstr ""
+"</p><p>Выражение <tt>case-lambda</tt> состоит из набора предложений, каждое "
+"из которых\n"
+"напоминает <tt>lambda</tt> выражение.\n"
+"Каждое предложение(<tt><i>clause</i></tt>) имеет следующую форму."
+
+#: binding.html:263
+msgctxt "binding.html:263"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:271
+msgid ""
+"</p><p><tt>[<i>formals</i>&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</"
+"sub></i>&nbsp;...]</tt>\n"
+"</p><p>The formal parameters of a clause are defined by <tt><i>formals</i></"
+"tt> in the\n"
+"same manner as for a <tt>lambda</tt> expression.\n"
+"The number of arguments accepted by the procedure value of a\n"
+"<tt>case-lambda</tt> expression is\n"
+"determined by the numbers of arguments accepted by the individual\n"
+"clauses."
+msgstr ""
+"</p><p><tt>[<i>formals</i>&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</"
+"sub></i>&nbsp;...]</tt>\n"
+"</p><p>Формальные параметры предложения определенняются формой "
+"<tt><i>formals</i></tt> также, как \n"
+"и для <tt>lambda</tt> выражения.\n"
+"Количество аргументов, принимаемых значением процедуры для выражения\n"
+"<tt>case-lambda</tt> определяется числом аргументов, принимаемых отдельными "
+"предложениями."
+
+#: binding.html:292
+msgid ""
+"</p><p>\n"
+"When a procedure created with <tt>case-lambda</tt> is invoked, the clauses\n"
+"are considered in order.\n"
+"The first clause that accepts the given number of actual parameters is\n"
+"selected, the formal parameters defined by its <tt><i>formals</i></tt> are\n"
+"bound to the corresponding actual parameters, and the body is\n"
+"evaluated as described for <tt>lambda</tt> above.\n"
+"If <tt><i>formals</i></tt> in a clause is a proper list of identifiers, "
+"then\n"
+"the clause accepts exactly as many actual parameters as there are\n"
+"formal parameters (identifiers) in <tt><i>formals</i></tt>.\n"
+"As with a <tt>lambda</tt> <tt><i>formals</i></tt>, a <tt>case-lambda</tt> "
+"clause\n"
+"<tt><i>formals</i></tt>\n"
+"may be a single identifier, in which case the clause accepts any\n"
+"number of arguments, or an improper list of identifiers terminated\n"
+"by an identifier, in which\n"
+"case the clause accepts any number of arguments greater than or\n"
+"equal to the number of formal parameters excluding the terminating\n"
+"identifier.\n"
+"If no clause accepts the number of actual parameters supplied, an\n"
+"exception with condition type <tt>&amp;assertion</tt> is raised."
+msgstr ""
+"</p><p>\n"
+"Когда вызываеся процедура, созданная с помощью <tt>case-lambda</tt>,\n"
+"предложения рассматриваются в порядке следования в определении.\n"
+"Выбирается первое предложение, которое принимает заданное количество\n"
+"фактических параметров, формальные параметры определенные <tt><i>formals</"
+"i></tt>\n"
+"связываются с соответствующими фактическими параметрами, и тело "
+"вычисляется,\n"
+"как описано выше для  <tt>lambda</tt> выражений.\n"
+"Если <tt><i>formals</i></tt> в предложении является правильным списком "
+"идентификаторов,\n"
+"то предложение принимает ровно столько же фактических параметров, сколько "
+"формальных\n"
+"параметров(идентификаторов) в <tt><i>formals</i></tt>.\n"
+"Как и в случае <tt>lambda</tt> <tt><i>formals</i></tt>, в <tt>case-lambda</"
+"tt> предложение\n"
+"<tt><i>formals</i></tt> может быть одиночным идентификатором, и в этом "
+"случае\n"
+"предложение принимает любое количество аргументов или неправильный список "
+"идентификаторов, \n"
+"завершающийся идентификатором, и в этом случае предложение принимает любое "
+"количество\n"
+"аргументов большее или равное числу формальных параметров, исключая "
+"завершающий\n"
+"идентификатор.\n"
+"Если никакое предложение не принимает имеющееся количество фактических "
+"параметров,\n"
+"возникает исключение типа <tt>&amp;assertion</tt>."
+
+#: binding.html:296
+msgid ""
+"</p><p>\n"
+"The following definition for <a name=\"./binding:s14\"></a><tt>make-list</"
+"tt> uses <tt>case-lambda</tt> to\n"
+"support an optional fill parameter."
+msgstr ""
+"</p><p>\n"
+"В следующем определении для  <a name=\"./binding:s14\"></a><tt>make-list</"
+"tt> используется <tt>case-lambda</tt> для\n"
+"поддержки необязательного параметра заполненителя."
+
+#: binding.html:298
+msgctxt "binding.html:298"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:300
+msgid "</p><p><tt>(define&nbsp;make-list<br>"
+msgstr ""
+
+#: binding.html:302
+msgctxt "binding.html:302"
+msgid "&nbsp;&nbsp;(case-lambda<br>"
+msgstr ""
+
+#: binding.html:304
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;[(n)&nbsp;(make-list&nbsp;n&nbsp;#f)]<br>"
+msgstr ""
+
+#: binding.html:306
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;[(n&nbsp;x)<br>"
+msgstr ""
+
+#: binding.html:308
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([n&nbsp;n&nbsp;(-&nbsp;"
+"n&nbsp;1)]&nbsp;[ls&nbsp;'()&nbsp;(cons&nbsp;x&nbsp;ls)])<br>"
+msgstr ""
+
+#: binding.html:314
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((zero?&nbsp;n)&nbsp;"
+"ls))]))</tt>\n"
+"</p><p>The <a name=\"./binding:s15\"></a><tt>substring</tt> procedure may be "
+"extended with <tt>case-lambda</tt> to\n"
+"accept either no <tt><i>end</i></tt> index, in which case it defaults to "
+"the\n"
+"end of the string, or no <tt><i>start</i></tt> and <tt><i>end</i></tt> "
+"indices, in which\n"
+"case <tt>substring</tt> is equivalent to <tt>string-copy</tt>:"
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((zero?&nbsp;n)&nbsp;"
+"ls))]))</tt>\n"
+"</p><p>Процедура <a name=\"./binding:s15\"></a><tt>substring</tt> может быть "
+"расширена с помощью\n"
+"<tt>case-lambda</tt>, чтобы принимать либо конечный(<tt><i>end</i></tt>) "
+"индекс, и в этом случае он по\n"
+"умолчению соответствует концу строки, или индексы начала(<tt><i>start</i></"
+"tt>) и конца(<tt><i>end</i></tt>),\n"
+"и в этом случае <tt>substring</tt> эквивалентна процедуре <tt>string-copy</"
+"tt>:"
+
+#: binding.html:316
+msgctxt "binding.html:316"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:318
+msgid "</p><p><tt>(define&nbsp;substring1<br>"
+msgstr ""
+
+#: binding.html:320
+msgctxt "binding.html:320"
+msgid "&nbsp;&nbsp;(case-lambda<br>"
+msgstr ""
+
+#: binding.html:322
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(s)&nbsp;(substring1&nbsp;s&nbsp;0&nbsp;(string-"
+"length&nbsp;s))]<br>"
+msgstr ""
+
+#: binding.html:324
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;start)&nbsp;(substring1&nbsp;s&nbsp;"
+"start&nbsp;(string-length&nbsp;s))]<br>"
+msgstr ""
+
+#: binding.html:328
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;start&nbsp;end)&nbsp;(substring&nbsp;s&nbsp;"
+"start&nbsp;end)]))</tt>\n"
+"</p><p>It is also possible to default the <tt><i>start</i></tt> index rather "
+"than\n"
+"the <tt><i>end</i></tt> index when only one index is supplied:"
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;start&nbsp;end)&nbsp;(substring&nbsp;s&nbsp;"
+"start&nbsp;end)]))</tt>\n"
+"</p><p>Так же можно указать индекс начала(<tt><i>start</i></tt>), а не "
+"конечный индекс(<tt><i>end</i></tt>),\n"
+"когда указывается только один индекс:"
+
+#: binding.html:330
+msgctxt "binding.html:330"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:332
+msgid "</p><p><tt>(define&nbsp;substring2<br>"
+msgstr ""
+
+#: binding.html:334
+msgctxt "binding.html:334"
+msgid "&nbsp;&nbsp;(case-lambda<br>"
+msgstr ""
+
+#: binding.html:336
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(s)&nbsp;(substring2&nbsp;s&nbsp;0&nbsp;(string-"
+"length&nbsp;s))]<br>"
+msgstr ""
+
+#: binding.html:338
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;end)&nbsp;(substring2&nbsp;s&nbsp;0&nbsp;"
+"end)]<br>"
+msgstr ""
+
+#: binding.html:343
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;start&nbsp;end)&nbsp;(substring&nbsp;s&nbsp;"
+"start&nbsp;end)]))</tt>\n"
+"</p><p>It is even possible to require that both or neither of the "
+"<tt><i>start</i></tt>\n"
+"and <tt><i>end</i></tt> indices be supplied, simply by leaving out the "
+"middle\n"
+"clause:"
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;start&nbsp;end)&nbsp;(substring&nbsp;s&nbsp;"
+"start&nbsp;end)]))</tt>\n"
+"</p><p>Можно даже потребовать, чтобы оба, или один как <tt><i>start</i></"
+"tt>\n"
+"так и <tt><i>end</i></tt> индексы были опущены, просто удалив среднее "
+"предложение:"
+
+#: binding.html:345
+msgctxt "binding.html:345"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:347
+msgid "</p><p><tt>(define&nbsp;substring3<br>"
+msgstr ""
+
+#: binding.html:349
+msgctxt "binding.html:349"
+msgid "&nbsp;&nbsp;(case-lambda<br>"
+msgstr ""
+
+#: binding.html:351
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(s)&nbsp;(substring3&nbsp;s&nbsp;0&nbsp;(string-"
+"length&nbsp;s))]<br>"
+msgstr ""
+
+#: binding.html:355
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;start&nbsp;end)&nbsp;(substring&nbsp;s&nbsp;"
+"start&nbsp;end)]))</tt>\n"
+"</p><p>\n"
+"</p><h3><a name=\"g92\"></a><a name=\"./binding:h4\"></a>Section 4.4. Local "
+"Binding<a name=\"SECTLOCALBINDING\"></a></h3>"
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;start&nbsp;end)&nbsp;(substring&nbsp;s&nbsp;"
+"start&nbsp;end)]))</tt>\n"
+"</p><p>\n"
+"</p><h3><a name=\"g92\"></a><a name=\"./binding:h4\"></a>Section 4.4. "
+"Локальное связывание(локальные переменные)<a name=\"SECTLOCALBINDING\"></a></"
+"h3>"
+
+#: binding.html:364
+msgid ""
+"<p>\n"
+"<a name=\"./binding:s16\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(let&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</"
+"sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>the values of the final body expression\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+msgstr ""
+"<p>\n"
+"<a name=\"./binding:s16\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(let&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</"
+"sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>значение последнего выражения тела let\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+
+#: binding.html:371
+msgid ""
+"</p><p><tt>let</tt> establishes <a name=\"./binding:s17\"></a>local variable "
+"bindings.\n"
+"Each variable <tt><i>var</i></tt> is bound to the value of the "
+"corresponding\n"
+"expression <tt><i>expr</i></tt>.\n"
+"The body of the <tt>let</tt>, in which the variables are bound, is\n"
+"the sequence of subforms <tt><i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</"
+"sub></i>&nbsp;...</tt> and is\n"
+"processed and evaluated like a <tt>lambda</tt> body."
+msgstr ""
+"</p><p><tt>let</tt> устанавливает <a name=\"./binding:s17\"></a>локальное "
+"связывание переменных.\n"
+"Каждая переменная <tt><i>var</i></tt> связывается со значением(образуется "
+"привязка) соответствующего\n"
+"выражения <tt><i>expr</i></tt>.\n"
+"Тело <tt>let</tt>, в котором связываются переменные, представляет собой "
+"последовательность подчиненных\n"
+"форм <tt><i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...</tt> "
+"и обрабатывается\n"
+"и вычисляется как тело <tt>lambda</tt>."
+
+#: binding.html:385
+msgid ""
+"</p><p>\n"
+"The forms <tt>let</tt>, <tt>let*</tt>, <tt>letrec</tt>, and <tt>letrec*</"
+"tt>\n"
+"(the others are described after <tt>let</tt>) are similar but serve\n"
+"slightly different purposes.\n"
+"With <tt>let</tt>, in contrast with <tt>let*</tt>, <tt>letrec</tt>, and "
+"<tt>letrec*</tt>,\n"
+"the expressions <tt><i>expr</i>&nbsp;...</tt> are all outside the scope of\n"
+"the variables <tt><i>var</i>&nbsp;...</tt>.\n"
+"Also, in contrast with <tt>let*</tt> and <tt>letrec*</tt>, no ordering is "
+"implied for the\n"
+"evaluation of the expressions <tt><i>expr</i>&nbsp;...</tt>.\n"
+"They may be evaluated from left to right, from right to left, or\n"
+"in any other order at the discretion of the implementation.\n"
+"Use <tt>let</tt> whenever the values are independent of the variables\n"
+"and the order of evaluation is unimportant."
+msgstr ""
+"</p><p>\n"
+"Формы <tt>let</tt>, <tt>let*</tt>, <tt>letrec</tt>, и <tt>letrec*</tt>\n"
+"(остальные описываются после <tt>let</tt>) аналогичны, но используются\n"
+"для разных целей.\n"
+"С <tt>let</tt>, в отличии от <tt>let*</tt>, <tt>letrec</tt>, и <tt>letrec*</"
+"tt>,\n"
+"выражения <tt><i>expr</i>&nbsp;...</tt> выходят за область действия "
+"переменных\n"
+"<tt><i>var</i>&nbsp;...</tt>.\n"
+"Кроме того, в отличии от <tt>let*</tt> и <tt>letrec*</tt>, нет определенного "
+"порядка\n"
+"для вычисления выражений <tt><i>expr</i>&nbsp;...</tt>.\n"
+"Они могут вычисляться слева на право, справа налево или в любом другом "
+"порядке\n"
+"по усмотрению реализации. Используйте <tt>let</tt> когда значения не зависят "
+"от\n"
+"переменных, а порядок вычисления не важен."
+
+#: binding.html:387
+msgctxt "binding.html:387"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:389
+msgid ""
+"</p><p><tt>(let&nbsp;([x&nbsp;(*&nbsp;3.0&nbsp;3.0)]&nbsp;[y&nbsp;"
+"(*&nbsp;4.0&nbsp;4.0)])<br>"
+msgstr ""
+
+#: binding.html:394
+msgid ""
+"&nbsp;&nbsp;(sqrt&nbsp;(+&nbsp;x&nbsp;y)))&nbsp;<img src=\"./binding_files/0."
+"gif\" alt=\"&lt;graphic&gt;\">&nbsp;5.0\n"
+"<br>\n"
+"<br>\n"
+"(let&nbsp;([x&nbsp;'a]&nbsp;[y&nbsp;'(b&nbsp;c)])<br>"
+msgstr ""
+
+#: binding.html:399
+msgid ""
+"&nbsp;&nbsp;(cons&nbsp;x&nbsp;y))&nbsp;<img src=\"./binding_files/0.gif\" "
+"alt=\"&lt;graphic&gt;\">&nbsp;(a&nbsp;b&nbsp;c)\n"
+"<br>\n"
+"<br>\n"
+"(let&nbsp;([x&nbsp;0]&nbsp;[y&nbsp;1])<br>"
+msgstr ""
+
+#: binding.html:401
+msgid "&nbsp;&nbsp;(let&nbsp;([x&nbsp;y]&nbsp;[y&nbsp;x])<br>"
+msgstr ""
+
+#: binding.html:405
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;x&nbsp;y)))&nbsp;<img src=\"./"
+"binding_files/0.gif\" alt=\"&lt;graphic&gt;\">&nbsp;(1&nbsp;0)</tt>\n"
+"</p><p>The following definition of <tt>let</tt> shows the\n"
+"typical derivation of <tt>let</tt> from <tt>lambda</tt>."
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;x&nbsp;y)))&nbsp;<img src=\"./"
+"binding_files/0.gif\" alt=\"&lt;graphic&gt;\">&nbsp;(1&nbsp;0)</tt>\n"
+"</p><p>Следующее определение <tt>let</tt> показывает типичный\n"
+"вывод <tt>let</tt> из <tt>lambda</tt>."
+
+#: binding.html:407
+msgctxt "binding.html:407"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:409
+msgid "</p><p><tt>(define-syntax&nbsp;let<br>"
+msgstr ""
+
+#: binding.html:411
+msgctxt "binding.html:411"
+msgid "&nbsp;&nbsp;(syntax-rules&nbsp;()<br>"
+msgstr ""
+
+#: binding.html:413
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((x&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;"
+"b2&nbsp;...)<br>"
+msgstr ""
+
+#: binding.html:418
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;"
+"b2&nbsp;...)&nbsp;e&nbsp;...)]))</tt>\n"
+"</p><p>Another form of <tt>let</tt>, <i>named</i> <tt>let</tt>, is described "
+"in\n"
+"Section&nbsp;<a href=\"control.html#g100\">5.4</a>, and a definition of the "
+"full\n"
+"<tt>let</tt> can be found on page&nbsp;<a href=\"syntax.html#defn:let\">312</"
+"a>."
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;"
+"b2&nbsp;...)&nbsp;e&nbsp;...)]))</tt>\n"
+"</p><p>Другая форма <tt>let</tt>, <i>Именованный</i> <tt>let</tt>, описана в "
+"разделе\n"
+"&nbsp;<a href=\"control.html#g100\">5.4</a>, а определение полного \n"
+"<tt>let</tt> можно найти на странице&nbsp;<a href=\"syntax.html#defn:let"
+"\">312</a>."
+
+#: binding.html:426
+msgid ""
+"</p><p>\n"
+"<a name=\"./binding:s18\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(let*&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</"
+"sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>the values of the final body expression\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+msgstr ""
+"</p><p>\n"
+"<a name=\"./binding:s18\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(let*&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</"
+"sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>значение последнего выражения тела\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+
+#: binding.html:434
+msgid ""
+"</p><p><tt>let*</tt> is similar to <tt>let</tt> except that the\n"
+"expressions <tt><i>expr</i>&nbsp;...</tt> are evaluated in sequence\n"
+"from left to right, and\n"
+"each of these expressions is within the scope of the variables to the\n"
+"left.\n"
+"Use <tt>let*</tt> when there is a linear dependency among the values or\n"
+"when the order of evaluation is important."
+msgstr ""
+"</p><p><tt>let*</tt> аналогично <tt>let</tt> исключаяя того что\n"
+"выражения <tt><i>expr</i>&nbsp;...</tt> вычисляются последовательно\n"
+"слева на право, и какждое из этих выражений находиться в области действия\n"
+"переменных слева.\n"
+"Используйте <tt>let*</tt> когда существует линейная зависимость между "
+"значениями\n"
+"или когда порядок вычисления важен."
+
+#: binding.html:436
+msgctxt "binding.html:436"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:438
+msgid "</p><p><tt>(let*&nbsp;([x&nbsp;(*&nbsp;5.0&nbsp;5.0)]<br>"
+msgstr ""
+
+#: binding.html:440
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[y&nbsp;(-&nbsp;x&nbsp;"
+"(*&nbsp;4.0&nbsp;4.0))])<br>"
+msgstr ""
+
+#: binding.html:445
+msgid ""
+"&nbsp;&nbsp;(sqrt&nbsp;y))&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;"
+"graphic&gt;\">&nbsp;3.0\n"
+"<br>\n"
+"<br>\n"
+"(let&nbsp;([x&nbsp;0]&nbsp;[y&nbsp;1])<br>"
+msgstr ""
+
+#: binding.html:447
+msgid "&nbsp;&nbsp;(let*&nbsp;([x&nbsp;y]&nbsp;[y&nbsp;x])<br>"
+msgstr ""
+
+#: binding.html:453
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;x&nbsp;y)))&nbsp;<img src=\"./"
+"binding_files/0.gif\" alt=\"&lt;graphic&gt;\">&nbsp;(1&nbsp;1)</tt>\n"
+"</p><p>Any <tt>let*</tt> expression may be converted to a set of\n"
+"<a name=\"./binding:s19\"></a>nested <tt>let</tt> expressions.\n"
+"The following definition of <tt>let*</tt> demonstrates\n"
+"the typical transformation."
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;x&nbsp;y)))&nbsp;<img src=\"./"
+"binding_files/0.gif\" alt=\"&lt;graphic&gt;\">&nbsp;(1&nbsp;1)</tt>\n"
+"</p><p>Любое <tt>let*</tt> выражение может быть преобразовано в набор\n"
+"<a name=\"./binding:s19\"></a>вложенных <tt>let</tt> выражений.\n"
+"Следующее определение  <tt>let*</tt> демонстриурет типичное\n"
+"преобразование."
+
+#: binding.html:455
+msgctxt "binding.html:455"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:457
+msgid "</p><p><tt>(define-syntax&nbsp;let*<a name=\"defn:let*\"></a><br>"
+msgstr ""
+
+#: binding.html:459
+msgctxt "binding.html:459"
+msgid "&nbsp;&nbsp;(syntax-rules&nbsp;()<br>"
+msgstr ""
+
+#: binding.html:461
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;()&nbsp;e1&nbsp;e2&nbsp;...)<br>"
+msgstr ""
+
+#: binding.html:463
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;()&nbsp;e1&nbsp;e2&nbsp;...)]<br>"
+msgstr ""
+
+#: binding.html:465
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((x1&nbsp;v1)&nbsp;(x2&nbsp;"
+"v2)&nbsp;...)&nbsp;e1&nbsp;e2&nbsp;...)<br>"
+msgstr ""
+
+#: binding.html:467
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;((x1&nbsp;v1))<br>"
+msgstr ""
+
+#: binding.html:474
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let*&nbsp;((x2&nbsp;"
+"v2)&nbsp;...)&nbsp;e1&nbsp;e2&nbsp;...))]))</tt>\n"
+"</p><p><a name=\"./binding:s20\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(letrec&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;"
+"<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>the values of the final body expression\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let*&nbsp;((x2&nbsp;"
+"v2)&nbsp;...)&nbsp;e1&nbsp;e2&nbsp;...))]))</tt>\n"
+"</p><p><a name=\"./binding:s20\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(letrec&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;"
+"<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b> значение последнего выражения тела\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+
+#: binding.html:480
+msgid ""
+"</p><p><tt>letrec</tt> is similar to <tt>let</tt> and <tt>let*</tt>, except\n"
+"that all of the expressions <tt><i>expr</i>&nbsp;...</tt>\n"
+"are within the scope of all of the variables <tt><i>var</i>&nbsp;...</tt>.\n"
+"<tt>letrec</tt> allows the definition of\n"
+"<a name=\"./binding:s21\"></a>mutually recursive procedures."
+msgstr ""
+"</p><p><tt>letrec</tt> аналогичен <tt>let</tt> и <tt>let*</tt>, за "
+"исключением\n"
+"того, что все выражения <tt><i>expr</i>&nbsp;...</tt>\n"
+"входят в область действия всех переменных <tt><i>var</i>&nbsp;...</tt>.\n"
+"<tt>letrec</tt> позволяет определять\n"
+"<a name=\"./binding:s21\"></a>взаимно-рекурсивные процедуры."
+
+#: binding.html:482
+msgctxt "binding.html:482"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:484
+msgid "</p><p><tt>(letrec&nbsp;([sum&nbsp;(lambda&nbsp;(x)<br>"
+msgstr ""
+
+#: binding.html:486
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+"&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(zero?&nbsp;x)<br>"
+msgstr ""
+
+#: binding.html:488
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>"
+msgstr ""
+
+#: binding.html:490
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;(sum&nbsp;(-"
+"&nbsp;x&nbsp;1)))))])<br>"
+msgstr ""
+
+#: binding.html:502
+msgid ""
+"&nbsp;&nbsp;(sum&nbsp;5))&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;"
+"graphic&gt;\">&nbsp;15</tt>\n"
+"</p><p>The order of evaluation of the expressions\n"
+"<tt><i>expr</i>&nbsp;...</tt> is unspecified, so a program must not\n"
+"evaluate a reference\n"
+"to any of the variables bound by the <tt>letrec</tt> expression before\n"
+"all of the values have been computed.\n"
+"(Occurrence of a variable within a <tt>lambda</tt> expression does\n"
+"not count as a reference, unless the resulting procedure is applied\n"
+"before all of the values have been computed.)\n"
+"If this restriction is violated, an exception with condition type\n"
+"<tt>&amp;assertion</tt> is raised."
+msgstr ""
+"&nbsp;&nbsp;(sum&nbsp;5))&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;"
+"graphic&gt;\">&nbsp;15</tt>\n"
+"</p><p>Порядок вычисления выражений\n"
+"<tt><i>expr</i>&nbsp;...</tt> не определен, поэтому программа не должна "
+"вычислять\n"
+"ссылку на любую из переменных, связанных выражением <tt>letrec</tt>, прежде "
+"чем\n"
+"все значения будут вычислены.\n"
+"(Возникновение переменной в <tt>lambda</tt> выражении не считается ссылкой,\n"
+"если только результирующая процедура не применяется до того, как будут\n"
+"вычислены все значения.)\n"
+"Если это ограничение нарушено, возникает исключение с условием типа\n"
+"<tt>&amp;assertion</tt>."
+
+#: binding.html:511
+msgid ""
+"</p><p>\n"
+"An <tt><i>expr</i></tt> should not return more than once.\n"
+"That is, it should not return both normally and via the invocation of a\n"
+"continuation obtained during its evaluation, and it should not return\n"
+"twice via two invocations of such a continuation.\n"
+"Implementations are not required to detect a violation of this restriction,\n"
+"but if they do, an exception with condition type <tt>&amp;assertion</tt> is\n"
+"raised."
+msgstr ""
+"</p><p>\n"
+"Выражение <tt><i>expr</i></tt> не должно возвращаться более одного раза.\n"
+"То есть, оно не должно возвращаться как нормально, так и посредством\n"
+"вызова продолжения, полученного во время его вычисления, и оно не должно\n"
+"возвращаться дважды через два вызова такого продолжения.\n"
+"От реализации не требуют определения нарушения данного ограничения, но\n"
+"если они это делают, возникает исключение с типом <tt>&amp;assertion</tt>."
+
+#: binding.html:518
+msgid ""
+"</p><p>\n"
+"Choose <tt>letrec</tt> over <tt>let</tt> or <tt>let*</tt> when there is a\n"
+"circular dependency among the variables and their values and\n"
+"when the order of evaluation is unimportant.\n"
+"Choose <tt>letrec*</tt> over <tt>letrec</tt> when there is a circular\n"
+"dependency and the bindings need to be evaluated from left to right."
+msgstr ""
+"</p><p>\n"
+"Выбирайте <tt>letrec</tt> прежде <tt>let</tt> или <tt>let*</tt> когда "
+"существует\n"
+"циклическая зависимость между переменными и их значениями, и когда\n"
+"порядок вычисления неважен.\n"
+"Выбирайте <tt>letrec*</tt> прежде <tt>letrec</tt> когда есть циклическая "
+"зависимость\n"
+"и привязки необходимо вычислять слева на право(когда важен порядок "
+"вычислений)."
+
+#: binding.html:521
+msgid ""
+"</p><p>\n"
+"A <tt>letrec</tt> expression of the form"
+msgstr ""
+"</p><p>\n"
+"Форма выражения <tt>letrec</tt>"
+
+#: binding.html:523
+msgctxt "binding.html:523"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:526
+msgid ""
+"</p><p><tt>(letrec&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;"
+"<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>\n"
+"</p><p>may be expressed in terms of <tt>let</tt> and <tt>set!</tt> as"
+msgstr ""
+"</p><p><tt>(letrec&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;"
+"<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>\n"
+"</p><p>может быть выражен в терминах <tt>let</tt> и <tt>set!</tt> в виде"
+
+#: binding.html:528
+msgctxt "binding.html:528"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:530
+msgctxt "binding.html:530"
+msgid "</p><p><tt>(let&nbsp;((<i>var</i>&nbsp;#f)&nbsp;...)<br>"
+msgstr ""
+
+#: binding.html:532
+msgid "&nbsp;&nbsp;(let&nbsp;((<i>temp</i>&nbsp;<i>expr</i>)&nbsp;...)<br>"
+msgstr ""
+
+#: binding.html:534
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;<i>var</i>&nbsp;<i>temp</i>)&nbsp;...<br>"
+msgstr ""
+
+#: binding.html:551
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;()&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)))</tt>\n"
+"</p><p>where <tt><i>temp</i>&nbsp;...</tt> are fresh variables, i.e., ones\n"
+"that do not already appear in the <tt>letrec</tt> expression,\n"
+"one for each <tt>(<i>var</i>&nbsp;<i>expr</i>)</tt> pair.\n"
+"The outer <tt>let</tt> expression establishes the variable bindings.\n"
+"The initial value given each variable is unimportant, so any value\n"
+"suffices in place of <tt>#f</tt>.\n"
+"The bindings are established first so that <tt><i>expr</i>&nbsp;...</tt>\n"
+"may contain\n"
+"occurrences of the variables, i.e., so that the expressions are computed\n"
+"within the scope of the variables.\n"
+"The middle <tt>let</tt> evaluates the values and binds them to the "
+"temporary\n"
+"variables, and the <tt>set!</tt> expressions assign each variable\n"
+"to the corresponding value.\n"
+"The inner <tt>let</tt> is present in case the body contains internal\n"
+"definitions."
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;()&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)))</tt>\n"
+"</p><p>где <tt><i>temp</i>&nbsp;...</tt> является новыми переменными, то "
+"есть теми, которые\n"
+"еще не появлялись в выражении  <tt>letrec</tt>,\n"
+"по одному для каждой пары <tt>(<i>var</i>&nbsp;<i>expr</i>)</tt>.\n"
+"Внешнее выражение <tt>let</tt> устанавливает привязки переменных.\n"
+"Начальное значение каждой переменной не имеет значения, поэтому можно "
+"использовать\n"
+"любое значение вместо <tt>#f</tt>.\n"
+"Связывание устнавливается сначала так, что <tt><i>expr</i>&nbsp;...</tt>\n"
+"может содержать вхождение переменных, т.е. чтобы выражения вычислялись\n"
+"в пределах области видимости переменных.\n"
+"Среднее <tt>let</tt> вычисляет значения и связывает их с временными "
+"переменными,\n"
+"и выражение <tt>set!</tt> присваивает какждой переменной соответствующее\n"
+"значение.\n"
+"Внутреннее <tt>let</tt> присутствует если тело содержит внутренние "
+"определения."
+
+#: binding.html:555
+msgid ""
+"</p><p>\n"
+"A definition of <tt>letrec</tt> that uses this transformation is shown\n"
+"on page&nbsp;<a href=\"syntax.html#defn:letrec\">310</a>."
+msgstr ""
+"</p><p>\n"
+"Определение <tt>letrec</tt> использующее это преобразование показано\n"
+"на странице&nbsp;<a href=\"syntax.html#defn:letrec\">310</a>."
+
+#: binding.html:563
+msgid ""
+"</p><p>\n"
+"This transformation does not enforce the restriction that\n"
+"the <tt><i>expr</i></tt> expressions must not evaluate any references of or\n"
+"assignments to the variables.\n"
+"More elaborate transformations that enforce this restriction and\n"
+"actually produce more efficient code are\n"
+"possible&nbsp;[<a class=\"citation\" href=\"bibliography.html#g249\">31</a>]."
+msgstr ""
+"</p><p>\n"
+"Это преобразование не приводит к ограничению того, что выражения\n"
+"<tt><i>expr</i></tt> не должны вычислять ссылки или присваивать\n"
+"переменные.\n"
+"Воможны более сложные преобразования, которые обеспечивают это\n"
+"ограничение и фактически создают более эффективный код\n"
+"&nbsp;[<a class=\"citation\" href=\"bibliography.html#g249\">31</a>]."
+
+#: binding.html:571
+msgid ""
+"</p><p>\n"
+"<a name=\"./binding:s22\"></a><a name=\"desc:letrec*\"></a>\n"
+"<span class=\"formdef\"><b>syntax</b>: <tt>(letrec*&nbsp;((<i>var</i>&nbsp;"
+"<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</"
+"sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>the values of the final body expression\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+msgstr ""
+"</p><p>\n"
+"<a name=\"./binding:s22\"></a><a name=\"desc:letrec*\"></a>\n"
+"<span class=\"formdef\"><b>syntax</b>: <tt>(letrec*&nbsp;((<i>var</i>&nbsp;"
+"<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</"
+"sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>значение последнего выражения тела\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+
+#: binding.html:578
+msgid ""
+"</p><p><tt>letrec*</tt> is similar to <tt>letrec</tt>, except that\n"
+"<tt>letrec*</tt> evaluates <tt><i>expr</i>&nbsp;...</tt> in sequence from "
+"left to right.\n"
+"While programs must still not evaluate a reference to any <tt><i>var</i></"
+"tt>\n"
+"before the corresponding <tt><i>expr</i></tt> has been evaluated, references "
+"to\n"
+"<tt><i>var</i></tt> may be evaluated any time thereafter, including during\n"
+"the evaluation of the <tt><i>expr</i></tt> of any subsequent binding."
+msgstr ""
+"</p><p><tt>letrec*</tt> аналогичен <tt>letrec</tt>, за исключением того, "
+"что\n"
+"<tt>letrec*</tt> вычисляет выражения <tt><i>expr</i>&nbsp;...</tt> "
+"последовательно\n"
+"слева на право.\n"
+"Хотя программы все равно не должны вычислять ссылки на любой <tt><i>var</i></"
+"tt>\n"
+"до того, как будет обработано соответствующее выражение <tt><i>expr</i></"
+"tt>, ссылки на\n"
+"<tt><i>var</i></tt> могут быть вычислены в любое время после этого, в том "
+"числе при\n"
+"вычислении <tt><i>expr</i></tt> любой последующей привязки."
+
+#: binding.html:581
+msgid ""
+"</p><p>\n"
+"A <tt>letrec*</tt> expression of the form"
+msgstr ""
+"</p><p>\n"
+"Выражение <tt>letrec*</tt> имеющее форму"
+
+#: binding.html:583
+msgctxt "binding.html:583"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:586
+msgid ""
+"</p><p><tt>(letrec*&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;"
+"<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>\n"
+"</p><p>may be expressed in terms of <tt>let</tt> and <tt>set!</tt> as"
+msgstr ""
+"</p><p><tt>(letrec*&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;"
+"<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>\n"
+"</p><p>может быть выражено в терминах <tt>let</tt> и <tt>set!</tt> как"
+
+#: binding.html:588
+msgctxt "binding.html:588"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:590
+msgctxt "binding.html:590"
+msgid "</p><p><tt>(let&nbsp;((<i>var</i>&nbsp;#f)&nbsp;...)<br>"
+msgstr ""
+
+#: binding.html:592
+msgid "&nbsp;&nbsp;(set!&nbsp;<i>var</i>&nbsp;<i>expr</i>)&nbsp;...<br>"
+msgstr ""
+
+#: binding.html:599
+msgid ""
+"&nbsp;&nbsp;(let&nbsp;()&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</"
+"sub></i>&nbsp;...))</tt>\n"
+"</p><p>The outer <tt>let</tt> expression creates the bindings, each "
+"assignment\n"
+"evaluates an expression and immediately sets the corresponding variable\n"
+"to its value, in sequence, and the inner let evaluates the body.\n"
+"<tt>let</tt> is used in the latter case rather than <tt>begin</tt>\n"
+"since the body may include internal definitions as well as expressions."
+msgstr ""
+"&nbsp;&nbsp;(let&nbsp;()&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</"
+"sub></i>&nbsp;...))</tt>\n"
+"</p><p>Внешнее выражение <tt>let</tt> создает привязки, каждое присваивание\n"
+"вычисляет выражение и сразу же устанавливает соответствующую переменную в "
+"свое \n"
+"значение, в указанной последовательности, а внутренний let вычисляет "
+"тело(body).\n"
+"<tt>let</tt> используемый в последнем случае лучше чем <tt>begin</tt>\n"
+"поскльку тело может включать внутренние определения, а также выражения."
+
+#: binding.html:601
+msgctxt "binding.html:601"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:603
+msgid "</p><p><tt>(letrec*&nbsp;([sum&nbsp;(lambda&nbsp;(x)<br>"
+msgstr ""
+
+#: binding.html:605
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(zero?&nbsp;x)<br>"
+msgstr ""
+
+#: binding.html:607
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>"
+msgstr ""
+
+#: binding.html:609
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;"
+"(sum&nbsp;(-&nbsp;x&nbsp;1)))))]<br>"
+msgstr ""
+
+#: binding.html:611
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[f&nbsp;"
+"(lambda&nbsp;()&nbsp;(cons&nbsp;n&nbsp;n-sum))]<br>"
+msgstr ""
+
+#: binding.html:613
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[n&nbsp;15]<br>"
+msgstr ""
+
+#: binding.html:615
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[n-sum&nbsp;"
+"(sum&nbsp;n)])<br>"
+msgstr ""
+
+#: binding.html:620
+msgid ""
+"&nbsp;&nbsp;(f))&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;"
+"graphic&gt;\">&nbsp;(15&nbsp;.&nbsp;120)\n"
+"<br>\n"
+"<br>\n"
+"(letrec*&nbsp;([f&nbsp;(lambda&nbsp;()&nbsp;(lambda&nbsp;()&nbsp;g))]<br>"
+msgstr ""
+
+#: binding.html:622
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[g&nbsp;(f)])<br>"
+msgstr ""
+
+#: binding.html:627
+msgid ""
+"&nbsp;&nbsp;(eq?&nbsp;(g)&nbsp;g))&nbsp;<img src=\"./binding_files/0.gif\" "
+"alt=\"&lt;graphic&gt;\">&nbsp;#t\n"
+"<br>\n"
+"<br>\n"
+"(letrec*&nbsp;([g&nbsp;(f)]<br>"
+msgstr ""
+
+#: binding.html:629
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[f&nbsp;"
+"(lambda&nbsp;()&nbsp;(lambda&nbsp;()&nbsp;g))])<br>"
+msgstr ""
+
+#: binding.html:633
+msgid ""
+"&nbsp;&nbsp;(eq?&nbsp;(g)&nbsp;g))&nbsp;<img src=\"./binding_files/0.gif\" "
+"alt=\"&lt;graphic&gt;\">&nbsp;<i>exception:&nbsp;attempt&nbsp;to&nbsp;"
+"reference&nbsp;undefined&nbsp;variable&nbsp;f</i></tt>\n"
+"</p><p>\n"
+"</p><h3><a name=\"g93\"></a><a name=\"./binding:h5\"></a>Section 4.5. "
+"Multiple Values<a name=\"SECTLETVALUES\"></a></h3>"
+msgstr ""
+"&nbsp;&nbsp;(eq?&nbsp;(g)&nbsp;g))&nbsp;<img src=\"./binding_files/0.gif\" "
+"alt=\"&lt;graphic&gt;\">&nbsp;<i>exception:&nbsp;attempt&nbsp;to&nbsp;"
+"reference&nbsp;undefined&nbsp;variable&nbsp;f</i></tt>\n"
+"</p><p>\n"
+"</p><h3><a name=\"g93\"></a><a name=\"./binding:h5\"></a>Section 4.5. "
+"Множественные значения<a name=\"SECTLETVALUES\"></a></h3>"
+
+#: binding.html:645
+msgid ""
+"<p>\n"
+"<a name=\"./binding:s23\"></a><a name=\"desc:let-values\"></a>\n"
+"<span class=\"formdef\"><b>syntax</b>: <tt>(let-values&nbsp;((<i>formals</"
+"i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<span class=\"formdef\"><b>syntax</b>: <tt>(let*-values&nbsp;((<i>formals</"
+"i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>the values of the final body expression\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+msgstr ""
+"<p>\n"
+"<a name=\"./binding:s23\"></a><a name=\"desc:let-values\"></a>\n"
+"<span class=\"formdef\"><b>syntax</b>: <tt>(let-values&nbsp;((<i>formals</"
+"i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<span class=\"formdef\"><b>syntax</b>: <tt>(let*-values&nbsp;((<i>formals</"
+"i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>значения последнего выражения\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+
+#: binding.html:658
+msgid ""
+"</p><p><tt>let-values</tt> is a convenient way to receive multiple\n"
+"values and bind them to variables.\n"
+"It is structured like <tt>let</tt> but permits an arbitrary\n"
+"formals list (like <tt>lambda</tt>) on each left-hand\n"
+"side.\n"
+"<tt>let*-values</tt> is similar but performs the bindings in\n"
+"left-to-right order, as with <tt>let*</tt>.\n"
+"An exception with condition type <tt>&amp;assertion</tt> is raised\n"
+"if the number of values returned by an <tt><i>expr</i></tt> is not "
+"appropriate\n"
+"for the corresponding <tt><i>formals</i></tt>, as described in the entry\n"
+"for <tt>lambda</tt> above.\n"
+"A definition of <tt>let-values</tt> is given on page&nbsp;<a href=\"syntax."
+"html#fullletvalues\">310</a>."
+msgstr ""
+"</p><p><tt>let-values</tt> удобный способ получить несколько\n"
+"значений и привязать их к переменным.\n"
+"Он структурирован как <tt>let</tt> но принимает произвольный\n"
+"формальный список (подобно <tt>lambda</tt>) на каждой левой\n"
+"стороне.\n"
+"<tt>let*-values</tt> работает аналогично, но выполняет привязки\n"
+"в порядке слева на право, как <tt>let*</tt>.\n"
+"Исключение типа <tt>&amp;assertion</tt> возникает, когда число\n"
+"значений возвращенных из <tt><i>expr</i></tt> не подходит\n"
+"для соответствующих <tt><i>formals</i></tt>, как описано выше \n"
+"для <tt>lambda</tt>.\n"
+"Определение <tt>let-values</tt> приведено на странице&nbsp;<a href=\"syntax."
+"html#fullletvalues\">310</a>."
+
+#: binding.html:660
+msgctxt "binding.html:660"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:662
+msgid ""
+"</p><p><tt>(let-values&nbsp;([(a&nbsp;b)&nbsp;(values&nbsp;1&nbsp;2)]&nbsp;"
+"[c&nbsp;(values&nbsp;1&nbsp;2&nbsp;3)])<br>"
+msgstr ""
+
+#: binding.html:667
+msgid ""
+"&nbsp;&nbsp;(list&nbsp;a&nbsp;b&nbsp;c))&nbsp;<img src=\"./binding_files/0."
+"gif\" alt=\"&lt;graphic&gt;\">&nbsp;(1&nbsp;2&nbsp;(1&nbsp;2&nbsp;3))\n"
+"<br>\n"
+"<br>\n"
+"(let*-values&nbsp;([(a&nbsp;b)&nbsp;(values&nbsp;1&nbsp;2)]&nbsp;[(a&nbsp;"
+"b)&nbsp;(values&nbsp;b&nbsp;a)])<br>"
+msgstr ""
+
+#: binding.html:671
+msgid ""
+"&nbsp;&nbsp;(list&nbsp;a&nbsp;b))&nbsp;<img src=\"./binding_files/0.gif\" "
+"alt=\"&lt;graphic&gt;\">&nbsp;(2&nbsp;1)</tt>\n"
+"</p><p>\n"
+"</p><h3><a name=\"g94\"></a><a name=\"./binding:h6\"></a>Section 4.6. "
+"Variable Definitions<a name=\"SECTDEFINITIONS\"></a></h3>"
+msgstr ""
+"&nbsp;&nbsp;(list&nbsp;a&nbsp;b))&nbsp;<img src=\"./binding_files/0.gif\" "
+"alt=\"&lt;graphic&gt;\">&nbsp;(2&nbsp;1)</tt>\n"
+"</p><p>\n"
+"</p><h3><a name=\"g94\"></a><a name=\"./binding:h6\"></a>Section 4.6. "
+"Определение Переменных<a name=\"SECTDEFINITIONS\"></a></h3>"
+
+#: binding.html:686
+msgid ""
+"<p>\n"
+"<a name=\"./binding:s24\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(define&nbsp;<i>var</i>&nbsp;<i>expr</i>)</tt></span>\n"
+"<br>\n"
+"<span class=\"formdef\"><b>syntax</b>: <tt>(define&nbsp;<i>var</i>)</tt></"
+"span>\n"
+"<br>\n"
+"<span class=\"formdef\"><b>syntax</b>: <tt>(define&nbsp;(<i>var<sub>0</sub></"
+"i>&nbsp;<i>var<sub>1</sub></i>&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<span class=\"formdef\"><b>syntax</b>: <tt>(define&nbsp;(<i>var<sub>0</sub></"
+"i>&nbsp;.&nbsp;<i>var<sub>r</sub></i>)&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<span class=\"formdef\"><b>syntax</b>: <tt>(define&nbsp;(<i>var<sub>0</sub></"
+"i>&nbsp;<i>var<sub>1</sub></i>&nbsp;<i>var<sub>2</sub></i>&nbsp;...&nbsp;."
+"&nbsp;<i>var<sub>r</sub></i>)&nbsp;<i>body<sub>1</sub></i>&nbsp;"
+"<i>body<sub>2</sub></i>&nbsp;...)</tt></span>\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+msgstr ""
+
+#: binding.html:696
+msgid ""
+"</p><p>In the first form, <tt>define</tt> creates a new binding of "
+"<tt><i>var</i></tt> to\n"
+"the value of <tt><i>expr</i></tt>.\n"
+"The <tt><i>expr</i></tt> should not return more than once.\n"
+"That is, it should not return both normally and via the invocation of a\n"
+"continuation obtained during its evaluation, and it should not return\n"
+"twice via two invocations of such a continuation.\n"
+"Implementations are not required to detect a violation of this restriction,\n"
+"but if they do, an exception with condition type <tt>&amp;assertion</tt> is\n"
+"raised."
+msgstr ""
+"</p><p>В первой форме, <tt>define</tt> создается новая связь(привязка) "
+"<tt><i>var</i></tt> с\n"
+"значением выражения <tt><i>expr</i></tt>.\n"
+"Выражение <tt><i>expr</i></tt> не должно возвращаться более одного раза.\n"
+"То есть, оно не должно возвращаться как нормально, так и посредством вызова\n"
+"продолжения, полученного во время его вычисления, и оно не должно "
+"возвращаться\n"
+"через два вызова такого продолжения.\n"
+"От реализации не требуется обнаружения нарушения этого ограничения, но если "
+"оно\n"
+"это делает, возникает исключение типа <tt>&amp;assertion</tt>."
+
+#: binding.html:704
+msgid ""
+"</p><p>\n"
+"The second form is equivalent to <tt>(define&nbsp;<i>var</i>&nbsp;"
+"<i>unspecified</i>)</tt>,\n"
+"where <tt><i>unspecified</i></tt> is some unspecified value.\n"
+"<a name=\"./binding:s25\"></a>The remaining are shorthand forms for\n"
+"binding variables to\n"
+"procedures; they are identical to the following definition in terms of\n"
+"<tt>lambda</tt>."
+msgstr ""
+"</p><p>\n"
+"Вторая форма эквивалентна <tt>(define&nbsp;<i>var</i>&nbsp;<i>unspecified</"
+"i>)</tt>,\n"
+"где <tt><i>unspecified</i></tt> некоторое неопределенное значение.\n"
+"<a name=\"./binding:s25\"></a>Остальные - это сокращенные формы для "
+"привязки\n"
+"переменных к процедурам; они идентичны следующему определению в терминах \n"
+"<tt>lambda</tt>."
+
+#: binding.html:706
+msgctxt "binding.html:706"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:708
+msgid "</p><p><tt>(define&nbsp;<i>var</i><br>"
+msgstr ""
+
+#: binding.html:710
+msgid "&nbsp;&nbsp;(lambda&nbsp;<i>formals</i><br>"
+msgstr ""
+
+#: binding.html:715
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></"
+"i>&nbsp;...))</tt>\n"
+"</p><p>where <tt><i>formals</i></tt> is <tt>(<i>var<sub>1</sub></"
+"i>&nbsp;...)</tt>, <tt><i>var<sub>r</sub></i></tt>,\n"
+"or <tt>(<i>var<sub>1</sub></i>&nbsp;<i>var<sub>2</sub></i>&nbsp;...&nbsp;."
+"&nbsp;<i>var<sub>r</sub></i>)</tt> for the third,\n"
+"fourth, and fifth <tt>define</tt> formats."
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></"
+"i>&nbsp;...))</tt>\n"
+"</p><p>где <tt><i>formals</i></tt> являются <tt>(<i>var<sub>1</sub></"
+"i>&nbsp;...)</tt>, <tt><i>var<sub>r</sub></i></tt>,\n"
+"или <tt>(<i>var<sub>1</sub></i>&nbsp;<i>var<sub>2</sub></i>&nbsp;...&nbsp;."
+"&nbsp;<i>var<sub>r</sub></i>)</tt> для\n"
+"третьего, четвертого и пятого форматов <tt>define</tt>."
+
+#: binding.html:724
+msgid ""
+"</p><p>\n"
+"Definitions may appear at the front of a <tt>library</tt> body, anywhere\n"
+"among the forms of a top-level-program body, and at the front of a\n"
+"<tt>lambda</tt> or <tt>case-lambda</tt> body or the body of any form\n"
+"derived from <tt>lambda</tt>, e.g., <tt>let</tt>, or <tt>letrec*</tt>.\n"
+"Any body that begins with a sequence of definitions is transformed\n"
+"during macro expansion into a <tt>letrec*</tt> expression as described\n"
+"on page&nbsp;<a href=\"syntax.html#body-expansion\">292</a>."
+msgstr ""
+"</p><p>\n"
+"Определения могут появляться в передней части тела библиотеки(<tt>library</"
+"tt>), где\n"
+"бы то нибыло среди форм тела программ верхнего уровня, а также вначале\n"
+"тела <tt>lambda</tt> или <tt>case-lambda</tt> или тела любой формы "
+"полученной из <tt>lambda</tt>,\n"
+"например, <tt>let</tt>, или <tt>letrec*</tt>.\n"
+"Любое тело, которое начинается с последовательности определений(define), "
+"трансформируется при расширении\n"
+"макросов в выражение <tt>letrec*</tt>, как описано на странице\n"
+"&nbsp;<a href=\"syntax.html#body-expansion\">292</a>."
+
+#: binding.html:728
+msgid ""
+"</p><p>\n"
+"Syntax definitions may appear along with variable definitions wherever\n"
+"variable definitions may appear; see Chapter&nbsp;<a href=\"syntax."
+"html#g133\">8</a>."
+msgstr ""
+"</p><p>\n"
+"Синтаксис определений может появлятьс вместе с определением переменных "
+"везде,\n"
+"где могут появляться определения переменных; см. главу &nbsp;<a href="
+"\"syntax.html#g133\">8</a>."
+
+#: binding.html:730
+msgctxt "binding.html:730"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:732
+msgid "</p><p><tt>(define&nbsp;x&nbsp;3)<br>"
+msgstr ""
+
+#: binding.html:737
+msgid ""
+"x&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;graphic&gt;\">&nbsp;3\n"
+"<br>\n"
+"<br>\n"
+"(define&nbsp;f<br>"
+msgstr ""
+
+#: binding.html:739
+msgid "&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>"
+msgstr ""
+
+#: binding.html:741
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;(+&nbsp;x&nbsp;y)&nbsp;2)))<br>"
+msgstr ""
+
+#: binding.html:746
+msgid ""
+"(f&nbsp;5&nbsp;4)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;"
+"graphic&gt;\">&nbsp;18\n"
+"<br>\n"
+"<br>\n"
+"(define&nbsp;(sum-of-squares&nbsp;x&nbsp;y)<br>"
+msgstr ""
+
+#: binding.html:748
+msgid "&nbsp;&nbsp;(+&nbsp;(*&nbsp;x&nbsp;x)&nbsp;(*&nbsp;y&nbsp;y)))<br>"
+msgstr ""
+
+#: binding.html:753
+msgid ""
+"(sum-of-squares&nbsp;3&nbsp;4)&nbsp;<img src=\"./binding_files/0.gif\" alt="
+"\"&lt;graphic&gt;\">&nbsp;25\n"
+"<br>\n"
+"<br>\n"
+"(define&nbsp;f<br>"
+msgstr ""
+
+#: binding.html:755
+msgctxt "binding.html:755"
+msgid "&nbsp;&nbsp;(lambda&nbsp;(x)<br>"
+msgstr ""
+
+#: binding.html:757
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;1)))<br>"
+msgstr ""
+
+#: binding.html:759
+msgid "(let&nbsp;([x&nbsp;2])<br>"
+msgstr ""
+
+#: binding.html:761
+msgid "&nbsp;&nbsp;(define&nbsp;f<br>"
+msgstr ""
+
+#: binding.html:763
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(y)<br>"
+msgstr ""
+
+#: binding.html:765
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;y&nbsp;x)))<br>"
+msgstr ""
+
+#: binding.html:767
+msgid ""
+"&nbsp;&nbsp;(f&nbsp;3))&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;"
+"graphic&gt;\">&nbsp;5<br>"
+msgstr ""
+
+#: binding.html:777
+msgid ""
+"(f&nbsp;3)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;graphic&gt;"
+"\">&nbsp;4</tt>\n"
+"</p><p>A set of definitions may be grouped by enclosing them in a\n"
+"<a name=\"./binding:s26\"></a><tt>begin</tt> form.\n"
+"Definitions grouped in this manner may appear wherever ordinary\n"
+"variable and syntax definitions may appear.\n"
+"They are treated as if written separately, i.e., without the\n"
+"enclosing <tt>begin</tt> form.\n"
+"<a name=\"multi-define-syntax\"></a>This feature allows syntactic extensions "
+"to\n"
+"expand into groups of definitions."
+msgstr ""
+"(f&nbsp;3)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;graphic&gt;"
+"\">&nbsp;4</tt>\n"
+"</p><p>Набор определений можно сгруппировать, заключив его в\n"
+"форму <a name=\"./binding:s26\"></a><tt>begin</tt>.\n"
+"Определения, сгруппированные таким образом, могут появляться везде, где "
+"могут\n"
+"появляться обычные определения переменных и синтаксиса.\n"
+"Они обрабатываются, как если бы они были написаны отдельно, т.е.\n"
+"без включения в форму <tt>begin</tt>.\n"
+"<a name=\"multi-define-syntax\"></a>Эта функция позволяет синтаксическим "
+"расширениям\n"
+"расширяться в группы определений."
+
+#: binding.html:779
+msgctxt "binding.html:779"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:781
+msgid "</p><p><tt>(define-syntax&nbsp;multi-define-syntax<br>"
+msgstr ""
+
+#: binding.html:783
+msgctxt "binding.html:783"
+msgid "&nbsp;&nbsp;(syntax-rules&nbsp;()<br>"
+msgstr ""
+
+#: binding.html:785
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(var&nbsp;expr)&nbsp;...)<br>"
+msgstr ""
+
+#: binding.html:787
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>"
+msgstr ""
+
+#: binding.html:789
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define-syntax&nbsp;var&nbsp;"
+"expr)<br>"
+msgstr ""
+
+#: binding.html:791
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...)]))<br>"
+msgstr ""
+
+#: binding.html:793
+msgid "(let&nbsp;()<br>"
+msgstr ""
+
+#: binding.html:795
+msgid "&nbsp;&nbsp;(define&nbsp;plus<br>"
+msgstr ""
+
+#: binding.html:797
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>"
+msgstr ""
+
+#: binding.html:799
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(zero?&nbsp;x)<br>"
+msgstr ""
+
+#: binding.html:801
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y<br>"
+msgstr ""
+
+#: binding.html:803
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+"(plus&nbsp;(sub1&nbsp;x)&nbsp;(add1&nbsp;y)))))<br>"
+msgstr ""
+
+#: binding.html:805
+msgid "&nbsp;&nbsp;(multi-define-syntax<br>"
+msgstr ""
+
+#: binding.html:807
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(add1&nbsp;(syntax-rules&nbsp;()&nbsp;[(_&nbsp;"
+"e)&nbsp;(+&nbsp;e&nbsp;1)]))<br>"
+msgstr ""
+
+#: binding.html:809
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(sub1&nbsp;(syntax-rules&nbsp;()&nbsp;[(_&nbsp;"
+"e)&nbsp;(-&nbsp;e&nbsp;1)])))<br>"
+msgstr ""
+
+#: binding.html:820
+msgid ""
+"&nbsp;&nbsp;(plus&nbsp;7&nbsp;8))&nbsp;<img src=\"./binding_files/0.gif\" "
+"alt=\"&lt;graphic&gt;\">&nbsp;15</tt>\n"
+"</p><p><a name=\"./binding:s27\"></a>Many implementations support an "
+"interactive \"top level\" in which variable\n"
+"and other definitions may be entered interactively or loaded from files.\n"
+"The behavior of these top-level definitions is outside the scope of the\n"
+"Revised<sup>6</sup> Report, but as long as top-level variables are defined "
+"before\n"
+"any references or assignments to them are evaluated, the behavior is\n"
+"consistent across most implementations.\n"
+"So, for example, the reference to <tt>g</tt> in the top-level definition\n"
+"of <tt>f</tt> below is okay if <tt><i>g</i></tt> is not already defined, and "
+"<tt>g</tt>\n"
+"is assumed to name a variable to be defined at some later point."
+msgstr ""
+"&nbsp;&nbsp;(plus&nbsp;7&nbsp;8))&nbsp;<img src=\"./binding_files/0.gif\" "
+"alt=\"&lt;graphic&gt;\">&nbsp;15</tt>\n"
+"</p><p><a name=\"./binding:s27\"></a>Многие реализации поддерживаю "
+"интерактивный \"верхний уровень\", в\n"
+"котором переменные и другие определения могут вводиться интерактивно или "
+"загружаться\n"
+"из файлов. Поведение этих определений верхнего уровня выходит за рамки\n"
+"Revised<sup>6</sup> Report, но до тех пор пока переменные верхнего уровня "
+"определяются до того\n"
+"как будут вычислены какие-либо ссылки на них или присваивания, поведение "
+"будет согласовано\n"
+"в большинстве реализаций.\n"
+"Так, например, ссылак на <tt>g</tt> в определении верхнего уровня <tt>f</tt> "
+"ниже это хорошо если\n"
+"<tt><i>g</i></tt> еще не определена, а <tt>g</tt>\n"
+"предполагается именовать переменную, которая будет определена в какой-то "
+"более поздней точке."
+
+#: binding.html:822
+msgctxt "binding.html:822"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:824
+msgctxt "binding.html:824"
+msgid "</p><p><tt>(define&nbsp;f<br>"
+msgstr ""
+
+#: binding.html:826
+msgctxt "binding.html:826"
+msgid "&nbsp;&nbsp;(lambda&nbsp;(x)<br>"
+msgstr ""
+
+#: binding.html:831
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(g&nbsp;x)))</tt>\n"
+"</p><p>If this is then followed by a definition of <tt>g</tt> before <tt>f</"
+"tt> is\n"
+"evaluated, the assumption that <tt>g</tt> would be defined as a variable is\n"
+"proven correct, and a call to <tt>f</tt> works as expected."
+msgstr ""
+"&nbsp;&nbsp;&nbsp;&nbsp;(g&nbsp;x)))</tt>\n"
+"</p><p>Если после этого следует определение <tt>g</tt>, до того как <tt>f</"
+"tt> \n"
+"будет вычислено, предположение о том, что <tt>g</tt> будет определено как "
+"переменная,\n"
+"будет проверено правильно, и вызов  <tt>f</tt> будет работать так как "
+"ожидалось."
+
+#: binding.html:833
+msgctxt "binding.html:833"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:835
+msgid "</p><p><tt>(define&nbsp;g<br>"
+msgstr ""
+
+#: binding.html:837
+msgctxt "binding.html:837"
+msgid "&nbsp;&nbsp;(lambda&nbsp;(x)<br>"
+msgstr ""
+
+#: binding.html:839
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;x)))<br>"
+msgstr ""
+
+#: binding.html:845
+msgid ""
+"(f&nbsp;3)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;graphic&gt;"
+"\">&nbsp;6</tt>\n"
+"</p><p>If <tt>g</tt> were defined instead as the keyword for a syntactic "
+"extension,\n"
+"the assumption that <tt>g</tt> would be bound as a variable is\n"
+"proven false, and if <tt>f</tt> is not redefined before it is invoked,\n"
+"the implementation is likely to raise an exception."
+msgstr ""
+"(f&nbsp;3)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;graphic&gt;"
+"\">&nbsp;6</tt>\n"
+"</p><p>Если <tt>g</tt> было определено вместо этого как ключевое слово для "
+"синтаксического\n"
+"расширения, предположение о том, что <tt>g</tt> является свяазнной "
+"переменной является ложным,\n"
+"и если <tt>f</tt> не будет переопределено до его вызова, реализация может \n"
+"вызвать исключение."
+
+#: binding.html:848
+msgctxt "binding.html:848"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:850
+msgid ""
+"</p><h3><a name=\"g95\"></a><a name=\"./binding:h7\"></a>Section 4.7. "
+"Assignment<a name=\"SECTASSIGNMENTS\"></a></h3>"
+msgstr ""
+"</p><h3><a name=\"g95\"></a><a name=\"./binding:h7\"></a>Section 4.7. "
+"Присваивание<a name=\"SECTASSIGNMENTS\"></a></h3>"
+
+#: binding.html:859
+msgid ""
+"<p>\n"
+"<a name=\"./binding:s28\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(set!&nbsp;<i>var</i>&nbsp;<i>expr</i>)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>unspecified\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+msgstr ""
+"<p>\n"
+"<a name=\"./binding:s28\"></a><span class=\"formdef\"><b>syntax</b>: "
+"<tt>(set!&nbsp;<i>var</i>&nbsp;<i>expr</i>)</tt></span>\n"
+"<br>\n"
+"<b>returns: </b>неопределено\n"
+"<br>\n"
+"<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>"
+
+#: binding.html:866
+msgid ""
+"</p><p><a name=\"./binding:s29\"></a><tt>set!</tt> does not establish a new "
+"binding for\n"
+"<tt><i>var</i></tt> but rather alters the value of an existing binding.\n"
+"<a name=\"./binding:s30\"></a>It first evaluates <tt><i>expr</i></tt>, then "
+"assigns\n"
+"<tt><i>var</i></tt> to the value of <tt><i>expr</i></tt>.\n"
+"Any subsequent reference to <tt><i>var</i></tt> within the scope of the "
+"altered\n"
+"binding evaluates to the new value."
+msgstr ""
+"</p><p><a name=\"./binding:s29\"></a><tt>set!</tt> не устанавливает новое "
+"связывание\n"
+"для <tt><i>var</i></tt>, а скорее изменяет значение существующего "
+"связывания.\n"
+"<a name=\"./binding:s30\"></a>Сначала он вычисляет <tt><i>expr</i></tt>, "
+"затем\n"
+"присваивает <tt><i>var</i></tt> значение вычисленного выражения <tt><i>expr</"
+"i></tt>.\n"
+"Любая последующая ссылка на <tt><i>var</i></tt> в пределах области действия\n"
+"связывания вычисляется с новым значением."
+
+#: binding.html:870
+msgid ""
+"</p><p>\n"
+"Assignments are not employed as frequently in Scheme as in most other\n"
+"languages, but they are useful for implementing state changes.<a name=\"./"
+"binding:s31\"></a>"
+msgstr ""
+"</p><p>\n"
+"Присваивания не так часто используются в Scheme как в большинстве других\n"
+"языков, но они полезны для реализации изменения состояния.<a name=\"./"
+"binding:s31\"></a>"
+
+#: binding.html:872
+msgctxt "binding.html:872"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:874
+msgid "</p><p><tt>(define&nbsp;flip-flop<br>"
+msgstr ""
+
+#: binding.html:876
+msgid "&nbsp;&nbsp;(let&nbsp;([state&nbsp;#f])<br>"
+msgstr ""
+
+#: binding.html:878
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>"
+msgstr ""
+
+#: binding.html:880
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;state&nbsp;(not&nbsp;"
+"state))<br>"
+msgstr ""
+
+#: binding.html:885
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state)))\n"
+"<br>\n"
+"<br>\n"
+"(flip-flop)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;graphic&gt;"
+"\">&nbsp;#t<br>"
+msgstr ""
+
+#: binding.html:887
+msgid ""
+"(flip-flop)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;graphic&gt;"
+"\">&nbsp;#f<br>"
+msgstr ""
+
+#: binding.html:896
+msgid ""
+"(flip-flop)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;graphic&gt;"
+"\">&nbsp;#t</tt>\n"
+"</p><p>Assignments are also useful for caching values.\n"
+"The example below uses a technique called <i>memoization</i>,\n"
+"in which a procedure records the values associated with old\n"
+"input values so it need not recompute them, to implement a fast\n"
+"version of the otherwise exponential doubly recursive definition\n"
+"of the <a name=\"./binding:s32\"></a>Fibonacci function (see\n"
+"page&nbsp;<a href=\"further.html#fibonacci\">69</a>).<a name=\"./binding:"
+"s33\"></a>"
+msgstr ""
+"(flip-flop)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;graphic&gt;"
+"\">&nbsp;#t</tt>\n"
+"</p><p>Присваивания также полезны для кеширования значений.\n"
+"В приведенном ниже примере используется метод называемый <i>memoization</"
+"i>,\n"
+"в котором процедура записывает значения, связанные со старыми входными "
+"значениями,\n"
+"поэтому не нужно их перевычислять, чтобы реализовать быструю версию, "
+"отличную \n"
+"от экспотенциального двухрекурсивного определения\n"
+"функции <a name=\"./binding:s32\"></a>Фибоначчи (см\n"
+"страницу&nbsp;<a href=\"further.html#fibonacci\">69</a>).<a name=\"./binding:"
+"s33\"></a>"
+
+#: binding.html:898
+msgctxt "binding.html:898"
+msgid "</p><p>"
+msgstr ""
+
+#: binding.html:900
+msgid "</p><p><tt>(define&nbsp;memoize<br>"
+msgstr ""
+
+#: binding.html:902
+msgid "&nbsp;&nbsp;(lambda&nbsp;(proc)<br>"
+msgstr ""
+
+#: binding.html:904
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([cache&nbsp;'()])<br>"
+msgstr ""
+
+#: binding.html:906
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>"
+msgstr ""
+
+#: binding.html:908
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>"
+msgstr ""
+
+#: binding.html:910
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(assq&nbsp;"
+"x&nbsp;cache)&nbsp;=&gt;&nbsp;cdr]<br>"
+msgstr ""
+
+#: binding.html:912
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else<br>"
+msgstr ""
+
+#: binding.html:914
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;"
+"([ans&nbsp;(proc&nbsp;x)])<br>"
+msgstr ""
+
+#: binding.html:916
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+"&nbsp;(set!&nbsp;cache&nbsp;(cons&nbsp;(cons&nbsp;x&nbsp;ans)&nbsp;"
+"cache))<br>"
+msgstr ""
+
+#: binding.html:921
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+"&nbsp;ans)])))))\n"
+"<br>\n"
+"<br>\n"
+"(define&nbsp;fibonacci<br>"
+msgstr ""
+
+#: binding.html:923
+msgid "&nbsp;&nbsp;(memoize<br>"
+msgstr ""
+
+#: binding.html:925
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(n)<br>"
+msgstr ""
+
+#: binding.html:927
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(&lt;&nbsp;n&nbsp;2)<br>"
+msgstr ""
+
+#: binding.html:929
+msgid "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1<br>"
+msgstr ""
+
+#: binding.html:935
+msgid ""
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;"
+"(fibonacci&nbsp;(-&nbsp;n&nbsp;1))&nbsp;(fibonacci&nbsp;(-&nbsp;"
+"n&nbsp;2)))))))\n"
+"<br>\n"
+"<br>\n"
+"(fibonacci&nbsp;100)&nbsp;<img src=\"./binding_files/0.gif\" alt=\"&lt;"
+"graphic&gt;\">&nbsp;573147844013817084101</tt>\n"
+"</p><p>"
+msgstr ""
+
+#: binding.html:947
+msgid ""
+"</p><hr class=\"copyright\" align=\"left\">\n"
+"<p>\n"
+"R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</"
+"it><br>\n"
+"Copyright © 2009 <a class=\"plain\" href=\"http://mitpress.mit.edu/catalog/"
+"item/default.asp?ttype=2&amp;tid=11984\">The MIT Press</a>.  Electronically "
+"reproduced by permission.<br>\n"
+"Illustrations © 2009 <a class=\"plain\" href=\"http://hebert.kitp.ucsb.edu/"
+"\">Jean-Pierre Hébert</a><br>\n"
+"ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>\n"
+"<a class=\"plain\" href=\"http://mitpress.mit.edu/catalog/item/default.asp?"
+"ttype=2&amp;tid=11984\">to order this book</a> / <a class=\"plain\" href="
+"\"canned/about.html\">about this book</a>\n"
+"</p>\n"
+"<p><a class=\"plain\" href=\"http://www.scheme.com/\">http://www.scheme.com</"
+"a></p>"
+msgstr ""
+
+#: binding.html:949
+msgid "</body></html>"
+msgstr ""

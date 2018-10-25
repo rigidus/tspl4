@@ -1,0 +1,2035 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0040)io.html#./io:h0 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<title>Ввод и Вывод</title>
+<link href="./io_files/tspl.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a name="g121"></a>
+<a name="./io:h0"></a>
+
+<div >
+<img  src="./io_files/ch7.png">
+</div>
+<h1>Chapter 7. Ввод и Вывод<a name="CHPTIO"></a></h1>
+
+<p>
+<a name="./io:s0"></a><a name="./io:s1"></a><a name="./io:s2"></a>Все операции ввода и 
+вывода выполняются через порты(<i>ports</i>).
+Порт(port) это указатель на (возможно бесконечный) поток данных
+(часто это <a name="./io:s3"></a>файл), открывая который программы могут получать
+байты или знаки из потока или размещать байты или знаки в поток.
+Порт может быть входным портом, выходным портом или обоими одновременно.
+
+</p><p>
+Порты являются объектами первого класса, как и любой другой объект
+в Scheme.
+Подобно процедурам, порты не имеют печатного представления, такого 
+как у строк и чисел.
+Изначально доступны три порта: текущий входной порт,
+текущий выходной порт и текущий порт ошибок, которые представляют собой
+текстовые порты, подключенные к стандартному входу процесса, стандартному
+выходу, и стандартному потоку ошибок.
+Предусмотрено несколько способов открытия новых портов.
+
+</p><p>
+Входной порт часто указывает на конечный поток, например, входной
+файл хранящийся на диске.
+Если одну из входных операций, например <tt>get-u8</tt>, <tt>get-char</tt>, или
+<tt>get-datum</tt>, просят прочитать из порта который достиг конца
+конечного потока, она возвращает специальный объект <a name="./io:s4"></a><i>eof</i>
+(конец файла) <i>object</i>.
+Предикат <a name="./io:s5"></a><tt>eof-object?</tt> может использоваться
+для определения того, является ли значение, возвращаемое из
+операции ввода, объектом eof.
+
+</p><p>
+<a name="./io:s6"></a><a name="./io:s7"></a><a name="./io:s8"></a>Порты бывают
+либо двоичными(<i>binary</i>), либо текстовыми(<i>textual</i>).
+Двоичный порт позволяет программе читать и записывать 8-битные беззнаковые
+байты или "октеты" из или в базовый поток.
+Текстовый порт позволяет программе читать или писать символьные знаки.
+
+</p><p>
+<a name="./io:s9"></a><a name="./io:s10"></a><a name="./io:s11"></a><a name="./io:s12"></a><a name="./io:s13"></a>Во многих случаях, базовый поток организован как
+последовательность байтов, но эти байты следует рассматривать как
+закодированные знаки.
+В этом случае текстовый порт может быть создан с перекодировщиком(<i>transcoder</i>)
+для декодирования байтов в знаки(для ввода) или для кодирования знаков в
+байты(для вывода).
+Перекодировщик(transcoder) инкапсулирует кодировку(<i>codec</i>), которая определяет
+как знаки представляются в виде байтов.
+Предусмотрены три стандартных кодировки: a <i>latin-1</i> кодировка, Юникод
+<i>utf-8</i> кодировка, и Юникод <i>utf-16</i> кодировка.
+Для кодировки <i>latin-1</i>, каждый знак представлен ровно одним байтом.
+Для кодировки <i>utf-8</i>, каждый знак представлен от одного до четырех
+байтов, а для <i>utf-16</i>, каждый знак представлен двумя или четырьмя
+байтами.
+
+</p><p>
+<a name="./io:s14"></a>Перекодировщик также инкапсулирует стиль окончания строки(<i>eol style</i>),
+который определяет, распознаются ли каким образом окончания строк.
+Если eol style отсутствует (т.е <tt>none</tt>), окончания строк не распознаются.
+Шесть других стандартных стилей eol следующие:
+
+</p><p>
+</p><table><tbody><tr><td nowrap="" align="left">
+<tt>lf</tt>: </td><td nowrap="" align="left"> знак перевода строки</td></tr><tr><td nowrap="" align="left">
+<tt>cr</tt>: </td><td nowrap="" align="left"> знак возврата каретки</td></tr><tr><td nowrap="" align="left">
+<tt>nel</tt>: </td><td nowrap="" align="left"> Юникод знак следующей строки</td></tr><tr><td nowrap="" align="left">
+<tt>ls</tt>: </td><td nowrap="" align="left">  Юникод знак разделителя строк</td></tr><tr><td nowrap="" align="left">
+<tt>crlf</tt>: </td><td nowrap="" align="left"> возврат каретки, за которым следует перевод строки, и</td></tr><tr><td nowrap="" align="left">
+<tt>crnel</tt>: </td><td nowrap="" align="left"> возврат каретки, сопровождаемый знаком следующая строка.
+</td></tr></tbody></table>
+
+<p>
+eol style влияет на операции ввода и вывода по разному.
+Для ввода, любой eol style, за исключением <tt>none</tt> приводит к 
+преобразованию каждого из знаковов окончания строки или двухсимвольных
+последовательностей в один знак перевода строки.
+Для вывода, любой eol style, за исключением <tt>none</tt> приводит к
+преобразованию знаков перевода строки в конкретную одно или двухсимвольную
+последовательность, связанную с eol style.
+При вводе, все eol style за исключением <tt>none</tt> эквивалентны,
+в то время как в направлении вывода,  эквивалентны eol style
+<tt>none</tt> и <tt>lf</tt>.
+
+</p><p>
+<a name="./io:s15"></a>В дополнении к кодировке и стилю завершения линии(eol style), перекодировщик
+содержит еще одну часть информации; режим обработки ошибок(<i>error-handling mode</i>) который определяет,
+что происходит если возникает ошибка декодирования или кодирования, т.е. если последовательность
+байтов не может быть конвертирована в знак инкапсулируемой кодировки при вводе или знак не может
+быть преобразован в последовательность байтов с помощью инкапсулируемой кодировки при выводе.
+Режимы обработки ошибок следующие: <tt>ignore</tt>, <tt>raise</tt>, или
+<tt>replace</tt>.
+Если режим обработки ошибок <tt>ignore</tt>, неправильная последовательность байтов или
+знак игнорируются.
+Если режим обработки ошибок <tt>raise</tt>, возникает исключение с условием типа
+ <tt>i/o-decoding</tt> или <tt>i/o-encoding</tt>; при вводе порт указатель ввода передвигается
+за последовательность байтов. 
+Если режим обработки ошибок <tt>replace</tt>, создается заменяющий знак или
+знак кодировки: в направлении ввода, замещающий знак равен U+FFFD, в то время
+как в направлении вывода замена является знаком кодировки U+FFFD для <tt>utf-8</tt> 
+и <tt>utf-16</tt> или кодируется знаком вопроса (&nbsp;?&nbsp;) для кодировки
+<tt>latin-1</tt>.
+
+</p><p>
+<a name="./io:s16"></a><a name="./io:s17"></a><a name="./io:s18"></a>Порт может быть буферизирован для повышания
+эффективности, чтобы устранить накладные расходы на вызов операционной системы для каждого байта или
+знака.
+Поддерживаются три стандартных режима буферизации: <i>block</i>, <i>line</i>,
+и <i>none</i>.
+При буферизации в режиме block, ввод берется из потока и вывод отправляется в поток в
+кусках(chunks) определенного размера зависящего от реализации.
+При буферизации в режиме line, буферизация выполняется от линии к линии или
+на другом, зависящем от реализации принципе.
+Буферизация строк обычно отличается от блочной буферизации только для текстовых
+выходных портов; в двоичных портах нет делений на линии, и ввод,
+скорее всего будет сделан из потока по мере его появления.
+В режиме буферизации none, буферизация не выполняется, поэтому вывод немедленно
+отправляется в поток, и ввод отображается только по мере необходимости.
+
+</p><p>
+В оставшейся части этой главы рассматриваются операции над перекодировщиками,
+файловыми портами, стандартными портами, строковыми и байтовыми портами,
+общими операциями с портом, операциями ввода, операциями вывода,
+удобным(convenience) I/O, операциями с файловой системой, и преобразованием
+межды байтовыми векторами и строками.
+
+</p><p>
+
+</p><h3><a name="g122"></a><a name="./io:h1"></a>Section 7.1. Перекодировщики<a name="SECTTRANSCODERS"></a></h3>
+
+<p>
+Как описано выше, перекодировщики инкапсулируют три значения: кодек,
+стиль окончания строки(eol style), и режим обработки ошибок.
+В этом разделе описываются процедуры, которые создают или работают
+с перекодировщиками и значениями инкапсулируемыми перекодировщиками.
+
+</p><p>
+<a name="./io:s19"></a><span class="formdef"><b>procedure</b>: <tt>(make-transcoder&nbsp;<i>codec</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-transcoder&nbsp;<i>codec</i>&nbsp;<i>eol-style</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-transcoder&nbsp;<i>codec</i>&nbsp;<i>eol-style</i>&nbsp;<i>error-handling-mode</i>)</tt></span>
+<br>
+<b>returns: </b> перекодировщик содержащий <tt><i>codec</i></tt>, <tt><i>eol-style</i></tt>, и <tt><i>error-handling-mode</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>eol-style</i></tt> должен быть корректным eol-style символом
+(<tt>lf</tt>, <tt>cr</tt>, <tt>nel</tt>, <tt>ls</tt>, <tt>crlf</tt>,
+<tt>crnel</tt>, или <tt>none</tt>); по умолчанию он равен родному
+eol-style для установленной платформы
+<tt><i>error-handling-mode</i></tt> должен быть корректным символом
+режима обработки ошибок (<tt>ignore</tt>, <tt>raise</tt>, or <tt>replace</tt>)
+и по умолчанию устанавливается в <tt>replace</tt>.
+
+</p><p>
+<a name="./io:s20"></a><span class="formdef"><b>procedure</b>: <tt>(transcoder-codec&nbsp;<i>transcoder</i>)</tt></span>
+<br>
+<b>returns: </b>кодек содержащийся в перекодировщике <tt><i>transcoder</i></tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(transcoder-eol-style&nbsp;<i>transcoder</i>)</tt></span>
+<br>
+<b>returns: </b>символ eol-style содержащийся в <tt><i>transcoder</i></tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(transcoder-error-handling-mode&nbsp;<i>transcoder</i>)</tt></span>
+<br>
+<b>returns: </b> символ режима обработки ошибок содержащийся в <tt><i>transcoder</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./io:s21"></a><span class="formdef"><b>procedure</b>: <tt>(native-transcoder)</tt></span>
+<br>
+<b>returns: </b>родной перекодировщик
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Родной перекодировщик зависит от реализации и может варьироваться
+в зависимости от платформы или локали.
+
+</p><p>
+<a name="./io:s22"></a><span class="formdef"><b>procedure</b>: <tt>(latin-1-codec)</tt></span>
+<br>
+<b>returns: </b>кодек для кодировки символьных знаков ISO 8859-1 (Latin 1)
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(utf-8-codec)</tt></span>
+<br>
+<b>returns: </b>кодек для кодировки символьных знаков Unicode UTF-8
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(utf-16-codec)</tt></span>
+<br>
+<b>returns: </b>кодек для кодировки символьных знаков Unicode UTF-16
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./io:s23"></a><span class="formdef"><b>syntax</b>: <tt>(eol-style&nbsp;<i>symbol</i>)</tt></span>
+<br>
+<b>returns: </b><tt><i>символ(symbol)</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>symbol</i></tt> должен быть одним из символов <tt>lf</tt>, <tt>cr</tt>, <tt>nel</tt>,
+<tt>ls</tt>, <tt>crlf</tt>, <tt>crnel</tt>, или <tt>none</tt>.
+Выражение <tt>(eol-style&nbsp;<i>symbol</i>)</tt> эквивалентно
+выражению <tt>(quote&nbsp;<i>symbol</i>)</tt> за исключением формы проверки во время
+расширения, что  <tt><i>symbol</i></tt> является одним из символов eol-style.
+Синтаксис <tt>eol-style</tt> также предоставляет полезную документацию.
+
+</p><p>
+
+</p><p><tt>(eol-style&nbsp;crlf)&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;crlf<br>
+
+(eol-style&nbsp;lfcr)&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>syntax&nbsp;violation</i></tt>
+</p><p><a name="./io:s24"></a><span class="formdef"><b>procedure</b>: <tt>(native-eol-style)</tt></span>
+<br>
+<b>returns: </b> родной стиль завершения стороки(eol style)
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Родной стиль завершения строки(eol style) зависит от реализации и может варьироваться
+в зависимости от платформы или локали.
+
+</p><p>
+<a name="./io:s25"></a><span class="formdef"><b>syntax</b>: <tt>(error-handling-mode&nbsp;<i>symbol</i>)</tt></span>
+<br>
+<b>returns: </b> символ(<tt><i>symbol</i></tt>)
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>symbol</i></tt> должен быть одним из символов <tt>ignore</tt>, <tt>raise</tt>
+или <tt>replace</tt>.
+Выражение <tt>(error-handling-mode&nbsp;<i>symbol</i>)</tt> эквивалентно выражению
+ <tt>(quote&nbsp;<i>symbol</i>)</tt> за исключением формы проверок во время
+расширения, что <tt><i>symbol</i></tt> является одним из символов режима обработки ошибок.
+Синтаксис <tt>error-handling-mode</tt> также предоставляет полезную документацию.
+
+</p><p>
+
+</p><p><tt>(error-handling-mode&nbsp;replace)&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;replace<br>
+
+(error-handling-mode&nbsp;relpace)&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>syntax&nbsp;violation</i></tt>
+</p><p>
+</p><h3><a name="g123"></a><a name="./io:h2"></a>Section 7.2. Открытие Файлов<a name="SECTOPENINGFILES"></a></h3>
+
+<p>
+Процеудры из данного раздела используются для открытия файловых портов.
+Процедуры открытия других видов портов, например, строковых портов или 
+пользовательских портов, описаны в последующих подразделах.
+
+</p><p>
+Каждая из операций открытия файла принимает аргумент путь(<tt><i>path</i></tt>),
+который определяет имя файла, который нужно открыть.
+Это должна быть строка или другое значени зависящее от реализации,
+которое является именем файла.
+
+</p><p>
+Некоторые процедуры открытия файла принимают необязательные параметры(<tt><i>options</i></tt>),
+<tt><i>b-mode</i></tt>, и <tt><i>?transcoder</i></tt>.
+<tt><i>options</i></tt> должны быть набором перечислений из символов составляющим допустимые
+фаайловые опции определенные в Опциях файлов(<tt>file-options</tt>) ниже,
+и по умолчанию значение <tt>(file-options)</tt>.
+<tt><i>b-mode</i></tt> должен быть допустимым режимом буферизации( <tt>buffer-mode</tt>),
+описанным в ниже и по умолчанию равным <tt>block</tt>.
+<tt><i>?transcoder</i></tt> должен быть перекодировщиком или <tt>#f</tt>; если это
+перекодировщик, операция open возвращает перекодированный порт для базового
+двоичного файла, а если он(перекодировщик) <tt>#f</tt> (по умолчанию), 
+операция открытия(open) возвращает двоичный порт.
+
+</p><p>
+Бинарные порты созданные процедурами в этом разделе, поддерживают
+операции <tt>port-position</tt> и <tt>set-port-position!</tt>.
+Будут ли текстовые порты, созданные процедурами в этом разделе, 
+поддерживать эти операции, зависит от реализации.
+
+</p><p>
+<a name="./io:s26"></a><span class="formdef"><b>syntax</b>: <tt>(file-options&nbsp;<i>symbol</i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>набор перечислений файловых опций
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Набор перечислений файловых опций может быть передан в операции
+открытия файла для управления аспектами операции открытия.
+Существуют три стандартных файловых опции: <tt>no-create</tt>, <tt>no-fail</tt>,
+и <tt>no-truncate</tt>, которые влияют только на операции открытия файла,
+которые создают порт вывода(включая ввод/вывод).
+
+</p><p>
+Если параметры файла по умолчанию, т.е. значения  <tt>(file-options)</tt>,
+когда программа пытается открыть файл для вывода, возникает исключение
+с типом условия <tt>i/o-file-already-exists</tt> если файл уже существует,
+и файл создается если он еще не существует.
+Если включен параметр <tt>no-fail</tt>, исключение не возникает, если
+файл уже существует; вместо этого файл открывается и усекается до нулевой
+длины.
+Если включен параметр <tt>no-create</tt>, файл не создается, если
+он не существует; вместо этого, возникает исключение с типом условия
+<tt>i/o-file-does-not-exist</tt>.
+Опция <tt>no-create</tt> подразумевает опцию <tt>no-fail</tt>.
+Опция <tt>no-truncate</tt> имеет значение только в том случае, если опция
+<tt>no-fail</tt> включена или подразумевается, и в этом случае, если
+существующий файл открыт, он не усекается, но позиция порта по прежнему
+устанавливается в начало файла.
+
+</p><p>
+Возможно, проще представить, что параметры файла по умолчанию - это
+мнимые опции символов <tt>create</tt>, <tt>fail-if-exists</tt>, и
+<tt>truncate</tt>; <tt>no-create</tt> удаляет
+<tt>create</tt>, <tt>no-fail</tt> удаляет <tt>fail-if-exists</tt>, и
+<tt>no-truncate</tt> удаляет <tt>truncate</tt>.
+
+</p><p>
+Реализации могут поддерживать дополнительные символы файловых опций.
+Chez&nbsp;Scheme, например, поддерживает опции которые контролируют
+должен ли это быть обычный файл или сжатый, блокировать ли его для эксклюзивного доступа
+и какие разрешения доступны файлу если он создается
+&nbsp;[<a class="citation" href="bibliography.html#g227">9</a>].
+
+</p><p>
+<a name="./io:s27"></a><span class="formdef"><b>syntax</b>: <tt>(buffer-mode&nbsp;<i>symbol</i>)</tt></span>
+<br>
+<b>returns: </b><tt><i>symbol</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>symbol</i></tt> должен быть одним из символов <tt>block</tt>, <tt>line</tt>, или
+<tt>none</tt>.
+Выражение <tt>(buffer-mode&nbsp;<i>symbol</i>)</tt> эквивалентно
+выражению <tt>(quote&nbsp;<i>symbol</i>)</tt> за исключением того, что первое
+проверяет во время расширения, что <tt><i>symbol</i></tt> является одним из
+символов управляющих буферизацией.
+Синтаксис <tt>buffer-mode</tt> также предоставляет полезную документацию.
+
+</p><p>
+
+</p><p><tt>(buffer-mode&nbsp;block)&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;block<br>
+
+(buffer-mode&nbsp;cushion)&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>syntax&nbsp;violation</i></tt>
+</p><p><a name="./io:s28"></a><span class="formdef"><b>syntax</b>: <tt>(buffer-mode?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> допустимый буферный режим, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+</p><p><tt>(buffer-mode?&nbsp;'block)&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(buffer-mode?&nbsp;'line)&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(buffer-mode?&nbsp;'none)&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(buffer-mode?&nbsp;'something-else)&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f</tt>
+</p><p><a name="./io:s29"></a><span class="formdef"><b>procedure</b>: <tt>(open-file-input-port&nbsp;<i>path</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(open-file-input-port&nbsp;<i>path</i>&nbsp;<i>options</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(open-file-input-port&nbsp;<i>path</i>&nbsp;<i>options</i>&nbsp;<i>b-mode</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(open-file-input-port&nbsp;<i>path</i>&nbsp;<i>options</i>&nbsp;<i>b-mode</i>&nbsp;<i>?transcoder</i>)</tt></span>
+<br>
+<b>returns: </b>новый порт ввода для  именованного файла
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если присутствует <tt><i>?transcoder</i></tt>, а не  <tt>#f</tt>, он должен быть
+перекодировщиком, и эта процедура вернет текстовый порт ввода, перекодировщиком
+которого является перекодировщик <tt><i>?transcoder</i></tt>.
+В противном случае, эта процедура возвращает бинарный порт ввода.
+См. руководство к этому разделу для описания ограничений и эффектов других
+аргументов.
+
+</p><p>
+<a name="./io:s30"></a><span class="formdef"><b>procedure</b>: <tt>(open-file-output-port&nbsp;<i>path</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(open-file-output-port&nbsp;<i>path</i>&nbsp;<i>options</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(open-file-output-port&nbsp;<i>path</i>&nbsp;<i>options</i>&nbsp;<i>b-mode</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(open-file-output-port&nbsp;<i>path</i>&nbsp;<i>options</i>&nbsp;<i>b-mode</i>&nbsp;<i>?transcoder</i>)</tt></span>
+<br>
+<b>returns: </b>новый порт вывода для именованного файла.
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если присутствует <tt><i>?transcoder</i></tt>, а не  <tt>#f</tt>, он должен быть
+перекодировщиком, и эта процедура вернет текстовый порт вывода, перекодировщиком
+которого является перекодировщик <tt><i>?transcoder</i></tt>.
+В противном случае, эта процедура возвращает бинарный порт вывода.
+См. руководство к этому разделу для описания ограничений и эффектов других
+аргументов.
+
+</p><p>
+<a name="./io:s31"></a><span class="formdef"><b>procedure</b>: <tt>(open-file-input/output-port&nbsp;<i>path</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(open-file-input/output-port&nbsp;<i>path</i>&nbsp;<i>options</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(open-file-input/output-port&nbsp;<i>path</i>&nbsp;<i>options</i>&nbsp;<i>b-mode</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(open-file-input/output-port&nbsp;<i>path</i>&nbsp;<i>options</i>&nbsp;<i>b-mode</i>&nbsp;<i>?transcoder</i>)</tt></span>
+<br>
+<b>returns: </b>новый порт ввода/вывода для именованного файла
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если присутствует <tt><i>?transcoder</i></tt>, а не  <tt>#f</tt>, он должен быть
+перекодировщиком, и эта процедура вернет текстовый порт ввода/вывода, перекодировщиком
+которого является перекодировщик <tt><i>?transcoder</i></tt>.
+В противном случае, эта процедура возвращает бинарный порт ввода/вывода.
+См. руководство к этому разделу для описания ограничений и эффектов других
+аргументов.
+
+</p><p>
+
+</p><h3><a name="g124"></a><a name="./io:h3"></a>Section 7.3. Стандартные Порты<a name="SECTSTANDARDPORTS"></a></h3>
+
+<p>
+Процедуры, описанные в этом разделе, возвращают порты, которые подключаются к стандартному
+входу процесса, стандартному выходу  и стандартному потоку ошибок.
+Первый набор возвращает "готовые" текстовые порты с зависимыми от реализации перекодировщиками
+(если есть) и режимом буферизации.
+Второй набор создает свежие двоичные порты и может использоваться либо для двоичного ввода/вывода,
+либо с помощью перекодирующего порта( <tt>transcoded-port</tt>), для текстового
+ввода/вывода с программно реализованным перекодировщиком и режимом буферизации.
+
+</p><p>
+<a name="./io:s32"></a><span class="formdef"><b>procedure</b>: <tt>(current-input-port)</tt></span>
+<br>
+<b>returns: </b>текущий порт ввода
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(current-output-port)</tt></span>
+<br>
+<b>returns: </b>текущий порт вывода
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(current-error-port)</tt></span>
+<br>
+<b>returns: </b>текущий порт ошибок
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p>current-input, current-output, и current-error возвращают порты предварительно
+построенны текстовые порты, которые изначально связаны со стандартным вводом процесса,
+стандартным выводом и стандартным потоком ошибок.
+
+</p><p>
+Значения возвращаемые <tt>current-input-port</tt> и
+<tt>current-output-port</tt> могут временно изменяться процедурами
+удобного ввода/вывода 
+<tt>with-input-from-file</tt> и <tt>with-output-to-file</tt>
+(Section&nbsp;<a href="io.html#g130">7.9</a>).
+
+</p><p>
+<a name="./io:s33"></a><span class="formdef"><b>procedure</b>: <tt>(standard-input-port)</tt></span>
+<br>
+<b>returns: </b>новый двоичный порт ввода, подключенный к стандартному входному потоку
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(standard-output-port)</tt></span>
+<br>
+<b>returns: </b>новый двоичный потр вывода, подключенный к стандартному выходному потоку
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(standard-error-port)</tt></span>
+<br>
+<b>returns: </b>новый двоичный потр вывода, подключенный к стандартному потоку ошибок
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Поскольку порты могут быть буферизированы, может возникнуть путаница, если чередуются
+операции над несколькими портами, подключенными к одному из стандартных потоков процесса.
+Таким образом, эти процедуры обычно подходят только тогда, когда программе больше
+не нужно использовать какие либо существующие порты, подключенные к стандартным потокам.
+
+</p><p>
+
+</p><h3><a name="g125"></a><a name="./io:h4"></a>Section 7.4. Строковые(String) и Байт-векторные(Bytevector) Порты<a name="SECTSTRINGPORTS"></a></h3>
+
+<p>
+Процедуры в этом разделе позволяют использовать байтовые векторы(bytevectors) и строки(strings)
+в качестве входных и выходных потоков.
+
+</p><p>
+Двоичные порты, созданные процедурами в этом разделе, поддерживают 
+операции <tt>port-position</tt> и <tt>set-port-position!</tt>.
+Будут ли текстовые порты, созданные процедурами в этом разделе, поддерживать
+эти операции, зависит от реализации.
+
+</p><p>
+<a name="./io:s34"></a><span class="formdef"><b>procedure</b>: <tt>(open-bytevector-input-port&nbsp;<i>bytevector</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(open-bytevector-input-port&nbsp;<i>bytevector</i>&nbsp;<i>?transcoder</i>)</tt></span>
+<br>
+<b>returns: </b>новый порт ввода, который получает ввод из <tt><i>bytevector</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если присутствует <tt><i>?transcoder</i></tt>, а не <tt>#f</tt>, он должен быть
+перекодировщиком и тогда эта процедура вернет текстовый порт ввода, перекодировщиком
+которого будет <tt><i>?transcoder</i></tt>.
+В противном случае, эта процедура возвращает двоичный порт ввода.
+
+</p><p>
+Эффект модификации <tt><i>bytevector</i></tt> после этой процедуры не определен.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([ip&nbsp;(open-bytevector-input-port&nbsp;#vu8(1&nbsp;2))])<br>
+
+&nbsp;&nbsp;(let*&nbsp;([x1&nbsp;(get-u8&nbsp;ip)]&nbsp;[x2&nbsp;(get-u8&nbsp;ip)]&nbsp;[x3&nbsp;(get-u8&nbsp;ip)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;x1&nbsp;x2&nbsp;(eof-object?&nbsp;x3))))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;#t)</tt>
+</p><p>Нет необходимости закрывать байт-векторный порт(bytevector port); это хранилище автоматически
+будет закрыто, когда оно станет больше не нужным, как и для любого другого объекта, а открытый
+байт-векторный порт не связывает ресурсы операционной системы.
+
+</p><p>
+<a name="./io:s35"></a><span class="formdef"><b>procedure</b>: <tt>(open-string-input-port&nbsp;<i>string</i>)</tt></span>
+<br>
+<b>returns: </b>новый текстовый порт ввода, который получает ввод из строки(<tt><i>string</i></tt>)
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эффект изменения <tt><i>string</i></tt> после этой процедуры неопределен.
+Новый порт может иметь или не иметь перекодировщик, и если он это так, перекодировщик
+зависито от реализации.
+Пока это не требуеся, реализациям рекомендуется поощрять поддержку <tt>port-position</tt>
+и <tt>set-port-position!</tt> для строковых портов.
+
+</p><p>
+
+</p><p><tt>(get-line&nbsp;(open-string-input-port&nbsp;"hi.\nwhat's&nbsp;up?\n"))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"hi."</tt>
+</p><p>Нет необходимости закрывать строковый порт; это хранилище автоматически закрывается, когда
+оно больше ненужно, как и для любого другого объекта, а открытый строковый порт не связывает
+ресурсы операционной системы.
+
+</p><p>
+<a name="./io:s36"></a><span class="formdef"><b>procedure</b>: <tt>(open-bytevector-output-port)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(open-bytevector-output-port&nbsp;<i>?transcoder</i>)</tt></span>
+<br>
+<b>returns: </b>два значения, новый порт вывода и процедуру извлечения
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если присутствует <tt><i>?transcoder</i></tt>, а не  <tt>#f</tt>, он должен быть
+перекодировщиком, а значение порта текстовым портом вывода, перекодирощиком которого
+является <tt><i>?transcoder</i></tt>.
+В проитвном случае, значение порта представляет собой бинарный порт вывода.
+
+</p><p>
+Процедура извлечения - это процедура, которая при вызове без аргументов создает
+байт-вектор содержащий накопленные в порту байты, очищает порт от накопленных байтов,
+сбрасывает позицию порта в ноль, и возвращает байт-вектор.
+Накопленные байты включают в себя любые байты, записанные за пределами текущей
+позиции, если эта позиция установлена  позади от максимально возможной позиции.
+
+</p><p>
+
+</p><p><tt>(let-values&nbsp;([(op&nbsp;g)&nbsp;(open-bytevector-output-port)])<br>
+
+&nbsp;&nbsp;(put-u8&nbsp;op&nbsp;15)<br>
+
+&nbsp;&nbsp;(put-u8&nbsp;op&nbsp;73)<br>
+
+&nbsp;&nbsp;(put-u8&nbsp;op&nbsp;115)<br>
+
+&nbsp;&nbsp;(set-port-position!&nbsp;op&nbsp;2)<br>
+
+&nbsp;&nbsp;(let&nbsp;([bv1&nbsp;(g)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(put-u8&nbsp;op&nbsp;27)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;bv1&nbsp;(g))))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#vu8(15&nbsp;73&nbsp;115)&nbsp;#vu8(27))</tt>
+</p><p>Нет необходимости закрывать байт-векторный порт; это хранилище будет автоматически закрыто,
+когда в нем не будет необходимости, как и для любого другого объекта, а отрытый байт-векторный порт
+не связывает ресурсы операционной системы.
+
+</p><p>
+<a name="./io:s37"></a><span class="formdef"><b>procedure</b>: <tt>(open-string-output-port)</tt></span>
+<br>
+<b>returns: </b>два значения, новый текстовый порт вывода и процедура извлечения
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Процедура извлечения - это процедура, которая при вызове без аргументов
+создает строку, содержащую накопленные символьные знаки в порту ,  очищает
+порт от накопленных знаков, сбрасывает позицию порта в ноль, и возващает строку.
+Накопленные символьные знаки включают в себя любые знаки записанные выше текущей
+позиции, если позиция стоит ниже максимально возможной позиции.
+Пока не требуется, но реализациям рекомендуется  поддерживать <tt>port-position</tt>
+и <tt>set-port-position!</tt> для строковых портов.
+
+</p><p>
+
+</p><p><tt>(let-values&nbsp;([(op&nbsp;g)&nbsp;(open-string-output-port)])<br>
+
+&nbsp;&nbsp;(put-string&nbsp;op&nbsp;"some&nbsp;data")<br>
+
+&nbsp;&nbsp;(let&nbsp;([str1&nbsp;(g)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(put-string&nbsp;op&nbsp;"new&nbsp;stuff")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;str1&nbsp;(g))))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;("some&nbsp;data"&nbsp;"new&nbsp;stuff")</tt>
+</p><p>Нет необходимости закрывать строковый порт; это хранилище автоматически закрывается
+когда оно больше не нужно, как и для любого другого объекта, а открытый строковый порт не связывает
+ресурсы операционной системы.
+
+</p><p>
+<a name="./io:s38"></a><span class="formdef"><b>procedure</b>: <tt>(call-with-bytevector-output-port&nbsp;<i>procedure</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(call-with-bytevector-output-port&nbsp;<i>procedure</i>&nbsp;<i>?transcoder</i>)</tt></span>
+<br>
+<b>returns: </b>байтовый вектор содержащий накопленные байты
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если присутствует <tt><i>?transcoder</i></tt> и не равен <tt>#f</tt>, он должен быть
+перекодировщиком, а <tt><i>procedure</i></tt> вызывается с текстовым байт векторным портом
+вывода, перекодировщиком которого является <tt><i>?transcoder</i></tt>.
+В противном случае, <tt><i>procedure</i></tt> вызывается с бинарным байт-векторным портом вывода.
+Если <tt><i>procedure</i></tt> возвращается, создается байтовый вектор содержащий
+байты накопленные в порту, накопленные байты очищаются из порта, позиция порта сбрасывается
+до нуля, а байтовый вектор возвращется из  <tt>call-with-bytevector-output-port</tt>.
+Эти действия происходят каждый раз когда возвращается процедура <tt><i>procedure</i></tt>, если она
+возвращается несколько раз из-за вызова продолжения, созданного когда процедура
+<tt><i>procedure</i></tt> была активна.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([tx&nbsp;(make-transcoder&nbsp;(latin-1-codec)&nbsp;(eol-style&nbsp;lf)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(error-handling-mode&nbsp;replace))])<br>
+
+&nbsp;&nbsp;(call-with-bytevector-output-port<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(p)&nbsp;(put-string&nbsp;p&nbsp;"abc"))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;tx))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#vu8(97&nbsp;98&nbsp;99)</tt>
+</p><p><a name="./io:s39"></a><span class="formdef"><b>procedure</b>: <tt>(call-with-string-output-port&nbsp;<i>procedure</i>)</tt></span>
+<br>
+<b>returns: </b>строку содержащую накопленные символьные знаки
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>procedure</i></tt> вызывается с одним аргументом, строковым портом вывода.
+Если <tt><i>procedure</i></tt> возвращается, создается строка содержащая символьные знаки, 
+накопленные в порту, накопленные знаки вычищаются из порта, позиция порта сбрасывается
+до нуля, а строка возвращается из <tt>call-with-string-output-port</tt>.
+Эти действия происходят всякий раз, когда <tt><i>procedure</i></tt> возвращается, если она
+возвращается несколько раз из за вызова продолжения созданного когда
+<tt><i>procedure</i></tt> была активна.
+
+</p><p>
+<a name="./io:s40"></a><tt>call-with-string-output-port</tt> может использоваться
+вместе с <tt>put-datum</tt> для определения процедуры, <tt>object-&gt;string</tt>, котораяэ
+возвращает строку содержащую напечатанное представление объекта.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;(object-&gt;string&nbsp;x)<br>
+
+&nbsp;&nbsp;(call-with-string-output-port<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(p)&nbsp;(put-datum&nbsp;p&nbsp;x))))
+<br>
+<br>
+(object-&gt;string&nbsp;(cons&nbsp;'a&nbsp;'(b&nbsp;c)))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"(a&nbsp;b&nbsp;c)"</tt>
+</p><p>
+</p><h3><a name="g126"></a><a name="./io:h5"></a>Section 7.5. Открытие Пользовательских Портов<a name="SECTCUSTOMPORTS"></a></h3>
+
+<p>
+<a name="./io:s41"></a><span class="formdef"><b>procedure</b>: <tt>(make-custom-binary-input-port&nbsp;<i>id</i>&nbsp;<i>r!</i>&nbsp;<i>gp</i>&nbsp;<i>sp!</i>&nbsp;<i>close</i>)</tt></span>
+<br>
+<b>returns: </b>новый бинарный пользовательскй порт ввода
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-custom-binary-output-port&nbsp;<i>id</i>&nbsp;<i>w!</i>&nbsp;<i>gp</i>&nbsp;<i>sp!</i>&nbsp;<i>close</i>)</tt></span>
+<br>
+<b>returns: </b>новый бинарный пользовательский порт вывода
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-custom-binary-input/output-port&nbsp;<i>id</i>&nbsp;<i>r!</i>&nbsp;<i>w!</i>&nbsp;<i>gp</i>&nbsp;<i>sp!</i>&nbsp;<i>close</i>)</tt></span>
+<br>
+<b>returns: </b>новый бинарный пользовательский порт ввода/вывода
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эти процедуры позволяют программам создавать порты из произвольных потоков
+байтов.
+<tt><i>id</i></tt> должен быть строкой, обозначающей новый порт; имя используется только
+в информационных целях, и реализация может включить его в печатный синтаксис,
+если таковой имеется у пользовательского порта.
+<tt><i>r!</i></tt> и <tt><i>w!</i></tt> должны быть процедурами, тогда как <tt><i>gp</i></tt>, <tt><i>sp!</i></tt>, и
+<tt><i>close</i></tt> должны быть процедурами или <tt>#f</tt>.
+Эти аргументы описаны ниже.
+
+</p><p>
+</p><dl compact="">
+<dt><tt><i>r!</i></tt></dt><dd> вызывается для получения ввода из пользовательского порта, например, для
+поддержки <tt>get-u8</tt> или <tt>get-bytevector-n</tt>.
+Она вызывается с тремя аргументами: <tt><i>bytevector</i></tt>, <tt><i>start</i></tt>, и <tt><i>n</i></tt>.
+<tt><i>start</i></tt> должне быть неотритцательным точным целым числом, <tt><i>n</i></tt> должен быть
+положительным точным целым числом, а сумма <tt><i>start</i></tt> и <tt><i>n</i></tt> должна не
+превышать длину <tt><i>bytevector</i></tt>.
+Если поток байтов находиться в конце файла, <tt><i>r!</i></tt> должна возвращать точный 0.
+В противном случае, она должна читать хотя бы один  и не более <tt><i>n</i></tt> байтов из
+потока, сохранить эти байты в последовательных местах  <tt><i>bytevector</i></tt>
+начиная с <tt><i>start</i></tt>, и возвращать точное целое неотритцательное число фактически
+прочитанных байтов.
+
+<p>
+</p></dd><dt><tt><i>w!</i></tt></dt><dd> вызывается для отправки вывода в порт, например, для поддержки
+<tt>put-u8</tt> или <tt>put-bytevector</tt>.
+Она вызвается с тремя аргументами: <tt><i>bytevector</i></tt>, <tt><i>start</i></tt>, и <tt><i>n</i></tt>.
+ <tt><i>start</i></tt> и <tt><i>n</i></tt> будут неотритцательными точными целыми числами, а
+сумма <tt><i>start</i></tt> и <tt><i>n</i></tt> не должна превышать длины
+<tt><i>bytevector</i></tt>.
+<tt><i>w!</i></tt> должен записывать до <tt><i>n</i></tt> последовательных байтов из
+<tt><i>bytevector</i></tt> начиная с <tt><i>start</i></tt> и возвращать, точное неотритцательное
+целое число, количество фактически записанных байтов.
+
+<p>
+</p></dd><dt><tt><i>gp</i></tt></dt><dd> вызывается для запроса указателя положения порта.
+Если он <tt>#f</tt>, порт не поддерживает <tt>port-position</tt>.
+Если он не <tt>#f</tt>, ему будут переданы ноль аргументов и он должен вернуть текущую
+позицию в виде смещения в байтах от начала потока байтов как точное неотритцательное
+целое число.
+
+<p>
+</p></dd><dt><tt><i>sp!</i></tt></dt><dd> вызывается для установки позиции указателя порта.
+Если он <tt>#f</tt>, порт не будет поддерживать <tt>set-port-position!</tt>.
+Если он не <tt>#f</tt>, ему будет передан один аргумент, точное целое неотритцательное
+число представляющее новую позици как смещение в байтах от начала потока байтов,
+и оно должно установить положение указателя этим значением.
+
+<p>
+</p></dd><dt><tt><i>close</i></tt></dt><dd> вызывается для закрытия байтового потока.
+Если он <tt>#f</tt>, никаких действий не будет выполнено, если закрыть поток байтов,
+когда новый порт будет закрыт.
+Если он не <tt>#f</tt>, ему будут передано ноль аргуменов и  должны быть предприняты
+любые действия, необходимые для закрытия потока байтов.
+</dd></dl>
+
+<p>
+Если новый порт является портом ввода/вывода и не обеспечивает ни <tt><i>gp</i></tt>,
+ни <tt><i>sp!</i></tt> процедуры, может окзаться невозможным правильная
+установка позиция возврата, если после операции ввода происходит операция вывода, из-за
+буфферицазии ввода, которая должна быть выполнена для поддержки <tt>lookahead-u8</tt>
+и часто делается в любом случае для повышения эффективности.
+По той же причине, вызов <tt>port-position</tt> после операции ввода
+может не возвратить точную позицию, если процедура <tt><i>sp!</i></tt> не предусмотрена.
+Таким образом, программы, которые создают пользовательские двоичные порты, обычно
+должны обеспечивать как <tt><i>gp</i></tt>, так <tt><i>sp!</i></tt> процедуры.
+
+</p><p>
+<a name="./io:s42"></a><span class="formdef"><b>procedure</b>: <tt>(make-custom-textual-input-port&nbsp;<i>id</i>&nbsp;<i>r!</i>&nbsp;<i>gp</i>&nbsp;<i>sp!</i>&nbsp;<i>close</i>)</tt></span>
+<br>
+<b>returns: </b>новый пользовательский порт ввода
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-custom-textual-output-port&nbsp;<i>id</i>&nbsp;<i>w!</i>&nbsp;<i>gp</i>&nbsp;<i>sp!</i>&nbsp;<i>close</i>)</tt></span>
+<br>
+<b>returns: </b>новый пользовательский порт вывода
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-custom-textual-input/output-port&nbsp;<i>id</i>&nbsp;<i>r!</i>&nbsp;<i>w!</i>&nbsp;<i>gp</i>&nbsp;<i>sp!</i>&nbsp;<i>close</i>)</tt></span>
+<br>
+<b>returns: </b>новый пользовательский порт ввода/вывода
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эти процедуры позволяют программам создавать порты из произвольных потоков символьных знаков.
+<tt><i>id</i></tt> должен быть строкой, обозначающей новый порт; имя используется только в информационных
+целях, и реализация может включить его в печатный синтаксис, если таковой имеется, пользовательского
+порта.
+<tt><i>r!</i></tt> и <tt><i>w!</i></tt> должны быть процедурами, тогда как <tt><i>gp</i></tt>, <tt><i>sp!</i></tt>, и
+<tt><i>close</i></tt> должны быть процедурой или  <tt>#f</tt>.
+Эти аргументы описаны ниже.
+
+</p><p>
+</p><dl compact="">
+<dt><tt><i>r!</i></tt></dt><dd> вызывается для получения ввода из пользовательского порта, например, для
+поддержки <tt>get-char</tt> или <tt>get-string-n</tt>..
+Она вызывается с тремя аргументами: <tt><i>string</i></tt>, <tt><i>start</i></tt>, и <tt><i>n</i></tt>.
+ <tt><i>start</i></tt> должен быть неотритцательным точным целым числом, <tt><i>n</i></tt> должен быть
+положительным точным целым числом, а сумма <tt><i>start</i></tt> и <tt><i>n</i></tt> не должна
+превышать длину  <tt><i>string</i></tt>.
+Если поток символьных знаков находиться в конце файла, <tt><i>r!</i></tt> должна возвращать точный 0.
+В противном случае, она должна читать хотя бы один  и не более <tt><i>n</i></tt> символьный знак из
+потока, сохранить эти символьные знаки в последовательных местах  <tt><i>string</i></tt>
+начиная с <tt><i>start</i></tt>, и возвращать точное целое неотритцательное число фактически
+прочитанных символьных знаков.
+
+<p>
+</p></dd><dt><tt><i>w!</i></tt></dt><dd> вызывается для отправки вывода в порт, например, для поддержки
+<tt>put-char</tt> or <tt>put-string</tt>.
+Она вызвается с тремя аргументами: <tt><i>string</i></tt>, <tt><i>start</i></tt>, и <tt><i>n</i></tt>.
+<tt><i>start</i></tt> и <tt><i>n</i></tt> будут неотритцательными точными целыми числами, а
+сумма <tt><i>start</i></tt> и <tt><i>n</i></tt> не должна превышать длины
+<tt><i>string</i></tt>.
+<tt><i>w!</i></tt> должен записывать до <tt><i>n</i></tt> последовательных знаков из
+<tt><i>string</i></tt> начиная с <tt><i>start</i></tt> и возвращать, точное неотритцательное
+целое число, количество фактически записанных знаков.
+
+<p>
+</p></dd><dt><tt><i>gp</i></tt></dt><dd> вызывается для запроса указателя положения порта.
+Если он <tt>#f</tt>, порт не поддерживает <tt>port-position</tt>.
+Если он не <tt>#f</tt>, ему будут переданы ноль аргументов и он должен вернуть текущую
+позицию, которая может быть произвольным значением.
+
+<p>
+</p></dd><dt><tt><i>sp!</i></tt></dt><dd> вызывается для установки положения порта.
+Если она <tt>#f</tt>, порт не будет поддерживать <tt>set-port-position!</tt>.
+Если она не <tt>#f</tt>, ей будет передан один аргумент <tt><i>pos</i></tt>, значение
+представляющее новую позицию.
+Если <tt><i>pos</i></tt> является результатом предыдущего вызова <tt><i>gp</i></tt>, <tt><i>sp!</i></tt> следует
+установить позицию в  <tt><i>pos</i></tt>.
+
+<p>
+</p></dd><dt><tt><i>close</i></tt></dt><dd> вызывается для закрытия потока символьных знаков.
+Если она <tt>#f</tt>, никакие действия не выполняются, чтобы закрыть поток символьных знаков,
+когда новый порт закрывается.
+Если она не <tt>#f</tt>, ей будет передан ноль аргументов и она должна предпринять любые
+действия, необходимые для закрытия потока символьных знаков.
+</dd></dl>
+
+<p>
+Если новый порт является портом ввода/вывода, может быть не возможно
+реализовать корретную обработку позиции в порту если операция вывда происходит после операции
+ввода, даже если  предоставляются процедуры <tt><i>gp</i></tt> и <tt><i>sp!</i></tt>, из-за
+буферизации ввода, которая должна быть выполнена для поддержки
+<tt>lookahead-char</tt> и часто делается в любом случае для повышения
+эффективности.
+Поскольку предствление позиции порта не определяется, реализация
+не может скорректировать возвращаемое значение <tt><i>gp</i></tt> для
+учета количества буферизированных символьных знаков.
+По той же причине вызов <tt>port-position</tt> после операции ввода
+может не вернуть точную позицию, даже если предоставляется процедура
+<tt><i>sp!</i></tt>.
+
+</p><p>
+Однако, должно быть, можно надежно выполнить вывод после чтения, если позиция
+будет сброшена в исходное положение.
+Таким образом, программы, которые создают пользовательские текстовые порты
+ввода/вывода, обычно должны обеспечивать предоставление обоих процедур
+<tt><i>gp</i></tt> и <tt><i>sp!</i></tt>, и потребители этих портов должны
+получать начальную позицию через <tt>port-position</tt> перед любыми
+операциями ввода и возвращать позицию назад в исходное положение перед
+выполнением любых операций вывода.
+
+</p><p>
+
+</p><h3><a name="g127"></a><a name="./io:h6"></a>Section 7.6. Операции с Портом<a name="SECTPORTOPERATIONS"></a></h3>
+
+<p>
+В этом разделе описывается множество операций с портами, которые не связаны
+непосредственно с чтением или записью в порт. Операции ввода и вывода описаны
+в последующих разделах.
+
+</p><p>
+<a name="./io:s43"></a><span class="formdef"><b>procedure</b>: <tt>(port?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> это порт, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./io:s44"></a><span class="formdef"><b>procedure</b>: <tt>(input-port?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> это порт ввода или ввода/вывода, <tt>#f</tt> в противном
+случе
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(output-port?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> это порт вывода или ввода/вывода, <tt>#f</tt> в противном
+случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./io:s45"></a><span class="formdef"><b>procedure</b>: <tt>(binary-port?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> это бинарный порт, <tt>#f</tt> в противном случае
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(textual-port?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> это текстовый порт, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./io:s46"></a><span class="formdef"><b>procedure</b>: <tt>(close-port&nbsp;<i>port</i>)</tt></span>
+<br>
+<b>returns: </b>неопределено
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>port</i></tt> еще не закрыт, <tt>close-port</tt> закрывает его,
+сначала сбрасывая(flushing) любые буферизированные байты или символьные знаки в базовый поток,
+если порт является выходным портом.
+После того как порт был закрыт, на порту не может выполняться больше операции ввода или вывода.
+Поскольку операционная система может ограничивать количество одновременно открытых портов файлов или
+ограничивать доступ к открытому файлу, рекомендуется закрывать порт файла, который больше не будет
+использоваться для ввода или вывода.
+Если порт является выходным портом, явное закрытие порта также гарантирует, что буферизированные данные
+записываются в базовый поток.
+Некоторые реалзиации Scheme закрывают порты автоматически после того, как они становятся недоступными для
+программы или когда программа Scheme завершает работу, но лучше всего закрывать порты файлов явно, когда
+это возможно. Закрытие закрытого порта ни на что не влияет.
+
+</p><p>
+<a name="./io:s47"></a><span class="formdef"><b>procedure</b>: <tt>(transcoded-port&nbsp;<i>binary-port</i>&nbsp;<i>transcoder</i>)</tt></span>
+<br>
+<b>returns: </b>новый текстовый порт с тем же байтовым потоком, что и <tt><i>binary-port</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта процедура возвращает новый текстовый порт с перекодировщиком <tt><i>transcoder</i></tt>
+и тем же базовым потоком байтов, что и <tt><i>binary-port</i></tt>, расположенный в текущей
+позиции <tt><i>binary-port</i></tt>.
+
+</p><p>
+В качестве побочного эффекта создания текстового порта, <tt><i>binary-port</i></tt> 
+закрывается чтобы предотвратить вмешательство операций чтения или записи на <tt><i>binary-port</i></tt> 
+в операции чтения и записи на новом текстовом порту.
+Однако основной поток байтов остается открытым, пока текстовый порт не будет закрыт.
+
+</p><p>
+<a name="./io:s48"></a><span class="formdef"><b>procedure</b>: <tt>(port-transcoder&nbsp;<i>port</i>)</tt></span>
+<br>
+<b>returns: </b>перекодировщик, связанный с портом <tt><i>port</i></tt> если он есть, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта процедура всегда возвращает <tt>#f</tt> для двоичных портов и может возрващать
+<tt>#f</tt> для некторых текстовых портов.
+
+</p><p>
+<a name="./io:s49"></a><span class="formdef"><b>procedure</b>: <tt>(port-position&nbsp;<i>port</i>)</tt></span>
+<br>
+<b>returns: </b>текущая позиция(указатель на текущий символьный знак) порта
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(port-has-port-position?&nbsp;<i>port</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если порт поддерживает <tt>port-position</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Порт может позволить запросам определять свою текущую позицию
+в базовом потоке байтов или символьных знаков.
+Если это так, процедура <tt>port-has-port-position?</tt> возвращает
+<tt>#t</tt> и <tt>port-position</tt> возвращает текущую позицию.
+Для бинарных портов позиция всегда представляет собой точное неотритцательное
+целое смещение байта с начала потока байтов.
+Для текстовых портов, представление позиции не указано; оно может не быть
+точным целым неотритцательным числом и даже если оно есть, оно может не представлять
+собой смещение байта или символьного знака в базовом потоке.
+Позиция может быть использована в более позднее время для переустановки
+позиции, если порт поддерживает <tt>set-port-position!</tt>.
+Если <tt>port-position</tt> вызывается для порта, который ее не поддерживает,
+возникает исключение с условием типа <tt>&amp;assertion</tt>.
+
+</p><p>
+<a name="./io:s50"></a><span class="formdef"><b>procedure</b>: <tt>(set-port-position!&nbsp;<i>port</i>&nbsp;<i>pos</i>)</tt></span>
+<br>
+<b>returns: </b>неопределено
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(port-has-set-port-position!?&nbsp;<i>port</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если порт поддерживает <tt>set-port-position!</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Порт может разрешать перемещение текущей позиции в другую позицию
+в базовом потоке байтов или символьных знаков.
+Если это так, процедура <tt>port-has-set-port-position!?</tt> возвращает
+<tt>#t</tt> и <tt>set-port-position!</tt> изменяет текущую позицию.
+Для двоичных портов, позиция <tt><i>pos</i></tt> должна быть точным неотритцательным
+целочисленным смещением байта с начала потока байтов.
+Для текстовых портов, представление позиции не определено, как написано в записи
+для <tt>port-position</tt> выше, но <tt><i>pos</i></tt> должно быть
+подходящей позицией для текстового порта, что обычно гарантируется только в том
+случае, если она была получена из вызвова <tt>port-position</tt>
+на этом же порту.
+Если <tt>set-port-position!</tt> вызывается для порта, которые ее не поддерживает
+возникает исключение типа <tt>&amp;assertion</tt>.
+
+</p><p>
+Если <tt><i>port</i></tt> является двоичным портом и позиция устанавливается
+за пределы текущего конца данных в базовом потоке, поток не расширяется до
+тех пор пока в эту позицию не будут записаны новые данные.
+Если новые данные записываются в эту позицию, содержимое каждой промежуточной
+позиции не указывается.
+Двоичные порты, созданные <tt>open-file-output-port</tt> и
+<tt>open-file-input/output-port</tt> всегда могут быть расширены таким образом в 
+пределах базовой операционной системы.
+В других случаях, попытки установить порт за текущий конец данных в базовом объекте
+могут привести к исключению с типом условия <tt>&amp;i/o-invalid-position</tt>.
+
+</p><p>
+<a name="./io:s51"></a><a name="desc:call-with-port"></a>
+<span class="formdef"><b>procedure</b>: <tt>(call-with-port&nbsp;<i>port</i>&nbsp;<i>procedure</i>)</tt></span>
+<br>
+<b>returns: </b>значения возвращаемые процедурой <tt><i>procedure</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>call-with-port</tt> вызывает <tt><i>procedure</i></tt> с портом <tt><i>port</i></tt> в качестве
+единственного аргумента.
+Если <tt><i>procedure</i></tt> возвращается, <tt>call-with-port</tt> закрывает порт и возвращает значения
+возвращенные  процедурой <tt><i>procedure</i></tt>.
+
+</p><p>
+<tt>call-with-port</tt> не закрывает порт автоматически, если
+вызывается продолжение созданное  вне <tt><i>procedure</i></tt>, поскольку
+возможно, что другое продолжение созданное внутри <tt><i>procedure</i></tt> будет
+вызвано позднее, при возврате управление <tt><i>procedure</i></tt>.
+Если <tt><i>procedure</i></tt> не выполняет возврат, реализация может закрыть
+порт только в том случае, если он может подтвердить что выходной порт больше не доступен.
+
+</p><p>
+Пример ниже копирует содержимое  infile в outfile, переписывая
+outfile если он существует.
+Если ошибка не возникает, порты закрываются после завершения копирования.
+
+</p><p>
+
+</p><p><tt>(call-with-port&nbsp;(open-file-input-port&nbsp;"infile"&nbsp;(file-options)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(buffer-mode&nbsp;block)&nbsp;(native-transcoder))<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ip)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(call-with-port&nbsp;(open-file-output-port&nbsp;"outfile"<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(file-options&nbsp;no-fail)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(buffer-mode&nbsp;block)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(native-transcoder))&nbsp;<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(op)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([c&nbsp;(get-char&nbsp;ip)&nbsp;(get-char&nbsp;ip)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((eof-object?&nbsp;c))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;op&nbsp;c))))))</tt>
+</p><p>Определение <tt>call-with-port</tt> приведено на странице &nbsp;<a href="control.html#defn:call-with-port">135</a>.
+
+</p><p>
+<a name="./io:s52"></a><span class="formdef"><b>procedure</b>: <tt>(output-port-buffer-mode&nbsp;<i>port</i>)</tt></span>
+<br>
+<b>returns: </b>символ, представляющий режим буферизации порта <tt><i>port</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+</p><h3><a name="g128"></a><a name="./io:h7"></a>Section 7.7. Операции Ввода<a name="SECTINPUT"></a></h3>
+
+<p>
+Процедуры, основная цель которых - считывать данные из порта ввода, описаны в 
+этом разделе вместе со связанными с ними процедурами для распознавания или
+создания объектов конца файла(end-of-file/eof).
+
+</p><p>
+<a name="./io:s53"></a><span class="formdef"><b>procedure</b>: <tt>(eof-object?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> является объектом eof(конца файла), <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Объект конца файла(end-of-file) возвращается операцией ввода, например,
+ <tt>get-datum</tt>, когда входной порт достиг конца ввода.
+
+</p><p>
+<a name="./io:s54"></a><span class="formdef"><b>procedure</b>: <tt>(eof-object)</tt></span>
+<br>
+<b>returns: </b>объект eof
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+</p><p><tt>(eof-object?&nbsp;(eof-object))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t</tt>
+</p><p><a name="./io:s55"></a><span class="formdef"><b>procedure</b>: <tt>(get-u8&nbsp;<i>binary-input-port</i>)</tt></span>
+<br>
+<b>returns: </b>следующий байт из <tt><i>binary-input-port</i></tt>, или объект eof
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>binary-input-port</i></tt> находиться в конце файла, возвращается eof объект.
+В противном случае, следующий доступный байт возвращается как 8-битное значение без знака, т.е точное целое
+беззнака, меньшее или равное 255, а позиция порта сдвигается на один байт.
+
+</p><p>
+<a name="./io:s56"></a><span class="formdef"><b>procedure</b>: <tt>(lookahead-u8&nbsp;<i>binary-input-port</i>)</tt></span>
+<br>
+<b>returns: </b>следующий байт из <tt><i>binary-input-port</i></tt>, или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>binary-input-port</i></tt> находиться в конце файла, возвращается eof объект.
+В противном случае, следующий доступный байт возвращается как 8-битное значение без
+знака, т.е, точное целое число беззнака, меньшее или равное 255.
+В отличии от <tt>get-u8</tt>, <tt>lookahead-u8</tt> не забирает байт
+читаемый из порта, поэтому если следующая операция на порту представляет
+собой вызов <tt>lookahead-u8</tt> или <tt>get-u8</tt>, возвращается тот же
+байт.
+
+</p><p>
+<a name="./io:s57"></a><span class="formdef"><b>procedure</b>: <tt>(get-bytevector-n&nbsp;<i>binary-input-port</i>&nbsp;<i>n</i>)</tt></span>
+<br>
+<b>returns: </b>не пустой байтовый вектор содержащий до <tt><i>n</i></tt> байт, или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>n</i></tt> должно быть точным неотритцательным целым числом.
+Если <tt><i>binary-input-port</i></tt> находиться в конце файла, возвращается eof объект.
+В противном случае, <tt>get-bytevector-n</tt> считывает (как если бы с <tt>get-u8</tt>)
+столько же байтов, сколько до <tt><i>n</i></tt>, доступно в порту до конца файла, и возвращает
+новый не пустой байт-вектор содержащий эти байты.
+Позиция порта передвигается за считанные байты.
+
+</p><p>
+<a name="./io:s58"></a><span class="formdef"><b>procedure</b>: <tt>(get-bytevector-n!&nbsp;<i>binary-input-port</i>&nbsp;<i>bytevector</i>&nbsp;<i>start</i>&nbsp;<i>n</i>)</tt></span>
+<br>
+<b>returns: </b>количество прочитанных байтов или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>start</i></tt> и <tt><i>n</i></tt> должны быть точными неотритцательными целыми числами, 
+а сумма <tt><i>start</i></tt> и <tt><i>n</i></tt> не должна превышать длину байт-вектора(<tt><i>bytevector</i></tt>).
+
+</p><p>
+Если <tt><i>binary-input-port</i></tt> находитсья в конце файла, возвращается eof объект.
+В противном случае, <tt>get-bytevector-n!</tt> читает (как если бы с <tt>get-u8</tt>)
+столько байтов, сколько до <tt><i>n</i></tt>, доступны до конца файла в порту,
+сохраняет байты в последовательных местоположениях байт-вектора(<tt><i>bytevector</i></tt>)
+начиная с местоположения <tt><i>start</i></tt>, и возвращая количество считанных байтов, как
+точное положительное целое число.
+Позиция порта продвигается за считанные байты.
+
+</p><p>
+<a name="./io:s59"></a><span class="formdef"><b>procedure</b>: <tt>(get-bytevector-some&nbsp;<i>binary-input-port</i>)</tt></span>
+<br>
+<b>returns: </b>не пустой байт-вектро или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>binary-input-port</i></tt> находиться в конце файла, возвращается eof объект.
+В противном случае, <tt>get-bytevector-some</tt> читает (как если бы с <tt>get-u8</tt>)
+хотя бы один байт и, возможно больше, и возвращает байтовый вектор, содержащий эти байты.
+Позиция порта продвиагется за считанные байты. Максимальное количество байтов, считанных этой
+операцией зависит от реализации.
+
+</p><p>
+<a name="./io:s60"></a><span class="formdef"><b>procedure</b>: <tt>(get-bytevector-all&nbsp;<i>binary-input-port</i>)</tt></span>
+<br>
+<b>returns: </b>не пустой байт-вектор или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>binary-input-port</i></tt> находиться в конце файла, возвращается eof объект.
+В противном случае, <tt>get-bytevector-all</tt> читает (как если бы с <tt>get-u8</tt>)
+все баайты, доступные до конца файла и возвращает байтовый вектор, содержащий эти байты.
+Позиция порта продвигается за считанные байты.
+
+</p><p>
+<a name="./io:s61"></a><span class="formdef"><b>procedure</b>: <tt>(get-char&nbsp;<i>textual-input-port</i>)</tt></span>
+<br>
+<b>returns: </b>следующий символьный знак <tt><i>textual-input-port</i></tt>, или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>textual-input-port</i></tt> находиться в конце файла, возвращается eof объект.
+В противном случае, возвращается следующий доступный символьный знак, а позиция порта сдвигается
+на один символьный знак.
+Если <tt><i>textual-input-port</i></tt> является перекодирующим портом, позиция в базовом потоке
+может сдвигаться больше чем на один байт.
+
+</p><p>
+<a name="./io:s62"></a><span class="formdef"><b>procedure</b>: <tt>(lookahead-char&nbsp;<i>textual-input-port</i>)</tt></span>
+<br>
+<b>returns: </b>следующий символьный знак <tt><i>textual-input-port</i></tt>, или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>textual-input-port</i></tt> находиться в конце файла, возвращается eof объект.
+В противном случае, возвращается следующий доступный символьный знак.
+В отличии от <tt>get-char</tt>, <tt>lookahead-char</tt> не уничтожает
+символьный знак при чтении из порта, поэтому если следующая операция на
+порту представляет собой вызов <tt>lookahead-char</tt> или <tt>get-char</tt>,
+возвращается тот же символьный знак.
+
+</p><p>
+<tt>lookahead-char</tt> предоставляется для приложений требующих
+просмотра одного символьного знака в текущем порту, без его
+извлечения из порта.
+Процедура <tt>get-word</tt> определяемая ниже возвращает следующее
+слово из текстового входного порта в виде строки, где слово определяется
+как последовательность алфавитных знаков.
+Поскольку <tt>get-word</tt> не знает, пока не увидит один знак за словом,
+что она прочитала все слово, она использует 
+<tt>lookahead-char</tt> для определения следующего символьного знака и <tt>get-char</tt>
+для извлечения символьного знака.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;get-word<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list-&gt;string<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([c&nbsp;(lookahead-char&nbsp;p)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(eof-object?&nbsp;c)&nbsp;'()]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(char-alphabetic?&nbsp;c)&nbsp;(get-char&nbsp;p)&nbsp;(cons&nbsp;c&nbsp;(f))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;'()]))))))</tt>
+</p><p><a name="./io:s63"></a><span class="formdef"><b>procedure</b>: <tt>(get-string-n&nbsp;<i>textual-input-port</i>&nbsp;<i>n</i>)</tt></span>
+<br>
+<b>returns: </b>не пустую строку, содержащую до <tt><i>n</i></tt> символьных знаков, или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>n</i></tt> должно быть точным неотритцательным целым числом.
+Если <tt><i>textual-input-port</i></tt> находиться в конце фаайла, возвращается
+eof объект.
+В противном случае, <tt>get-string-n</tt> читает (как если бы с <tt>get-char</tt>)
+столько символьных знаков, сколько доступно до конца файла, но меньше или равно <tt><i>n</i></tt>
+и возвращает новыую(не пустую) строку содержащую эти символьные знаки.
+Позиция порта продвигается за прочитанные знаки.
+
+</p><p>
+<a name="./io:s64"></a><span class="formdef"><b>procedure</b>: <tt>(get-string-n!&nbsp;<i>textual-input-port</i>&nbsp;<i>string</i>&nbsp;<i>start</i>&nbsp;<i>n</i>)</tt></span>
+<br>
+<b>returns: </b>количество прочитанных симольных знаков или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>start</i></tt> и <tt><i>n</i></tt> должны быть точными неотритцательными целыми числами, а сумма
+<tt><i>start</i></tt> и <tt><i>n</i></tt> не должна превышать длину <tt><i>string</i></tt>.
+
+</p><p>
+Если <tt><i>textual-input-port</i></tt> находиться в конце файла, возвращается объект eof.
+В противном случае, <tt>get-string-n!</tt> читает (как если бы с <tt>get-char</tt>)
+столько символьных знаков сколько есть в порту до конца файла, но не больше <tt><i>n</i></tt>,
+и сохраняет прочитанные знаки в соответствующих местоположениях в <tt><i>string</i></tt>
+начиная с <tt><i>start</i></tt>, и возвращает количество прочитанных символьных знаков, как 
+точное положительное целое число.
+Позиция порта продвигается за прочитанные символьные знаки.
+
+</p><p>
+<tt>get-string-n!</tt> может использоваться для реализации <tt>string-set!</tt> и
+<tt>string-fill!</tt>, как показано ниже, хотя это не основная цель.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;string-set!<a name="backdoor-string-fill"></a><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(s&nbsp;i&nbsp;c)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([sip&nbsp;(open-string-input-port&nbsp;(string&nbsp;c))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(get-string-n!&nbsp;sip&nbsp;s&nbsp;i&nbsp;1)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;return&nbsp;unspecified&nbsp;values:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;#f&nbsp;#f))))
+<br>
+<br>
+(define&nbsp;string-fill!<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(s&nbsp;c)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([n&nbsp;(string-length&nbsp;s)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([sip&nbsp;(open-string-input-port&nbsp;(make-string&nbsp;n&nbsp;c))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(get-string-n!&nbsp;sip&nbsp;s&nbsp;0&nbsp;n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;return&nbsp;unspecified&nbsp;values:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;#f&nbsp;#f)))))
+<br>
+<br>
+(let&nbsp;([x&nbsp;(make-string&nbsp;3)])<br>
+
+&nbsp;&nbsp;(string-fill!&nbsp;x&nbsp;#\-)<br>
+
+&nbsp;&nbsp;(string-set!&nbsp;x&nbsp;2&nbsp;#\))<br>
+
+&nbsp;&nbsp;(string-set!&nbsp;x&nbsp;0&nbsp;#\;)<br>
+
+&nbsp;&nbsp;x)&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;";-)"</tt>
+</p><p><a name="./io:s65"></a><span class="formdef"><b>procedure</b>: <tt>(get-string-all&nbsp;<i>textual-input-port</i>)</tt></span>
+<br>
+<b>returns: </b>не пустая строка или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>textual-input-port</i></tt> находиться в конце файла, возвращается eof объект.
+В противном случае, <tt>get-string-all</tt> читаются (как если бы с <tt>get-char</tt>)
+все символьные знаки доступные до конца файла и возвращает строку содержащую эти символьные знаки.
+Позиция порта сдвигается за прочитанные символьные знаки.
+
+</p><p>
+<a name="./io:s66"></a><span class="formdef"><b>procedure</b>: <tt>(get-line&nbsp;<i>textual-input-port</i>)</tt></span>
+<br>
+<b>returns: </b>строка или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>textual-input-port</i></tt> находиться в конце файла, возвращается eof объект.
+В противном случае, <tt>get-line</tt> читает (как если бы с <tt>get-char</tt>)
+все символьные знаки доступные до того как порт достигнет конца файла или будет прочитан
+знак завершения строки(line-feed) и возвращает строку содержащую все прочитанные символьные знаки,
+кроме знака завершения строки.
+Позиция порта продвигается за прочитанные символьные знаки.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([sip&nbsp;(open-string-input-port&nbsp;"one\ntwo\n")])<br>
+
+&nbsp;&nbsp;(let*&nbsp;([s1&nbsp;(get-line&nbsp;sip)]&nbsp;[s2&nbsp;(get-line&nbsp;sip)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;s1&nbsp;s2&nbsp;(port-eof?&nbsp;sip))))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;("one"&nbsp;"two"&nbsp;#t)
+<br>
+<br>
+(let&nbsp;([sip&nbsp;(open-string-input-port&nbsp;"one\ntwo")])<br>
+
+&nbsp;&nbsp;(let*&nbsp;([s1&nbsp;(get-line&nbsp;sip)]&nbsp;[s2&nbsp;(get-line&nbsp;sip)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;s1&nbsp;s2&nbsp;(port-eof?&nbsp;sip))))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;("one"&nbsp;"two"&nbsp;#t)</tt>
+</p><p><a name="./io:s67"></a><span class="formdef"><b>procedure</b>: <tt>(get-datum&nbsp;<i>textual-input-port</i>)</tt></span>
+<br>
+<b>returns: </b> объект данных(datum) Scheme или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Данная процедура просматривает пробелы и комментарии и ищет начало
+внешнего представления данных(datum).
+Если <tt><i>textual-input-port</i></tt> доходит до конца файла, до того как
+будет найдено внешнее представление данных, возвращается eof объект.
+
+</p><p>
+В противном случае, <tt>get-datum</tt> читает столько символьных знаков, 
+сколько необходимо (и не более) для синтаксического анализа одного
+элемнта данных и возвращает вновь выделенный объект, структура которого
+определяется внешним представлением.
+Позиция порта сдвигается вперед за прочитанные символьные знаки.
+Если конец файла будет достигнут до того, как внешнее представление
+данных будет завершено или будет прочитан неожиданных символьный знак,
+будет создано исключение с типом условия <tt>&amp;lexical</tt> и
+<tt>i/o-read</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([sip&nbsp;(open-string-input-port&nbsp;";&nbsp;a\n\n&nbsp;one&nbsp;(two)\n")])<br>
+
+&nbsp;&nbsp;(let*&nbsp;([x1&nbsp;(get-datum&nbsp;sip)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[c1&nbsp;(lookahead-char&nbsp;sip)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[x2&nbsp;(get-datum&nbsp;sip)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;x1&nbsp;c1&nbsp;x2&nbsp;(port-eof?&nbsp;sip))))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(one&nbsp;#\space&nbsp;(two)&nbsp;#f)</tt>
+</p><p><a name="./io:s68"></a><span class="formdef"><b>procedure</b>: <tt>(port-eof?&nbsp;<i>input-port</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>input-port</i></tt> находиться в конце файла, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта процедура похожа на <tt>lookahead-u8</tt> на двоичном порту ввода
+или <tt>lookahead-char</tt> на текством порту ввода, за исключением того,
+что в место возврата следующего байта/символьного знака или  eof объекта, она
+возвращает логическое значение, указывающее, будет ли прочитанное значение
+eof объектом.
+
+</p><p>
+
+</p><h3><a name="g129"></a><a name="./io:h8"></a>Section 7.8. Операции Вывода<a name="SECTOUTPUT"></a></h3>
+
+<p>
+Процедуры, основная цель которых - отправить данные на порт вывода, описаны в этом разделе.
+
+</p><p>
+<a name="./io:s69"></a><span class="formdef"><b>procedure</b>: <tt>(put-u8&nbsp;<i>binary-output-port</i>&nbsp;<i>octet</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>octet</i></tt> должен быть точным неотритцательным целым числом, меньшим или равным 255.
+Эта процедура записывает <tt><i>octet</i></tt> в <tt><i>binary-output-port</i></tt>, продвигая позицию порта
+на один байт.
+
+</p><p>
+<a name="./io:s70"></a><span class="formdef"><b>procedure</b>: <tt>(put-bytevector&nbsp;<i>binary-output-port</i>&nbsp;<i>bytevector</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(put-bytevector&nbsp;<i>binary-output-port</i>&nbsp;<i>bytevector</i>&nbsp;<i>start</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(put-bytevector&nbsp;<i>binary-output-port</i>&nbsp;<i>bytevector</i>&nbsp;<i>start</i>&nbsp;<i>n</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>start</i></tt> и <tt><i>n</i></tt> должны быть неотритцательными точными целыми числами, и сумма
+<tt><i>start</i></tt> и <tt><i>n</i></tt> не должна превышать длину <tt><i>bytevector</i></tt>.
+Если не указано <tt><i>start</i></tt> по умолчанию он равен нулю и <tt><i>n</i></tt> по умолчанию это разность
+между длиной <tt><i>bytevector</i></tt> и <tt><i>start</i></tt>.
+
+</p><p>
+Эта процедура записывает <tt><i>n</i></tt> байт из <tt><i>bytevector</i></tt> начиная с
+<tt><i>start</i></tt> в порт и передвигает позицию порта за конец записанных байтов.
+
+</p><p>
+<a name="./io:s71"></a><span class="formdef"><b>procedure</b>: <tt>(put-char&nbsp;<i>textual-output-port</i>&nbsp;<i>char</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта процедура записывает знак <tt><i>char</i></tt> в <tt><i>textual-output-port</i></tt>, 
+продвигая позицию порта на один символьный знак.
+Если <tt><i>textual-output-port</i></tt> является перекодирующим портом, сдвиг позиции в базовом потоке
+может быть больше одного байта.
+
+</p><p>
+<a name="./io:s72"></a><span class="formdef"><b>procedure</b>: <tt>(put-string&nbsp;<i>textual-output-port</i>&nbsp;<i>string</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(put-string&nbsp;<i>textual-output-port</i>&nbsp;<i>string</i>&nbsp;<i>start</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(put-string&nbsp;<i>textual-output-port</i>&nbsp;<i>string</i>&nbsp;<i>start</i>&nbsp;<i>n</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>start</i></tt> и <tt><i>n</i></tt> должны быть неотритцательными точными целыми числами, а
+сумма <tt><i>start</i></tt> и <tt><i>n</i></tt> не должна превышать длины <tt><i>string</i></tt>.
+Если не указаны, <tt><i>start</i></tt> по умолчанию равен нулю и <tt><i>n</i></tt> по умолчанию равен
+разности между длиной <tt><i>string</i></tt> и <tt><i>start</i></tt>.
+
+</p><p>
+Эта процедура записывает <tt><i>n</i></tt> символьных знаков из <tt><i>string</i></tt> начианая
+<tt><i>start</i></tt> в порт и передвигает позицию порта за конец записанных символьных знаков.
+
+</p><p>
+<a name="./io:s73"></a><span class="formdef"><b>procedure</b>: <tt>(put-datum&nbsp;<i>textual-output-port</i>&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта процедура записывает внешнее представление <tt><i>obj</i></tt> в
+<tt><i>textual-output-port</i></tt>.
+Если <tt><i>obj</i></tt> не имеет внешнего представления в качестве элемента
+данных, поведение не определено.
+Точное внешнее представление зависит от реализации, но когда <tt><i>obj</i></tt>
+имеет внешнее представление как элемент данных,
+<tt>put-datum</tt> должна создавать последовательность символьных знаков, которые
+позже могут быть прочитаны <tt>get-datum</tt> как эквивалент
+(в смысле  <tt>equal?</tt>) к <tt><i>obj</i></tt>.
+См. Раздел&nbsp;<a href="examples.html#g176">12.5</a> для реализации <tt>put-datum</tt>,
+<tt>write</tt>, и <tt>display</tt>.
+
+</p><p>
+<a name="./io:s74"></a><span class="formdef"><b>procedure</b>: <tt>(flush-output-port&nbsp;<i>output-port</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта процедура заставляет любый байты и символьные знаки в буфере, связанном
+с <tt><i>output-port</i></tt> немедленно отправляться в базовый поток.
+
+</p><p>
+
+</p><h3><a name="g130"></a><a name="./io:h9"></a>Section 7.9. Удобный Ввод/Вывод<a name="SECTCONVENIENCE"></a></h3>
+
+<p>
+Процедуры в этом разделе называются "удобными"
+опрациями ввода/вывода, поскольку они представляют собой несколько
+упрощенный интерфейс для создания и взаимодействия с текстовыми
+портами.
+Они также обеспечивают обратную совместимость с Revised<sup>5</sup> Report,
+который не поддерживает отдельный двоичныи и текстовый ввод.
+
+</p><p>
+Удобные процедуры ввода/вывода могут быть вызваны с явным аргументом порта или
+без него.
+Если вызываются без аргумента порта, используется текущий порт ввода или вывода.
+Например, <tt>(read-char)</tt> и <tt>(read-char&nbsp;(current-input-port))</tt>
+оба возвращают следующий символ из текущего порта ввода.
+
+</p><p>
+<a name="./io:s75"></a><span class="formdef"><b>procedure</b>: <tt>(open-input-file&nbsp;<i>path</i>)</tt></span>
+<br>
+<b>returns: </b>новый порт ввода
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>path</i></tt> должен быть строкой или некоторым другим значением,
+зависящим от реализации, которое именует файл.
+<tt>open-input-file</tt> создает новый текстовый порт ввода для файла с именем
+<tt><i>path</i></tt>, как если бы <tt>open-file-input-port</tt>
+с опциями по умолчанию, зависящим от реализации режимом буферизации, и
+зависимым от реализации перекодировщиком.
+
+</p><p>
+Ниже показано использование <tt>open-input-file</tt>, <tt>read</tt>, и
+<tt>close-port</tt> в выражении, которое собирает список объектов из
+файла с именем "myfile.ss."
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([p&nbsp;(open-input-file&nbsp;"myfile.ss")])<br>
+
+&nbsp;&nbsp;(let&nbsp;f&nbsp;([x&nbsp;(read&nbsp;p)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(eof-object?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(close-port&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'())<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;x&nbsp;(f&nbsp;(read&nbsp;p))))))</tt>
+</p><p><a name="./io:s76"></a><span class="formdef"><b>procedure</b>: <tt>(open-output-file&nbsp;<i>path</i>)</tt></span>
+<br>
+<b>returns: </b>новый порт вывода
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>path</i></tt> должен быть строкой или другим значением, зависящим
+от реализации, именующим файл.
+<tt>open-output-file</tt> создает новый порт вывода для файла с именем
+<tt><i>path</i></tt>, как если бы использовался <tt>open-file-output-port</tt> с опциями по умолчанию,
+с зависящим от реализации режимом буферизации, и зависящим от реализации перекодировщиком.
+
+</p><p>
+Ниже показано испоьзование <tt>open-output-file</tt> 
+для записи списка объектов(значений <tt>list-to-be-printed</tt>), 
+разделяемых знаками новой строки, в файл с именем "myfile.ss."
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([p&nbsp;(open-output-file&nbsp;"myfile.ss")])<br>
+
+&nbsp;&nbsp;(let&nbsp;f&nbsp;([ls&nbsp;list-to-be-printed])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(not&nbsp;(null?&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(write&nbsp;(car&nbsp;ls)&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(newline&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(f&nbsp;(cdr&nbsp;ls)))))<br>
+
+&nbsp;&nbsp;(close-port&nbsp;p))</tt>
+</p><p><a name="./io:s77"></a><span class="formdef"><b>procedure</b>: <tt>(call-with-input-file&nbsp;<i>path</i>&nbsp;<i>procedure</i>)</tt></span>
+<br>
+<b>returns: </b>значения возвращаемые процедурой <tt><i>procedure</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>path</i></tt> должен быть строкой или другим зависящим от реализации
+значением именующим файл.
+<tt><i>procedure</i></tt> должна принимать один аргумент.
+
+</p><p>
+<tt>call-with-input-file</tt> создает новый порт ввода для файла с именем
+<tt><i>path</i></tt>, как будто используется <tt>open-input-file</tt>, и передает этот порт
+в процедуру <tt><i>procedure</i></tt>.
+Если <tt><i>procedure</i></tt> возвращется, <tt>call-with-input-file</tt> закрывает порт ввода
+и возвращет значения возвращенные процедурой <tt><i>procedure</i></tt>.
+
+</p><p>
+<tt>call-with-input-file</tt> не закрывает автоматически порт ввода, если 
+вызывается продолжение созданное вне процедуры <tt><i>procedure</i></tt>, поскольку
+возможно, что другое продолжение созданное внутри процедуры <tt><i>procedure</i></tt>
+будет вызываться позднее, возвращая управление  <tt><i>procedure</i></tt>.
+Если <tt><i>procedure</i></tt> не возвращается, реализация может закрывать порт ввода
+только в том случае, если она может подтвердить, что порт ввода больше не доступен.
+Как показано в разделе&nbsp;<a href="control.html#g102">5.6</a>, <tt>dynamic-wind</tt> 
+может использоваться, что бы гарантировать, что порт будет закрыт, если будет
+вызвано продолжение, созданное вне <tt><i>procedure</i></tt>.
+
+</p><p>
+В следующем примере показано использование <tt>call-with-input-file</tt>
+в выражении, которое собирает список объектов из файла с именем "myfile.ss."
+Это функционально эквивалентно примеру, приведенному выше для
+<tt>open-input-file</tt>.
+
+</p><p>
+
+</p><p><tt>(call-with-input-file&nbsp;"myfile.ss"<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([x&nbsp;(read&nbsp;p)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(eof-object?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;x&nbsp;(f&nbsp;(read&nbsp;p)))))))</tt>
+</p><p><tt>call-with-input-file</tt> может быть определен без проверки ошибок следующим образом.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;call-with-input-file<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(filename&nbsp;proc)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([p&nbsp;(open-input-file&nbsp;filename)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let-values&nbsp;([v*&nbsp;(proc&nbsp;p)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(close-port&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;values&nbsp;v*)))))</tt>
+</p><p><a name="./io:s78"></a><span class="formdef"><b>procedure</b>: <tt>(call-with-output-file&nbsp;<i>path</i>&nbsp;<i>procedure</i>)</tt></span>
+<br>
+<b>returns: </b>значения возвращенные процедурой <tt><i>procedure</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>path</i></tt> должен быть строкой или другим значением, зависящим от
+реализаии, именующим файл.
+<tt><i>procedure</i></tt> должна принимать один аргумент
+
+</p><p>
+<tt>call-with-output-file</tt> создает новый порт вывода для файла с именем
+ <tt><i>path</i></tt>, как если бы использовался <tt>open-output-file</tt>, 
+и передает этот порт в процедуру <tt><i>procedure</i></tt>.
+Если <tt><i>procedure</i></tt> возвращается, <tt>call-with-output-file</tt> закрывает порт вывода
+и возвращает значения возвращенные <tt><i>procedure</i></tt>.
+
+</p><p>
+<tt>call-with-output-file</tt> не закрывает автоматически порт вывода, если
+вызывается продолжение, созданное вне  <tt><i>procedure</i></tt>, так как возможно,
+что другое продолжение, созданное внутри процедуры <tt><i>procedure</i></tt> будет
+вызвано позднее, возвращая управление процедуре <tt><i>procedure</i></tt>.
+Если <tt><i>procedure</i></tt> не возвращается, реализация может закрыть порт вывода
+только в том случае, если она может подтвердить что порт больше не доступен.
+Как показано в разделе&nbsp;<a href="control.html#g102">5.6</a>, <tt>dynamic-wind</tt> 
+может быть использоваться, чтобы гарантировать, что порт будет закрыт, если будет
+вызвано продолжение, созданное вне процедуры <tt><i>procedure</i></tt>.
+
+</p><p>
+Ниже показано использование <tt>call-with-output-file</tt> для
+записи списка объектов( значений <tt>list-to-be-printed</tt>),
+разделенных знаками новой линии, в файл с именем "myfile.ss."
+Он функционально эквивалентен приведенному выше примеру для
+<tt>open-output-file</tt>.
+
+</p><p>
+
+</p><p><tt>(call-with-output-file&nbsp;"myfile.ss"<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([ls&nbsp;list-to-be-printed])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(write&nbsp;(car&nbsp;ls)&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(newline&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(f&nbsp;(cdr&nbsp;ls))))))</tt>
+</p><p><tt>call-with-output-file</tt> может быть определена без проверки ошибок следующим образом.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;call-with-output-file<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(filename&nbsp;proc)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([p&nbsp;(open-output-file&nbsp;filename)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let-values&nbsp;([v*&nbsp;(proc&nbsp;p)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(close-port&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;values&nbsp;v*)))))</tt>
+</p><p><a name="./io:s79"></a><span class="formdef"><b>procedure</b>: <tt>(with-input-from-file&nbsp;<i>path</i>&nbsp;<i>thunk</i>)</tt></span>
+<br>
+<b>returns: </b>значения возвращенные  <tt><i>thunk</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>path</i></tt> должен быть строкой или другим зависящим от реализации значением
+именующим файл.
+<tt><i>thunk</i></tt> должен быть процедурой и должен принимать ноль аргументов.
+
+</p><p>
+<tt>with-input-from-file</tt> временно изменяет текущий порт ввода на результат открытия
+файла с именем <tt><i>path</i></tt>, как если бы использовалась <tt>open-input-file</tt>, во
+время применения <tt><i>thunk</i></tt>.
+Если <tt><i>thunk</i></tt> возвращается, порт закрывается и текущий порт ввода
+восстанавливается до его старого значения.
+
+</p><p>
+Поведение <tt>with-input-from-file</tt> не определено
+если вызывается продолжение созданное вне <tt><i>thunk</i></tt> до
+возврата из <tt><i>thunk</i></tt>.
+Реализация может закрыть порт и востановить текущий порт ввода до его
+старого значения---но это может быть не так.
+
+</p><p>
+<a name="./io:s80"></a><span class="formdef"><b>procedure</b>: <tt>(with-output-to-file&nbsp;<i>path</i>&nbsp;<i>thunk</i>)</tt></span>
+<br>
+<b>returns: </b>значения возвращаемые <tt><i>thunk</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>path</i></tt> должен быть строкой или другим зависящим от реализации значением
+именующим файл.
+<tt><i>thunk</i></tt> должен быть процедурой принимающей ноль аргументов.
+
+</p><p>
+<tt>with-output-to-file</tt> временно пересвязывает текущий порт вывода с результатом
+открытия файла с именем <tt><i>path</i></tt>, как если бы использовался <tt>open-output-file</tt>,
+на время применения <tt><i>thunk</i></tt>.
+Если <tt><i>thunk</i></tt> возвращается, порт закрывается и текущий порт вывода востанавливается
+до его старого значения.
+
+</p><p>
+Поведение <tt>with-output-to-file</tt> не определено, если вызвается
+продолжение созданное вне <tt><i>thunk</i></tt> до возвращения 
+из <tt><i>thunk</i></tt>.
+Реализация может закрыть порт и востановить его старое значение, но это
+может быть не так.
+
+</p><p>
+<a name="./io:s81"></a><span class="formdef"><b>procedure</b>: <tt>(read)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(read&nbsp;<i>textual-input-port</i>)</tt></span>
+<br>
+<b>returns: </b>базовый объект Scheme или eof объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>textual-input-port</i></tt> не указан, по умолчанию используется текущий порт ввода.
+Эта процедура в остальном эквивалентна <tt>get-datum</tt>.
+
+</p><p>
+<a name="./io:s82"></a><span class="formdef"><b>procedure</b>: <tt>(read-char)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(read-char&nbsp;<i>textual-input-port</i>)</tt></span>
+<br>
+<b>returns: </b>следующий символьный знак из <tt><i>textual-input-port</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>textual-input-port</i></tt> не указан, по умолчанию используется текущий порт ввода.
+В остальном эта процедура эквивалентна <tt>get-char</tt>.
+
+</p><p>
+<a name="./io:s83"></a><span class="formdef"><b>procedure</b>: <tt>(peek-char)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(peek-char&nbsp;<i>textual-input-port</i>)</tt></span>
+<br>
+<b>returns: </b>следующий символьный знак из <tt><i>textual-input-port</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>textual-input-port</i></tt> не указывается, по умолчанию используется текущий
+порт ввода.
+В остальном эта процедура эквивалентна <tt>lookahead-char</tt>.
+
+</p><p>
+<a name="./io:s84"></a><span class="formdef"><b>procedure</b>: <tt>(write&nbsp;<i>obj</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(write&nbsp;<i>obj</i>&nbsp;<i>textual-output-port</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>textual-output-port</i></tt> не указывается, по умолчанию испоьзуется текущий
+порт вывода.
+В остальном данная процедура эквивалентна <tt>put-datum</tt>, при этом 
+аргументы меняются на противоположные.
+См. Раздел&nbsp;<a href="examples.html#g176">12.5</a> для реализации <tt>put-datum</tt>,
+<tt>write</tt>, и <tt>display</tt>.
+
+</p><p>
+<a name="./io:s85"></a><span class="formdef"><b>procedure</b>: <tt>(display&nbsp;<i>obj</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(display&nbsp;<i>obj</i>&nbsp;<i>textual-output-port</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>textual-output-port</i></tt> не предоставляется, по умолчанию используется текущий
+порт вывода.
+
+</p><p>
+<tt>display</tt> похож на <tt>write</tt> или <tt>put-datum</tt>, но печатает строки
+и символьные знаки найденные внутри <tt><i>obj</i></tt> напрямую.
+Строки печатаются без кавычек или экранирования специальных символьных знаков, как если бы
+использовалась <tt>put-string</tt>, и символьные знаки печатаются без обозначения <tt>#\</tt>,
+как если бы использовался <tt>put-char</tt>.
+С <tt>display</tt>,
+трех элементный список <tt>(a&nbsp;b&nbsp;c)</tt>
+и двух элементный список <tt>("a&nbsp;b"&nbsp;c)</tt> оба печатаются как
+<tt>(a&nbsp;b&nbsp;c)</tt>.
+Из-за этого, <tt>display</tt> не должен использоаться для печати объектов,
+которые предназначены для чтения с <tt>read</tt>.
+<tt>display</tt> полезно использовать в первую очередь для печати сообщений
+причем <tt><i>obj</i></tt> чаще всего является строкой.
+См. Раздел&nbsp;<a href="examples.html#g176">12.5</a> для реализации <tt>put-datum</tt>,
+<tt>write</tt>, и <tt>display</tt>.
+
+</p><p>
+<a name="./io:s86"></a><span class="formdef"><b>procedure</b>: <tt>(write-char&nbsp;<i>char</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(write-char&nbsp;<i>char</i>&nbsp;<i>textual-output-port</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>textual-output-port</i></tt> не предоставляется, по умолчанию используется текущий
+порт вывода.
+Эта процедура  в остальном эквивалентна <tt>put-char</tt>, при этом аргументы меняются на противоположные.
+
+</p><p>
+<a name="./io:s87"></a><span class="formdef"><b>procedure</b>: <tt>(newline)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(newline&nbsp;<i>textual-output-port</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если <tt><i>textual-output-port</i></tt> не предоставляется, по умолчанию используется текущий
+порт вывода. 
+<tt>newline</tt> посылает знак перевода строки(line-feed) в порт.
+
+</p><p>
+<a name="./io:s88"></a><span class="formdef"><b>procedure</b>: <tt>(close-input-port&nbsp;<i>input-port</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(close-output-port&nbsp;<i>output-port</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>close-input-port</tt> закрывает порт ввода, и
+<tt>close-output-port</tt> закрывает порт вывода.
+Эти процедуры предоставляются для обратной совместимости с Revised<sup>5</sup>
+Report; они на самом деле не являются более удобными в использовании, чем <tt>close-port</tt>.
+
+</p><p>
+
+</p><h3><a name="g131"></a><a name="./io:h10"></a>Section 7.10. Операции файловой системы<a name="SECTFILESYSTEM"></a></h3>
+
+<p>
+Scheme имеет две стандартные операции, помимо файлового ввода/вывода, для взаимодействия
+с файловой системой: <tt>file-exists?</tt> и <tt>delete-file</tt>.
+Большинство реализаций поддерживают дополнительные операции.
+
+</p><p>
+<a name="./io:s89"></a><span class="formdef"><b>procedure</b>: <tt>(file-exists?&nbsp;<i>path</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если файл с именем <tt><i>path</i></tt> существует, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>path</i></tt> должен быть строкой или некоторым другим значением, зависящим
+от реализаци, котое именует файл.
+Существует ли файл <tt>file-exists?</tt> следование символическим ссылкам не определено.
+
+</p><p>
+<a name="./io:s90"></a><span class="formdef"><b>procedure</b>: <tt>(delete-file&nbsp;<i>path</i>)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>path</i></tt> должен быть строкой или некоторым другим значением,
+зависящим от реализации, которое именует файл.
+<tt>delete-file</tt> удаляет файл с именем <tt><i>path</i></tt> если он существует
+и может быть удален, иначе она вызывает исключение с типом условия <tt>&amp;i/o-filename</tt>.
+Действе <tt>delete-file</tt> с символическими ссылками не определено.
+
+</p><p>
+
+</p><h3><a name="g132"></a><a name="./io:h11"></a>Section 7.11. Преобразование байтовых-векторов/Строк<a name="SECTBSCONVS"></a></h3>
+
+<p>
+Процедуры описанные в этом разделе, кодируют или декодируют последовательности
+символьных знаков, преобразуя их из строк байтовые вектора или байтовые вектора
+в строки.
+Они не обязательно включают ввод/вывод, хотя они могут быть реализованы с 
+использованием байт-векторных портов ввода и вывода.
+
+</p><p>
+Первые две процедуры, <tt>bytevector-&gt;string</tt> и
+<tt>string-&gt;bytevector</tt>, принимают явный аргумент transcoder(перекодировщик)
+который определяет кодировку символьных знаков, стиль окончания линии(eol styles) и
+режим обработки ошибок(error-handling modes).
+Другие выполняют определенные  Unicode преобразования с неявным
+eol-style равным <tt>none</tt> и режимом обработки ошибок равным <tt>replace</tt>.
+
+</p><p>
+<a name="./io:s91"></a><span class="formdef"><b>procedure</b>: <tt>(bytevector-&gt;string&nbsp;<i>bytevector</i>&nbsp;<i>transcoder</i>)</tt></span>
+<br>
+<b>returns: </b>строку содержащую символьные знаки закодированные в <tt><i>bytevector</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта операция, по крайней мере, создает байт-векторный порт ввода с указанным
+перекодировщиком <tt><i>transcoder</i></tt> из которого считываются все доступные
+символьные знаки, как будто <tt>get-string-all</tt>, и помещаются в выходную строку.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([tx&nbsp;(make-transcoder&nbsp;(utf-8-codec)&nbsp;(eol-style&nbsp;lf)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(error-handling-mode&nbsp;replace))])<br>
+
+&nbsp;&nbsp;(bytevector-&gt;string&nbsp;#vu8(97&nbsp;98&nbsp;99)&nbsp;tx))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"abc"</tt>
+</p><p><a name="./io:s92"></a><span class="formdef"><b>procedure</b>: <tt>(string-&gt;bytevector&nbsp;<i>string</i>&nbsp;<i>transcoder</i>)</tt></span>
+<br>
+<b>returns: </b>байт-вектор, содержащий закодированые символьные знаки из <tt><i>string</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта операция, по крайней мере, создает байт-векторный порт вывода с указанным
+перекодировщиком <tt><i>transcoder</i></tt> в который записываются все символьные знаки
+строки <tt><i>string</i></tt>, а затем извлекает байтовый вектор, содержащий накопленные
+байты.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([tx&nbsp;(make-transcoder&nbsp;(utf-8-codec)&nbsp;(eol-style&nbsp;none)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(error-handling-mode&nbsp;raise))])<br>
+
+&nbsp;&nbsp;(string-&gt;bytevector&nbsp;"abc"&nbsp;tx))&nbsp;<img src="./io_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#vu8(97&nbsp;98&nbsp;99)</tt>
+</p><p><a name="./io:s93"></a><span class="formdef"><b>procedure</b>: <tt>(string-&gt;utf8&nbsp;<i>string</i>)</tt></span>
+<br>
+<b>returns: </b>байтовый вектор содержащий закодированную в UTF-8 строку <tt><i>string</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;bytevectors)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./io:s94"></a><span class="formdef"><b>procedure</b>: <tt>(string-&gt;utf16&nbsp;<i>string</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(string-&gt;utf16&nbsp;<i>string</i>&nbsp;<i>endianness</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(string-&gt;utf32&nbsp;<i>string</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(string-&gt;utf32&nbsp;<i>string</i>&nbsp;<i>endianness</i>)</tt></span>
+<br>
+<b>returns: </b>байтовый вектор содержащий закодированную в укзанную кодировку строку <tt><i>string</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;bytevectors)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>endianness</i></tt> должен быть одним из символов <tt>big</tt> или <tt>little</tt>.
+Если <tt><i>endianness</i></tt> не указывается или символ <tt>big</tt>,
+<tt>string-&gt;utf16</tt> возвращает закодированную в UTF-16BE строку <tt><i>string</i></tt> и
+<tt>string-&gt;utf32</tt> возвращает закодированную в UTF-32BE строку <tt><i>string</i></tt>.
+Если <tt><i>endianness</i></tt> равен символу <tt>little</tt>, <tt>string-&gt;utf16</tt> возвращает
+закодированную в UTF-16LE строку <tt><i>string</i></tt> и <tt>string-&gt;utf32</tt> возвращает
+закодированную в UTF-32LE строку <tt><i>string</i></tt>.
+В кодировку не вклчается знак байтового порядка.
+
+</p><p>
+<a name="./io:s95"></a><span class="formdef"><b>procedure</b>: <tt>(utf8-&gt;string&nbsp;<i>bytevector</i>)</tt></span>
+<br>
+<b>returns: </b>строка содержащая знаки декодирующие с помощью кодировки UTF-8 байт-вектор <tt><i>bytevector</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;bytevectors)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./io:s96"></a><span class="formdef"><b>procedure</b>: <tt>(utf16-&gt;string&nbsp;<i>bytevector</i>&nbsp;<i>endianness</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(utf16-&gt;string&nbsp;<i>bytevector</i>&nbsp;<i>endianness</i>&nbsp;<i>endianness-mandatory?</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(utf32-&gt;string&nbsp;<i>bytevector</i>&nbsp;<i>endianness</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(utf32-&gt;string&nbsp;<i>bytevector</i>&nbsp;<i>endianness</i>&nbsp;<i>endianness-mandatory?</i>)</tt></span>
+<br>
+<b>returns: </b>строку, содержащую знаки декодирующие из указанной кодировки байт-вектор <tt><i>bytevector</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;bytevectors)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>endianness</i></tt> должен быть одним из символов <tt>big</tt> или
+<tt>little</tt>.
+Эти процедуры возвращают декодированую строку из <tt><i>bytevector</i></tt> кодированного в UTF-16 или UTF-32 ,
+причем endianness представление определяется из аргумента endianness
+ или знака порядка байтов(byte-order mark) (BOM).
+Если <tt><i>endianness-mandatory?</i></tt> не указывается или равно <tt>#f</tt>, 
+то endianness определяетя с помощью BOM стоящего в начале <tt><i>bytevector</i></tt> или, 
+если BOM отсутствует, по аргументу <tt><i>endianness</i></tt>.
+Если <tt><i>endianness-mandatory?</i></tt> равен <tt>#t</tt>, endianness 
+определяется аргументом <tt><i>endianness</i></tt>, и если BOM появляется в начале
+<tt><i>bytevector</i></tt>, он рассматривается как обычный закодированный символьный знак.
+
+</p><p>
+UTF-16 BOM это двух байтовая последовательность <tt>#xFE</tt>, <tt>#xFF</tt>
+указывающая "big" или двух байтовая последовательность <tt>#xFF</tt>, <tt>#xFE</tt>
+указывающая "little."
+UTF-32 BOM это четырех байтовая последовательность <tt>#x00</tt>, <tt>#x00</tt>,
+<tt>#xFE</tt>, <tt>#xFF</tt> указывающая "big" или четырех байтовая последовательность
+<tt>#xFF</tt>, <tt>#xFE</tt>, <tt>#x00</tt>, <tt>#x00</tt> указывающая "little."
+
+</p><hr class="copyright" align="left">
+<p>
+R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</it><br>
+Copyright © 2009 <a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">The MIT Press</a>.  Electronically reproduced by permission.<br>
+Illustrations © 2009 <a class="plain" href="http://hebert.kitp.ucsb.edu/">Jean-Pierre Hébert</a><br>
+ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>
+<a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">to order this book</a> / <a class="plain" href="canned/about.html">about this book</a>
+</p>
+<p><a class="plain" href="http://www.scheme.com/">http://www.scheme.com</a></p>
+
+</body></html>

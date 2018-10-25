@@ -1,0 +1,3296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0046)start.html#./start:h0 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<title>Начало</title>
+<link href="./start_files/tspl.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a name="g4"></a>
+<a name="./start:h0"></a>
+
+<div>
+<img  src="./start_files/ch2.png">
+</div>
+<h1>Chapter 2. Начало<a name="CHPTGETTINGSTARTED"></a></h1>
+
+<p>
+Эта глава представляет собой введение в Scheme для программистов, которые
+не знакомы с языком.
+Вы получите больше от прочтения этой главы, если сидите перед интерактивной
+системой Scheme, пробуя примеры по мере чтения.
+
+</p><p>
+После прочтения этой главы и работы над упражнениями, вы сможете начать
+использовать Scheme.
+Вы узнаете синтаксис программ Scheme и их выполнение, а также как использовать
+простые структуры данных и механизмы управления.
+
+</p><p>
+
+</p><h3><a name="g5"></a><a name="./start:h1"></a>Section 2.1. Взаимодействие со Scheme<a name="SECTGSINTERACTING"></a></h3>
+
+<p>
+Большинство систем Scheme обеспечивают интерактивную среду программирования,
+которая упрощает разработку программ и постановку программных экспериментов.
+Простейшее взаимодействие с Scheme цикл последовательных операций "ввод-выполнение-печать"
+("read-evaluate-print").
+Программа (часто называемая <i>read-evaluate-print loop</i>, или REPL)
+читает каждое выражение вводимое с клавиатуры и выполняет его, и печатает его значение.
+
+</p><p>
+С помощью интерактивной системы Scheme, вы можете ввести выражение на
+клавиатуре и сразу увидеть его значение.
+Вы можете определить процедуру и применить ее к аргументам, чтобы увидеть
+как она работает.
+Вы можете ввести всю программу, состоящую из набора процедур и протестировать
+ее не покидая систему.
+Когда ваша программа начнет увеличиваться, удобнее будет ввести ее в файл
+(используя текстовый редактор), загрузить файл и протестировать его
+в интерактивном режиме.
+В большинстве систем Scheme, файл может быть загружен не стандартной
+процедурой <a name="./start:s0"></a><tt>load</tt>,  которая принимает
+строковый аргумент, именующий файл.
+Подготовка вашей программы в файле имеет несколько преимуществ: вы можете
+исправить ошибки без повторного ввода программы, и вы можете сохранить копию
+для последующего использования.
+Большинство реализаций Scheme обрабатывают выражения, загруженные из файла, также
+как если бы эти выражения были введены на клавиатуре.
+
+</p><p>
+Хотя Scheme предоставляет различные процедуры ввода и вывода, REPL
+заботиться о чтении выражений и печати их значений. Это позволяет
+вам сосредоточиться на написании вашей программы, не беспокоясь о том, 
+как ее результаты будут отображаться.
+
+</p><p>
+Примеры в этой главе и в остальной части книги соотвествуют регулярному формату.
+Вы можете ввести выражение, которое вы можете ввести с клавиатуры, стоит вначале,
+возможно, в нескольких строках.
+Значение выражения указывается после символа <img src="./start_files/0.gif" alt="&lt;graphic&gt;">,
+который можно прочитать как "вычисляется в."
+Для определений <img src="./start_files/0.gif" alt="&lt;graphic&gt;"> параметр опущен и когда значение
+выражения не указано.
+
+</p><p>
+Примеры программ отформатированы в стиле который  "выглядит хорошо"
+и передает структуру программы.
+Код легко читается, потому что явно видно соотношение между каждым выражением
+и его подвыражениями.
+Однако Scheme игнорирует отсупы и переносы строк, поэтому нет необходимости
+следовать определенному стилю.
+Важно установить один стиль и сохранить его.
+Scheme видит каждую программу, как если бы она была на одной строке, а ее
+подвыражения упорядочены слева на право.
+
+</p><p>
+</p><p>Если у вас есть доступ к интеркативной среде Scheme, может быть неплохо начать
+ее сейчас использовать и набирать примеры по мере чтения.
+Одним из простейших выражений Scheme является <a name="./start:s1"></a>строковая константа.
+Попробуйте ввести <tt>"Hi&nbsp;Mom!"</tt> (включая двойные кавычки) в ответ на приглашение.
+Система должна ответить <tt>"Hi&nbsp;Mom!"</tt>; значение любой констаны является
+самой константой.
+
+</p><p>
+
+</p><p><tt>"Hi&nbsp;Mom!"&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"Hi&nbsp;Mom!"</tt>
+</p><p>Вот набор выражений, с ответом Scheme на каждый из них.
+Они объясняются в последующих разделах этой главы, но теперь используйте их для взаимодействия со Scheme.
+
+</p><p>
+
+</p><p><tt>"hello"&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"hello"<br>
+
+42&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;42<br>
+
+22/7&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;22/7<br>
+
+3.141592653&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3.141592653<br>
+
++&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#&lt;procedure&gt;<br>
+
+(+&nbsp;76&nbsp;31)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;107<br>
+
+(*&nbsp;-12&nbsp;10)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;-120<br>
+
+'(a&nbsp;b&nbsp;c&nbsp;d)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c&nbsp;d)</tt>
+</p><p>Будьте осторожны, чтобы не пропустить ни одной кавычки (&nbsp;<tt>'</tt>&nbsp;), двойной кавычки, или
+скобки. Если в последнем выражении вы пропустите одиночную кавычку, вы вероятно получите сообщение о том,
+что произошло исключение. Попробуйте еще раз.
+Ели вы пропустите закрытие круглой скобки или двойной кавычки, система будет ее ожидать.
+
+</p><p>
+Вот еще несколько выражений, которые нужно попробовать.  Вы можете попытаться самостоятельно
+выяснить, что они означают или подождать, чтобы узнать о них позже в этой главе.
+
+</p><p>
+
+</p><p><tt>(car&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a<br>
+
+(cdr&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;c)<br>
+
+(cons&nbsp;'a&nbsp;'(b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)<br>
+
+(cons&nbsp;(car&nbsp;'(a&nbsp;b&nbsp;c))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cdr&nbsp;'(d&nbsp;e&nbsp;f)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;e&nbsp;f)</tt>
+</p><p>Как вы можете видеть, выражения Scheme могут охватывать более одной строки.
+Система Scheme знает когда у нее есть введенное выражение , сопоставляя двойные кавычки
+и круглые скобки.
+
+</p><p>
+Далее, давайте попробуем определить процедуру<a name="./start:s2"></a>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;square<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;n&nbsp;n)))</tt>
+</p><p>Процедура <tt>square</tt> вычисляет квадрат <i>n</i><sup>2</sup> любого числа <i>n</i>.
+Мы больше поговорим о выражениях, которые составляют это определение позже в этой главе.
+На данный момент достаточно сказать, что <tt>define</tt> устанавливает привязку переменной(связывает переменную и, в данном случае,
+значение), создаваемое процедурой <tt>lambda</tt>, и <tt>*</tt> именует процедуру умножения.
+Обратите внимание на форму этих выражений.
+Все структурированные формы заключены в круглые скобки и записаны в 
+<a name="./start:s3"></a><i>префиксной нотации</i>, т.е., оператор предшествует
+аргументам.
+Как вы можете видеть, это справедливо даже для простых арифметических операций, таких
+как <tt>*</tt>.
+
+</p><p>
+Попробуйте использовать <tt>square</tt>.
+
+</p><p>
+
+</p><p><tt>(square&nbsp;5)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;25<br>
+
+(square&nbsp;-200)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;40000<br>
+
+(square&nbsp;0.5)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0.25<br>
+
+(square&nbsp;-1/2)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1/4</tt>
+</p><p>Даже если следующее определение короткое, вы можете ввести его в файл.
+Предположим, вы назовете файл "reciprocal.ss."
+
+</p><p>
+
+</p><p><tt>(define&nbsp;reciprocal<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;n&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"oops!"<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(/&nbsp;1&nbsp;n))))</tt>
+</p><p>процедура(обратное), <a name="./start:s4"></a><tt>reciprocal</tt>, вычисляет величину 1/<i>n</i> для
+любого числа <i>n</i> &#8800; 0.
+Для <i>n</i> = 0, <tt>reciprocal</tt> возвращает строку <tt>"oops!"</tt>.
+Вернитесь к Scheme и попробуйте загрузить файл процедурой <tt>load</tt>.
+
+</p><p>
+
+</p><p><tt>(load&nbsp;"reciprocal.ss")</tt>
+</p><p>Finally, try using the procedure we have just defined.
+
+</p><p>
+
+</p><p><tt>(reciprocal&nbsp;10)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1/10<br>
+
+(reciprocal&nbsp;1/10)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;10<br>
+
+(reciprocal&nbsp;0)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"oops!"<br>
+
+(reciprocal&nbsp;(reciprocal&nbsp;1/10))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1/10</tt>
+</p><p>В следующем разделе мы более подробно обсудим выражения Scheme.
+В этой главе запомните, что ваша система Scheme является одним из
+самых полезных инструментов для обучения Scheme.
+Всякий раз, как вы пытаетесь использовать один из примеров в тексте,
+проверяйте ваши собственные примеры.
+В интерактивной системе Scheme, затраты на то чтобы что то попробовать,
+невелики---обычно это просто время чтобы его ввести.
+
+</p><p>
+
+</p><h3><a name="g6"></a><a name="./start:h2"></a>Section 2.2. Простые Выражения<a name="SECTGSSIMPLE"></a></h3>
+
+<p>
+Простейшим выражением Scheme являются постоянные объекты данных, такие как строки,
+числа, символы и списки.
+Scheme поддерживает другие типы объектов, но этих четырех достаточно для многих программ.
+Мы видели несколько примеров строк и чисел в предыдущем разделе.
+
+</p><p>
+Давайте обсудим <a name="./start:s5"></a>числа немного подробнее.
+Числа - это константы.
+Если вы вводите число, Scheme передает его обратно вам.
+Следующие примеры показывают, что Scheme поддерживает несколько типов
+чисел.
+
+</p><p>
+
+</p><p><tt>123456789987654321&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;123456789987654321<br>
+
+3/4&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3/4<br>
+
+2.718281828&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2.718281828<br>
+
+2.2+1.1i&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2.2+1.1i</tt>
+</p><p>Числа Scheme включают точные и не точные целые, рациональные, действительные и
+комплексные числа.
+Точные целые и рациональные числа имеют произвольную точность, т.е они могут быть
+произвольного размера. Неточные числа обычно представляются внутренне с использованием
+стандартных представлений с плавающей точкой IEEE.
+
+</p><p>
+Scheme предоставляет имена <a name="./start:s6"></a><tt>+</tt>, <a name="./start:s7"></a><tt>-</tt>, <a name="./start:s8"></a><tt>*</tt>, и <a name="./start:s9"></a><tt>/</tt> для соответствующих
+арифметических процедур.
+Каждая процедура принимает два числовых аргумента.
+Выражения, приведенные ниже, называются <a name="./start:s10"></a><i>применением процедур</i>,
+потому что они определяют применение процедуры к набору аргументов.
+
+</p><p>
+
+</p><p><tt>(+&nbsp;1/2&nbsp;1/2)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+(-&nbsp;1.5&nbsp;1/2)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1.0
+<br>
+<br>
+(*&nbsp;3&nbsp;1/2)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3/2<br>
+
+(/&nbsp;1.5&nbsp;3/4)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2.0</tt>
+</p><p>В Scheme используется <a name="./start:s11"></a>префиксная нотация даже для обычных арифметических операций.
+Любое применение процедуры, независимо от того, принимает ли она
+ноль, один, два или несколько аргументов, записывается как
+<tt>(<i>procedure</i>&nbsp;<i>arg</i>&nbsp;...)</tt>.
+Эта регулярность упрощает синтаксис выражений; одна нотация используется
+независимо от операции, и нет сложных правил относительно <a name="./start:s12"></a> приоритета или
+ассоциативности операторов.
+
+</p><p>
+Применения процедур могут быть вложенными, и в этом случае сначала вычисляются
+внутренние значения.
+Таким образом, мы можем применить описанные выше арифметические процедуры
+для вычисления более сложных формл.
+
+</p><p>
+
+</p><p><tt>(+&nbsp;(+&nbsp;2&nbsp;2)&nbsp;(+&nbsp;2&nbsp;2))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;8<br>
+
+(-&nbsp;2&nbsp;(*&nbsp;4&nbsp;1/3))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2/3<br>
+
+(*&nbsp;2&nbsp;(*&nbsp;2&nbsp;(*&nbsp;2&nbsp;(*&nbsp;2&nbsp;2))))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;32<br>
+
+(/&nbsp;(*&nbsp;6/7&nbsp;7/2)&nbsp;(-&nbsp;4.5&nbsp;1.5))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1.0</tt>
+</p><p>Эти примеры демонстрируют все, что вам нужно, чтобы использовать Scheme как
+четырех-функциональный настольный калькулятор.
+Хотя мы не будем обсуждать их в этой главе, Scheme поддерживает многие
+друге арифметические процедуры.
+Теперь, возможно, подходящее время чтобы перейти к разделу &nbsp;<a href="objects.html#g110">6.4</a> 
+и поэксперементировать с некоторыми из них.
+
+</p><p>
+</p><p><a name="./start:s13"></a>Для многих задач достаточно простых числовых объектов, но
+иногда необходимы агрегированные структуры данных, содержащие два или более значений.
+На многих языках основной агрегированной структурой данных является массив.
+В Scheme, это список(<i>list</i>).
+Списки записываются как последовательности объектов, окруженные скобками.
+Например, <tt>(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5)</tt> представляет собой список чисел, и
+<tt>("this"&nbsp;"is"&nbsp;"a"&nbsp;"list")</tt> представляет собой список строк.
+Списки не обязаны содержать только один тип объекта, поэтому
+<tt>(4.2&nbsp;"hi")</tt> является допустимым списком, содержащим число и строку.
+Списки могут быть вложенными (могут содержать другие списки), поэтому <tt>((1&nbsp;2)&nbsp;(3&nbsp;4))</tt>
+является допустимым списком с двумя элементами, каждый из которых
+представляет собой список из двух элементов.
+
+</p><p>
+Вы можете заметить что спики выглядят также как и применение процедур,
+и задасться вопросом, как Scheme различает их.
+Т.е как Scheme отличает список объектов,
+<tt>(<i>obj<sub>1</sub></i>&nbsp;<i>obj<sub>2</sub></i>&nbsp;...)</tt>,
+от  <a name="./start:s14"></a>применения процедуры,
+<tt>(<i>procedure</i>&nbsp;<i>arg</i>&nbsp;...)</tt>?
+
+</p><p>
+В некоторых случаях различие может быть очевидным.
+Список чисел <tt>(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5)</tt> вряд ли можно спутать с
+применением процедуры, поскольку 1 это число, а не процедура.
+Таким образом, ответ может заключаться в том, что Scheme смотрит на первых элемент
+списка или применения процедуры и  принимает решение на основании того, является ли
+этот первый элемент процедурой или нет.
+Этот ответ недостаточно хорош, так как мы можем даже хотеть рассматривать действительное
+применение процедуры такое как <tt>(+&nbsp;3&nbsp;4)</tt> как список.
+Ответ заключается в том, что мы явно должны сказать Scheme о том, чтобы рассматривать
+список как данные, а не как применение процедуры. Мы делае это с помощью
+<a name="./start:s15"></a><a name="./start:s16"></a><tt>quote(кавычки/выражения цитирования, являющегося синтаксической формой)</tt>.
+
+</p><p>
+
+</p><p><tt>(quote&nbsp;(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5)<br>
+
+(quote&nbsp;("this"&nbsp;"is"&nbsp;"a"&nbsp;"list"))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;("this"&nbsp;"is"&nbsp;"a"&nbsp;"list")<br>
+
+(quote&nbsp;(+&nbsp;3&nbsp;4))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(+&nbsp;3&nbsp;4)</tt>
+</p><p><tt>quote</tt> заставляет обрабатывать список как данные.
+Попробуйте ввести приведенные выше выражения без quote; скорее всего, вы получите
+сообщение  о том, что произошло исключение для первых двух и неверный ответ
+(<tt>7</tt>) для третьего.
+
+</p><p>
+Поскольку<tt>quote</tt> требуется довольно часто в коде Scheme, Scheme
+распознает знак кавычки (&nbsp;<tt>'</tt>&nbsp;) предшестующий выражению
+как сокращение для выражения <tt>quote</tt>.
+
+</p><p>
+
+</p><p><tt>'(1&nbsp;2&nbsp;3&nbsp;4)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;3&nbsp;4)<br>
+
+'((1&nbsp;2)&nbsp;(3&nbsp;4))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((1&nbsp;2)&nbsp;(3&nbsp;4))<br>
+
+'(/&nbsp;(*&nbsp;2&nbsp;-1)&nbsp;3)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(/&nbsp;(*&nbsp;2&nbsp;-1)&nbsp;3)</tt>
+</p><p>Обе формы называются выражениями <tt>quote(цитирования)</tt>.
+Мы часто говорим, что объект <i>quoted</i> когда он заключен в 
+выражении <tt>quote</tt>.
+
+</p><p>
+Выражение <tt>quote</tt> <i>не</i> является применением процедуры, поскольку
+оно препятствует оценке его подвыражений.
+Это совершенно другая синтаксическая форма.
+Scheme поддерживает несколько других <a name="./start:s17"></a>синтаксических форм
+в дополнение к применению процедур и выражениям <tt>quote(цитирования)</tt>.
+Каждая синтаксическая форма вычисляется по разному. К счастью, количество
+различных синтаксических форм невелико. Мы познакомимся с ними позже в этой главе.
+
+</p><p>
+Не все выражения <tt>quote</tt> содержат списки.
+Попробуйте следующие выражение с и без обертывания <tt>quote</tt>.
+
+</p><p>
+
+</p><p><tt>(quote&nbsp;hello)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;hello</tt>
+</p><p>Символ <tt>hello</tt> должен быть квотирован, чтобы предотвратить обращение Scheme к
+<tt>hello</tt> как <i>переменной</i>.
+Символы и <a name="./start:s18"></a>переменные в Scheme аналогичны <a name="./start:s19"></a>символам и
+переменным в математических выражениях и уравнениях.
+Когда мы вычисляем математическое выражение 1 - <i>x</i> для некотрого значения
+<i>x</i>, мы рассматриваем <i>x</i> как переменную.
+С другой стороны, когда мы рассматриваем алгебраическое уравнение 
+<i>x</i><sup>2</sup> - 1 = (<i>x</i> - 1)(<i>x</i> + 1), мы считаем <i>x</i> символом (на самом деле
+мы рассматриваем все уравнение символически).
+Так же как квотирование списка говорит Scheme рассматривать форму в скобках как список,
+а не как выполнение процедуры, квотирование идентификатора говорит Scheme рассматривать
+идентификатор как символ, а не как переменную.
+Хотя символы обычно используются для представления переменных в символических
+представлениях уравнений или программ, символы могут также использоваться, например
+как слова в представлении предложений естественного языка.
+
+</p><p>
+Вы можете удиваться, почему применение процедур и переменных имеют сходное обозначение
+вместе со списками и символами.
+Сходное обозначение позволяет программам Scheme быть представленными в виде
+данных Scheme, упрощая написание интерпретаторов, компиляторов, редакторов и
+других инструментов на Scheme.
+Здесь демонстрируется интерпретатор Scheme приведенный в разделе
+&nbsp;<a href="examples.html#g187">12.7</a>,
+который сам написан на Scheme.
+Многие считают, что это одна из самых важных особенностей
+Scheme.
+
+</p><p>
+Числа и строки могут быть также цитированы.
+
+</p><p>
+
+</p><p><tt>'2&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2<br>
+
+'2/3&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2/3<br>
+
+(quote&nbsp;"Hi&nbsp;Mom!")&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"Hi&nbsp;Mom!"</tt>
+</p><p>Однако числа и строки рассматриваются как константы в любом случае, поэтому их
+квотирование не является необходимым.
+
+</p><p>
+</p><p>Теперь давайте обсудим некоторые процедуры Scheme для манипулирования 
+<a name="./start:s20"></a>списками.
+Существуют две основные процедуры для получения частей списков: <a name="./start:s21"></a><tt>car</tt> и
+<a name="./start:s22"></a><tt>cdr</tt> (произносится как <i>could-er</i>).
+<tt>car</tt> возвращает первый элемент списка, и <tt>cdr</tt> возвращает
+оставшуюся часть списка.
+(Имена "car" и "cdr" происходят из операций поддерживаемых первым
+компьютером, на котором был реализован язык Lisp - IBM&nbsp;704.)
+Каждый из них требует непустой список в качестве аргумента.
+
+</p><p>
+
+</p><p><tt>(car&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a<br>
+
+(cdr&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;c)<br>
+
+(cdr&nbsp;'(a))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;()
+<br>
+<br>
+(car&nbsp;(cdr&nbsp;'(a&nbsp;b&nbsp;c)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;b<br>
+
+(cdr&nbsp;(cdr&nbsp;'(a&nbsp;b&nbsp;c)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(c)
+<br>
+<br>
+(car&nbsp;'((a&nbsp;b)&nbsp;(c&nbsp;d)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b)<br>
+
+(cdr&nbsp;'((a&nbsp;b)&nbsp;(c&nbsp;d)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((c&nbsp;d))</tt>
+</p><p>Первый элемент списка часто называют "car" списка, а оставшуюся
+часть списка называют "cdr" списка.
+cdr списка с одним элементом это <a name="./start:s23"></a><tt>()</tt>, <a name="./start:s24"></a><i>пустой список</i>.
+
+</p><p>
+Процедура <a name="./start:s25"></a><tt>cons</tt> строит списки.
+Она принимает два аргумента. Второй аргумент обычно представляет собой список,
+и в этом случае <tt>cons</tt> возвращает список.
+
+</p><p>
+
+</p><p><tt>(cons&nbsp;'a&nbsp;'())&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a)<br>
+
+(cons&nbsp;'a&nbsp;'(b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)<br>
+
+(cons&nbsp;'a&nbsp;(cons&nbsp;'b&nbsp;(cons&nbsp;'c&nbsp;'())))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)<br>
+
+(cons&nbsp;'(a&nbsp;b)&nbsp;'(c&nbsp;d))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((a&nbsp;b)&nbsp;c&nbsp;d)
+<br>
+<br>
+(car&nbsp;(cons&nbsp;'a&nbsp;'(b&nbsp;c)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a<br>
+
+(cdr&nbsp;(cons&nbsp;'a&nbsp;'(b&nbsp;c)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;c)<br>
+
+(cons&nbsp;(car&nbsp;'(a&nbsp;b&nbsp;c))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cdr&nbsp;'(d&nbsp;e&nbsp;f)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;e&nbsp;f)<br>
+
+(cons&nbsp;(car&nbsp;'(a&nbsp;b&nbsp;c))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cdr&nbsp;'(a&nbsp;b&nbsp;c)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)</tt>
+</p><p>Так же как "car" и "cdr" часто используются в качестве существительных, "cons" 
+часто используется в качестве глагола.
+Создание нового списка путем добавления элемента в начало списка называется 
+<a name="./start:s26"></a><i>consing</i> элемента в список.
+
+</p><p>
+Обратите внимание на слово "обычно" в описании второго аргумента  <tt>cons</tt>.
+Процедура <tt>cons</tt> фактически создает <a name="./start:s27"></a><i>пары</i>, и нет никакой
+причины чтобы cdr в паре был списком.
+Список это последовательность пар; в каждаой паре cdr это следующая пара в последовательности.
+</p><p>
+<img src="./start_files/1.gif" alt="&lt;graphic&gt;"></p><p>
+
+cdr последней пары в <a name="./start:s28"></a><i>правильном списке</i> это пустой список.
+Иначе, последовательность пар образует <a name="./start:s29"></a><i>неправильные список</i>.
+Более формально: пустой список в правильном списке, и любая пара, чей cdr
+является правильным списком, является правильным списком.
+
+</p><p>
+Неправильный список печатается в виде <i>пары с точкой</i>, с периодом, или
+ <a name="./start:s30"></a><a name="./start:s31"></a><i>точкой</i>,
+предшествующей последнему элементу списка.
+
+</p><p>
+
+</p><p><tt>(cons&nbsp;'a&nbsp;'b)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;.&nbsp;b)<br>
+
+(cdr&nbsp;'(a&nbsp;.&nbsp;b))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;b<br>
+
+(cons&nbsp;'a&nbsp;'(b&nbsp;.&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;.&nbsp;c)</tt>
+</p><p>Из за своей печатной нотации, пару чей cdr не является списком часто
+называю <a name="./start:s32"></a><i>парой с точкой</i>.
+Даже пары, чьи списки правильные могут быть записаны в виде пары с точкой, однако,
+процедура вывода всегда предпочитает писать правильные списки без точек.
+
+</p><p>
+
+</p><p><tt>'(a&nbsp;.&nbsp;(b&nbsp;.&nbsp;(c&nbsp;.&nbsp;())))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)</tt>
+</p><p>Процедура <a name="./start:s33"></a><tt>list</tt> похожа на <tt>cons</tt>, за исключением того,
+что она принимает произвольное количество аргументов и всегда строит правильный список.
+
+</p><p>
+
+</p><p><tt>(list&nbsp;'a&nbsp;'b&nbsp;'c)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)<br>
+
+(list&nbsp;'a)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a)<br>
+
+(list)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;()</tt>
+</p><p>Раздел&nbsp;<a href="objects.html#g109">6.3</a> содержит дополнительную информацию о списках
+и процедурах Scheme для манипуляции ими. 
+Это может быть подходящее время, чтобы обратиться к этому разделу и ознакомиться с
+другими процедурами.
+
+</p><p>
+
+</p><h4>Упражнение <a name="g7"></a>2.2.1</h4>
+<a name="./start:s34"></a>Преобразуйте последующие арифметические выражения в выражения Scheme и
+вычислите их.
+
+<p>
+
+ </p><table>
+<tbody><tr valign="top"><td><i>&nbsp;&nbsp;a</i>.</td><td>1.2 × (2 - 1/3) + -8.7
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;b</i>.</td><td>(2/3 + 4/9) ÷ (5/11 - 4/3)
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;c</i>.</td><td>1 + 1 ÷ (2 + 1 ÷ (1 + 1/2))
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;d</i>.</td><td>1 × -2 × 3 × -4 × 5 × -6 × 7
+</td></tr></tbody></table>
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g8"></a>2.2.2</h4>
+<a name="./start:s35"></a>Поэксперементируйте с процедурами <tt>+</tt>, <tt>-</tt>, <tt>*</tt>, и <tt>/</tt>
+чтобы определить правила Scheme для типа значения, возвращаемого каждым при задании разных типов числовых
+аргументов.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g9"></a>2.2.3</h4>
+<a name="./start:s36"></a><a name="EXEXPRVALUE"></a>Определите значения следующих выражений.
+Используйте вашу систему Scheme для проверки своих ответов.
+
+<p>
+
+ </p><table>
+<tbody><tr valign="top"><td><i>&nbsp;&nbsp;a</i>.</td><td><tt>(cons&nbsp;'car&nbsp;'cdr)</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;b</i>.</td><td><tt>(list&nbsp;'this&nbsp;'(is&nbsp;silly))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;c</i>.</td><td><tt>(cons&nbsp;'is&nbsp;'(this&nbsp;silly?))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;d</i>.</td><td><tt>(quote&nbsp;(+&nbsp;2&nbsp;3))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;e</i>.</td><td><tt>(cons&nbsp;'+&nbsp;'(2&nbsp;3))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;f</i>.</td><td><tt>(car&nbsp;'(+&nbsp;2&nbsp;3))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;g</i>.</td><td><tt>(cdr&nbsp;'(+&nbsp;2&nbsp;3))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;h</i>.</td><td><tt>cons</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;i</i>.</td><td><tt>(quote&nbsp;cons)</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;j</i>.</td><td><tt>(quote&nbsp;(quote&nbsp;cons))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;k</i>.</td><td><tt>(car&nbsp;(quote&nbsp;(quote&nbsp;cons)))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;l</i>.</td><td><tt>(+&nbsp;2&nbsp;3)</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;m</i>.</td><td><tt>(+&nbsp;'2&nbsp;'3)</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;n</i>.</td><td><tt>(+&nbsp;(car&nbsp;'(2&nbsp;3))&nbsp;(car&nbsp;(cdr&nbsp;'(2&nbsp;3))))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;o</i>.</td><td><tt>((car&nbsp;(list&nbsp;+&nbsp;-&nbsp;*&nbsp;/))&nbsp;2&nbsp;3)</tt>
+</td></tr></tbody></table>
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g10"></a>2.2.4</h4>
+<a name="./start:s37"></a><tt>(car&nbsp;(car&nbsp;'((a&nbsp;b)&nbsp;(c&nbsp;d))))</tt> дает <tt>a</tt>.
+Определите какие комбинации <tt>car</tt> и <tt>cdr</tt> примененные к
+<tt>((a&nbsp;b)&nbsp;(c&nbsp;d))</tt> дадут <tt>b</tt>, <tt>c</tt>, и
+<tt>d</tt>.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g11"></a>2.2.5</h4>
+<a name="./start:s38"></a>Напишите на Scheme выражение которое вычисляет следующую внутреннюю
+структуру списка.
+
+<p>
+</p><p>
+<img src="./start_files/2.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+
+</p><p>
+
+</p><h4>Exercise <a name="g12"></a>2.2.6</h4>
+<a name="./start:s39"></a>Нарисуйте внутренню структуру списка получаемого выражением ниже.
+
+<p>
+
+</p><p><tt>(cons&nbsp;1&nbsp;(cons&nbsp;'(2&nbsp;.&nbsp;((3)&nbsp;.&nbsp;()))&nbsp;(cons&nbsp;'(())&nbsp;(cons&nbsp;4&nbsp;5))))</tt>
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g13"></a>2.2.7</h4>
+<a name="./start:s40"></a>Поведение
+<tt>(car&nbsp;(car&nbsp;(car&nbsp;'((a&nbsp;b)&nbsp;(c&nbsp;d)))))</tt> не определено, поскольку
+<tt>(car&nbsp;'((a&nbsp;b)&nbsp;(c&nbsp;d)))</tt> это <tt>(a&nbsp;b)</tt>,
+<tt>(car&nbsp;'(a&nbsp;b))</tt> это <tt>a</tt>,
+и <tt>(car&nbsp;'a)</tt> не определено.
+Определите все правильные сочетания <tt>car</tt> и <tt>cdr</tt> применяемые к
+<tt>((a&nbsp;b)&nbsp;(c&nbsp;d))</tt>.
+
+<p>
+
+</p><p>
+
+</p><h4> Упражнение <a name="g14"></a>2.2.8</h4>
+<a name="./start:s41"></a>Попробуйте объяснить, как вычисляются выражения Scheme.
+Обобщает ли ваше объяснение последний пример упражнения&nbsp;<a href="start.html#g9">2.2.3</a>?
+
+<p>
+
+</p><p>
+
+</p><h3><a name="g15"></a><a name="./start:h3"></a>Section 2.3. Вычисление выражений Scheme<a name="SECTGSEVALUATING"></a></h3>
+
+<p>
+Перейдем к обсуждению того как  Scheme вычисляет введенные выражения.
+Мы уже установили правила для <a name="./start:s42"></a>константных объектов,
+таких как строки и числа: объект сам является значением.
+Вероятно, вы также разработали в своем уме правило для вычисления 
+<a name="./start:s43"></a>применения процедуры procedure формы
+<tt>(<i>procedure</i>&nbsp;<i>arg<sub>1</sub></i>&nbsp;...&nbsp;<i>arg<sub>n</sub></i>)</tt>.
+Здесь, <tt><i>procedure</i></tt> это выражение представляющее процедуру Scheme,
+и <tt><i>arg<sub>1</sub></i>&nbsp;...&nbsp;<i>arg<sub>n</sub></i></tt> выражения, представляющие
+ее аргументы.
+Одна из возможностей заключается в следующем.
+
+</p><p>
+</p><ul>
+<li>Найти значение <tt><i>procedure</i></tt>.
+
+<p>
+</p></li><li>Найти значение <tt><i>arg<sub>1</sub></i></tt>.
+
+<p>
+<img src="./start_files/3.gif" alt="&lt;graphic&gt;">
+
+</p><p>
+</p></li><li>Найти значение <tt><i>arg<sub>n</sub></i></tt>.
+
+<p>
+</p></li><li>Применить значение <tt><i>procedure</i></tt> к значениями
+<tt><i>arg<sub>1</sub></i>&nbsp;...&nbsp;<i>arg<sub>n</sub></i></tt>.
+</li></ul>
+<p>
+
+</p><p>
+Например, рассмотрите применение процедуры <tt>(+&nbsp;3&nbsp;4)</tt>.
+Значением <tt>+</tt> является процедура сложения, значение 3
+это число 3, и значение 4 это число 4.
+Применение процедуры сложения 3 и 4 дает 7, поэтому наше значение
+является объектом 7.
+
+</p><p>
+Применяя это процесс на каждом уровне, мы можем найти значение вложенного
+выражения <tt>(*&nbsp;(+&nbsp;3&nbsp;4)&nbsp;2)</tt>.
+Значение <tt>*</tt> это процедура умножения, значение
+<tt>(+&nbsp;3&nbsp;4)</tt> мы можем определить как число 7, и
+значение 2 это число 2.
+Умножение 7 на 2 дает нам 14, поэтому наш ответ 14.
+
+</p><p>
+Это правило работает для применения процедур, но не для выражений
+<a name="./start:s44"></a><a name="./start:s45"></a><tt>quote</tt> 
+потому что подвыражения при применении процедуры вычисляются,
+тогда как подвыражения выражения <tt>quote</tt> нет.
+Вычисление выражения <tt>quote</tt> похоже на вычисление константных
+объектов.
+Значением выражения <tt>quote</tt> формы
+<tt>(quote&nbsp;<i>object</i>)</tt>
+будет просто <tt><i>object</i></tt>.
+
+</p><p>
+Константные объекты, применение процедур, и выражения <tt>quote</tt>
+являются только тремя из множества синтаксических форм, предоставляемых
+Scheme.
+К счастью, только некоторые из других синтаксических форм должны быть
+поняты непосредственно программистом Scheme; они называются
+<i>основные</i> синтаксические формы.
+Остальные  синтаксические формы являются <a name="./start:s46"></a><i>синтаксическими расширениями</i>
+определяемыми, в конечном счете, в терминах <a name="./start:s47"></a>основных синтаксических форм.
+Мы обсудим оставшиеся основные синтаксические формы и несколько синтаксических расширений в остальных
+разделах этой главы.
+Раздел&nbsp;<a href="further.html#g50">3.1</a> обобщает основные синтаксические формы и вводит механизм
+синтаксического расширения.
+
+</p><p>
+</p><p>До того как мы перейдем к другим синтаксическим формам и процедурам,
+обратим внимание на два момента, связанных с вычислением применения процедур.
+<a name="./start:s48"></a>Первое, описанный выше процесс слишком заспецифирован,
+поскольку он требует вычисления слева на право.
+То есть, <tt><i>procedure</i></tt> вычисляется перед <tt><i>arg<sub>1</sub></i></tt>,
+<tt><i>arg<sub>1</sub></i></tt> вычисляется перед <tt><i>arg<sub>2</sub></i></tt>, и т.д.
+Этого не должно быть.
+Вычислитель Scheme может свободно вычислять выражения в любом порядке; слева на право, 
+справа на лево или в любой другой последовательности.
+Фактически, подвыражения могут вычислятся в различных порядках для разных
+приложений, даже в одной и той же реализации.
+
+</p><p>
+Второй момент заключается в том, что <tt><i>procedure</i></tt> вычисляется так же, как
+<tt><i>arg<sub>1</sub></i>&nbsp;...&nbsp;<i>arg<sub>n</sub></i></tt>.
+Хотя <tt><i>procedure</i></tt> часто является переменной, которая именует
+конкретную процедуру, это не обязательно.
+Упражнение&nbsp;<a href="start.html#g9">2.2.3</a> вы определяли значение выражения
+ <tt>((car&nbsp;(list&nbsp;+&nbsp;-&nbsp;*&nbsp;/))&nbsp;2&nbsp;3)</tt>.
+Здесь, <tt><i>procedure</i></tt> это <tt>(car&nbsp;(list&nbsp;+&nbsp;-&nbsp;*&nbsp;/))</tt>.
+Значение <tt>(car&nbsp;(list&nbsp;+&nbsp;-&nbsp;*&nbsp;/))</tt> это процедура сложения,
+как если бы <tt><i>procedure</i></tt> была бы просто переменной
+<tt>+</tt>.
+
+</p><p>
+
+</p><h4>Упражнение <a name="g16"></a>2.3.1</h4>
+<a name="./start:s49"></a>Запишите шаги, необходимые для вычисления выражения ниже.
+
+<p>
+
+</p><p><tt>((car&nbsp;(cdr&nbsp;(list&nbsp;+&nbsp;-&nbsp;*&nbsp;/)))&nbsp;17&nbsp;5)</tt>
+</p><p>
+
+</p><p>
+
+</p><h3><a name="g17"></a><a name="./start:h4"></a>Section 2.4. Переменные и Выражения Let<a name="SECTGSIDENTIFIERS"></a></h3>
+
+<p>
+<a name="./start:s50"></a>Предположим, что <tt><i>expr</i></tt> является выражением Scheme, которое
+содержит переменну <tt><i>var</i></tt>.
+Предположим, кроме того, что мы хотели бы, чтобы <tt><i>var</i></tt> имел значение 
+<tt><i>val</i></tt> когда мы вычисляем <tt><i>expr</i></tt>.
+Например, нам может потребоваться, чтобы <tt>x</tt> получило значение 2 при
+вычислении <tt>(+&nbsp;x&nbsp;3)</tt>.
+или, мы можем захотеть, чтобы <tt>y</tt> имело значение 3 при вычислении
+<tt>(+&nbsp;2&nbsp;y)</tt>.
+Следующие примеры демонстрируют, как это сделать, используя синтаксическую форму Scheme
+<a name="./start:s51"></a><tt>let</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;((x&nbsp;2))<br>
+
+&nbsp;&nbsp;(+&nbsp;x&nbsp;3))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5
+<br>
+<br>
+(let&nbsp;((y&nbsp;3))<br>
+
+&nbsp;&nbsp;(+&nbsp;2&nbsp;y))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5
+<br>
+<br>
+(let&nbsp;((x&nbsp;2)&nbsp;(y&nbsp;3))<br>
+
+&nbsp;&nbsp;(+&nbsp;x&nbsp;y))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5</tt>
+</p><p>Синтаксическая форма <tt>let</tt> включает список пар переменная - выражение, 
+а также последовательность выражений, называемую <i>тело</i> 
+<tt>let</tt>. 
+Общая форма выражения <tt>let</tt>
+
+</p><p>
+
+</p><p><tt>(let&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><p><a name="./start:s52"></a>Мы говорим, что переменные <i>связанны</i> со значениями в форме
+ <tt>let</tt>.
+Мы будем называть переменные связанными <tt>let</tt> как
+<a name="./start:s53"></a><tt>let</tt>-<i>связанные</i> переменные.
+
+</p><p>
+Выражение <tt>let</tt> часто использутся для упрощения выражения, которое будет
+содержать два идентичных подвыражения.
+Это также гарантирует, что значение общего подвыражения вычисляется
+только один раз.
+
+</p><p>
+
+</p><p><tt>(+&nbsp;(*&nbsp;4&nbsp;4)&nbsp;(*&nbsp;4&nbsp;4))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;32
+<br>
+<br>
+(let&nbsp;((a&nbsp;(*&nbsp;4&nbsp;4)))&nbsp;(+&nbsp;a&nbsp;a))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;32</tt>
+</p><p>Квадратные скобки часто используются вместо круглых скобок, чтобы разграничить привязки
+выражения <tt>let</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([list1&nbsp;'(a&nbsp;b&nbsp;c)]&nbsp;[list2&nbsp;'(d&nbsp;e&nbsp;f)])<br>
+
+&nbsp;&nbsp;(cons&nbsp;(cons&nbsp;(car&nbsp;list1)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;list2))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(car&nbsp;(cdr&nbsp;list1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;(cdr&nbsp;list2)))))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((a&nbsp;.&nbsp;d)&nbsp;b&nbsp;.&nbsp;e)</tt>
+</p><p>Scheme рассматривает формы, заключенные в квадратные скобки, также как формы, заключенные
+в круглые скобки.
+Открытой квадратной скобке должна быть сопоставлена закрытая квадратная скобка, и открытой
+круглой скобке должна соответствовать закрытая круглая скобка.
+Мы используем квадратные скобки для <tt>let</tt> (и, как мы увидим, несколько других
+стандартных синтаксических форм) для улучшения удобочитаемости, особенно
+когда мы могли бы иметь две или более последовательно открытые круглые скобки.
+
+</p><p>
+Поскольку выражение в первой позиции применения процедуры вычисляются так же,
+как и другие выражения,  <tt>let</tt>-связывание переменной может
+использоваться также и для них.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([f&nbsp;+])<br>
+
+&nbsp;&nbsp;(f&nbsp;2&nbsp;3))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5
+<br>
+<br>
+(let&nbsp;([f&nbsp;+]&nbsp;[x&nbsp;2])<br>
+
+&nbsp;&nbsp;(f&nbsp;x&nbsp;3))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5
+<br>
+<br>
+(let&nbsp;([f&nbsp;+]&nbsp;[x&nbsp;2]&nbsp;[y&nbsp;3])<br>
+
+&nbsp;&nbsp;(f&nbsp;x&nbsp;y))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5</tt>
+</p><p>Переменные связанные  <tt>let</tt> видны только внутри тела <tt>let</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([+&nbsp;*])<br>
+
+&nbsp;&nbsp;(+&nbsp;2&nbsp;3))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;6
+<br>
+<br>
+(+&nbsp;2&nbsp;3)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5</tt>
+</p><p>Это удачное локальное присваивание, поскольку мы не хотели бы, чтобы  значение<tt>+</tt> было бы
+методом умножения повсюду.
+
+</p><p>
+Можно вкладывать выражения <tt>let</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([a&nbsp;4]&nbsp;[b&nbsp;-3])<br>
+
+&nbsp;&nbsp;(let&nbsp;([a-squared&nbsp;(*&nbsp;a&nbsp;a)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[b-squared&nbsp;(*&nbsp;b&nbsp;b)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;a-squared&nbsp;b-squared)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;25</tt>
+</p><p>Когда вложенные выражения <tt>let</tt> связывают одну и туже переменную, внутри своего тела
+видимым является только связывание, созданное внутренним <tt>let</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;1])<br>
+
+&nbsp;&nbsp;(let&nbsp;([x&nbsp;(+&nbsp;x&nbsp;1)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;x)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4</tt>
+</p><p>Внешнее выражение <tt>let</tt> связывает <tt>x</tt> с 1 внутри своего тела,
+которым является  второе выражение <tt>let</tt>.
+Внутренне выражение <tt>let</tt> связывает <tt>x</tt> с <tt>(+&nbsp;x&nbsp;1)</tt> внутри
+своего тело, которым является выражение <tt>(+&nbsp;x&nbsp;x)</tt>.
+Каково значение  <tt>(+&nbsp;x&nbsp;1)</tt>?
+Так как <tt>(+&nbsp;x&nbsp;1)</tt> появляется внутри тела внешнего <tt>let</tt>,
+но не внутри тела внутреннего <tt>let</tt>, значение <tt>x</tt>
+должно быть равным 1 и следовательно значение <tt>(+&nbsp;x&nbsp;1)</tt> равно 2.
+Что относительно <tt>(+&nbsp;x&nbsp;x)</tt>?
+Он появляется внутри тела обоих выражений <tt>let</tt>.
+Но только внутренняя привязка для <tt>x</tt> видна, внутри второго <tt>let</tt>, тогда <tt>x</tt> это 2
+и <tt>(+&nbsp;x&nbsp;x)</tt> равно 4.
+
+</p><p>
+<a name="./start:s54"></a>Про внутреннюю привязку <tt>x</tt> говорят что она <i>скрывает(затеняет)</i> 
+внешнюю привязку.
+<tt>let</tt>-связывание переменной видно везде внутри тела выражения <tt>let</tt> исключая выражения,
+где она скрывается. Область где привязка переменной видима называется
+<a name="./start:s55"></a><i>охватом(scope)</i>.
+Охват первого <tt>x</tt> в примере выше это тело внешнего выражения <tt>let</tt> исключая
+тело внутреннего выражения <tt>let</tt>, где он затеняется вторым <tt>x</tt>.
+Эта форма охвата называется <a name="./start:s56"></a><i>лексическим охватом(lexical scoping)</i>,
+поскольку область каждой связи может быть определена простым анализом текста
+программы.
+
+</p><p>
+Сокрытия связанной переменной можно избежать, выбирая разные имена для
+переменных.
+Вышеприведенное выражение можно переписать так, чтобы переменная связываемая
+во внутреннем <tt>let</tt> называлась <tt>new-x</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;1])<br>
+
+&nbsp;&nbsp;(let&nbsp;([new-x&nbsp;(+&nbsp;x&nbsp;1)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;new-x&nbsp;new-x)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4</tt>
+</p><p>Хотя выбор разных имен иногда может препятствовать путанице,
+затенение может помочь предотвратить случайное использование
+"старого" значения.
+Например, с исходной версией предыдущего примера нам было бы невозможно
+ошибочно обратиться к внешнему  <tt>x</tt>
+внутри тела внутреннего <tt>let</tt>.
+
+</p><p>
+
+</p><h4>Упражнение <a name="g18"></a>2.4.1</h4>
+<a name="./start:s57"></a>Перепишите следующие выражения, используя возможность удаления общих
+подвыражений и улучшения структуры кода.
+Не выполняйте алгебраических упрощений.
+
+<p>
+
+ </p><table>
+<tbody><tr valign="top"><td><i>&nbsp;&nbsp;a</i>.</td><td><tt>(+&nbsp;(-&nbsp;(*&nbsp;3&nbsp;a)&nbsp;b)&nbsp;(+&nbsp;(*&nbsp;3&nbsp;a)&nbsp;b))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;b</i>.</td><td><tt>(cons&nbsp;(car&nbsp;(list&nbsp;a&nbsp;b&nbsp;c))&nbsp;(cdr&nbsp;(list&nbsp;a&nbsp;b&nbsp;c)))</tt>
+</td></tr></tbody></table>
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g19"></a>2.4.2</h4>
+<a name="./start:s58"></a>Определите значение следующего выражения. Объясните,
+как вы получили это значение.
+
+<p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;9])<br>
+
+&nbsp;&nbsp;(*&nbsp;x<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;(/&nbsp;x&nbsp;3)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;x))))</tt>
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g20"></a>2.4.3</h4>
+<a name="./start:s59"></a>Перепишите следующие выражения, чтобы дать уникальные
+имена каждой <tt>let</tt>-связанной переменной, чтобы ни одна из переменных,
+не была затенена. Убедитесь, что значение вашего выражения совпадает с значением
+исходного выражения.
+
+<p>
+
+ </p><table>
+<tbody><tr valign="top"><td><i>&nbsp;&nbsp;a</i>.</td><td>
+<p><tt>(let&nbsp;([x&nbsp;'a]&nbsp;[y&nbsp;'b])<br>
+
+&nbsp;&nbsp;(list&nbsp;(let&nbsp;([x&nbsp;'c])&nbsp;(cons&nbsp;x&nbsp;y))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([y&nbsp;'d])&nbsp;(cons&nbsp;x&nbsp;y))))</tt>
+</p><p></p></td></tr><tr valign="top"><td><i>&nbsp;&nbsp;b</i>.</td><td>
+<p><tt>(let&nbsp;([x&nbsp;'((a&nbsp;b)&nbsp;c)])<br>
+
+&nbsp;&nbsp;(cons&nbsp;(let&nbsp;([x&nbsp;(cdr&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;(car&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(let&nbsp;([x&nbsp;(cdr&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(let&nbsp;([x&nbsp;(car&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cdr&nbsp;x))))))</tt>
+</p><p></p></td></tr></tbody></table>
+
+<p>
+
+</p><p>
+
+</p><h3><a name="g21"></a><a name="./start:h5"></a>Section 2.5. Lambda выражения<a name="SECTGSLAMBDA"></a></h3>
+
+<p>
+В выражении <tt>(let&nbsp;([x&nbsp;(*&nbsp;3&nbsp;4)])&nbsp;(+&nbsp;x&nbsp;x))</tt>, переменная
+<tt>x</tt> связана со значением <tt>(*&nbsp;3&nbsp;4)</tt>.
+Что, если мы хотим получить значение <tt>(+&nbsp;x&nbsp;x)</tt> где <tt>x</tt> связано
+со значением <tt>(/&nbsp;99&nbsp;11)</tt>?
+Где <tt>x</tt> связано со значением <tt>(-&nbsp;2&nbsp;7)</tt>?
+В каждом случае нам нужно другое выражение <tt>let</tt>.
+Однако, когда тело <tt>let</tt> сложное, повторять его ввод очень неудобно.
+
+</p><p>
+Вместо этого мы можем использовать синтаксическую форму <a name="./start:s60"></a><tt>lambda</tt> для
+создания новой <a name="./start:s61"></a>процедуры, которая имеет параметр <tt>x</tt> и имеет тело такое
+же как выражение <tt>let</tt>.
+
+</p><p>
+
+</p><p><tt>(lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;x))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#&lt;procedure&gt;</tt>
+</p><p>Общий вид <tt>lambda</tt> выражения
+
+</p><p>
+
+</p><p><tt>(lambda&nbsp;(<i>var</i>&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>Переменные <tt><i>var</i>&nbsp;...</tt> являются <a name="./start:s62"></a><i>формальными параметрами</i>
+процедуры, а последовательность выражений
+<tt><i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...</tt> ее телом.
+(Собственно, настоящая общая форма несколько более общая, чем эта, как вы увидите позже.)
+
+</p><p>
+Процедура - это такой же объект, как число, строка, символ или
+пара.
+Тем не менее, он не имеет никакого печатного представления
+в Scheme поэтому в этой книге используется обозначение <tt>#&lt;procedure&gt;</tt>,
+чтобы показать, что значение выражения является процедурой.
+
+</p><p>
+Наиболее распространенная операция примняемая к процедуре это 
+применение(apply) процедуры к одному или нескольким значениям.
+
+</p><p>
+
+</p><p><tt>((lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;x))&nbsp;(*&nbsp;3&nbsp;4))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;24</tt>
+</p><p>Это ничем не отличается от любого другого <a name="./start:s63"></a>применения процедуры.
+Процедура это значение <tt>(lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;x))</tt>, и 
+единственным аргументом ее является значение <tt>(*&nbsp;3&nbsp;4)</tt>, или 12.
+Значения аргументов, или <a name="./start:s64"></a><i>фактические параметры</i>, связываются
+с формальными параметрами в пределах тела <tt>lambda</tt> выражения
+так же, как связываются переменные в <tt>let</tt>-форме с их значениями.
+В данном случае, <tt>x</tt> связывается с 12, а значение <tt>(+&nbsp;x&nbsp;x)</tt> равно 24.
+Таким образом, результат применения процедуры к значению 12 равен 24.
+
+</p><p>
+Поскольку процедуры являются объектами, мы можем установить процедуру
+как значение переменной и использовать процедуру более одного раза.<a name="./start:s65"></a>
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([double&nbsp;(lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;x))])<br>
+
+&nbsp;&nbsp;(list&nbsp;(double&nbsp;(*&nbsp;3&nbsp;4))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(double&nbsp;(/&nbsp;99&nbsp;11))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(double&nbsp;(-&nbsp;2&nbsp;7))))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(24&nbsp;18&nbsp;-10)</tt>
+</p><p>Здесь мы устанавливаем связь для <tt>double</tt> с процедурой, затем
+используем эту процедуру чтобы удвоить три разные значения.
+
+</p><p>
+Процедура ожидает, что ее фактический параметр будет числом, так как
+она передает фактический параметр процедуре <tt>+</tt>.
+В общем, фактический параметр может быть любым объектом.
+Рассмотрим, например, аналогичную процедуру, в которой используются
+<tt>cons</tt> вместо <tt>+</tt>.<a name="./start:s66"></a>
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([double-cons&nbsp;(lambda&nbsp;(x)&nbsp;(cons&nbsp;x&nbsp;x))])<br>
+
+&nbsp;&nbsp;(double-cons&nbsp;'a))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;.&nbsp;a)</tt>
+</p><p>Отмечая сходство между  <tt>double</tt> и <tt>double-cons</tt>,
+вы не должны удивляться узнав, что они могут быть свернуты в одну процедуру,
+добавлением дополнительного аргумента.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([double-any&nbsp;(lambda&nbsp;(f&nbsp;x)&nbsp;(f&nbsp;x&nbsp;x))])<br>
+
+&nbsp;&nbsp;(list&nbsp;(double-any&nbsp;+&nbsp;13)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(double-any&nbsp;cons&nbsp;'a)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(26&nbsp;(a&nbsp;.&nbsp;a))</tt>
+</p><p>Это демонстрирует, что процедуры могут принимать более одного аргумента и что
+аргументы, перееданные процедуре, сами могут быть процедурами.
+
+</p><p>
+</p><p>Как и в случае выражений <tt>let</tt>, выражения <tt>lambda</tt> становятся несколько
+более интересными, когда они вложены в другие выражения
+<tt>lambda</tt> или <tt>let</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;'a])<br>
+
+&nbsp;&nbsp;(let&nbsp;([f&nbsp;(lambda&nbsp;(y)&nbsp;(list&nbsp;x&nbsp;y))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(f&nbsp;'b)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b)</tt>
+</p><p>Вхождение <tt>x</tt> в <tt>lambda</tt> выражение относится
+к  <tt>x</tt> внешней по отношению к <tt>lambda</tt> связанной внешним
+ <tt>let</tt> выражением.
+Говорят, что переменная <tt>x</tt>  <a name="./start:s67"></a><i>свободна</i>
+в <tt>lambda</tt> выражении или является 
+<a name="./start:s68"></a><i>свободной переменной</i>  <tt>lambda</tt> выражения.
+Переменная <tt>y</tt> не является свободной в <tt>lambda</tt> выражении,
+так как она связана  <tt>lambda</tt> выражением.
+Переменная, которая является свободной в <tt>lambda</tt> выражении
+должно быть связана, например путем включения(замыкания) в <tt>lambda</tt> или <tt>let</tt>
+выражния, если только переменная(например, имена примитивных процедур)) не связана
+внешним выражением, о чем мы поговорим в следующем разделе.
+
+</p><p>
+Что происходит, когда процедура применяется где-то вне
+области привязок для переменных, которые являются
+свободными внутри процедуры, как в следующем
+выражении?
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([f&nbsp;(let&nbsp;([x&nbsp;'sam])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(y&nbsp;z)&nbsp;(list&nbsp;x&nbsp;y&nbsp;z)))])<br>
+
+&nbsp;&nbsp;(f&nbsp;'i&nbsp;'am))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(sam&nbsp;i&nbsp;am)</tt>
+</p><p>Ответ заключается в том, что те же привязки, которые были действительны при
+создании процедуры, снова действуют при применении процедуры.
+Это справедливо, даже в том случае, если в процедура применяется
+когда действует другая привязка для <tt>x</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([f&nbsp;(let&nbsp;([x&nbsp;'sam])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(y&nbsp;z)&nbsp;(list&nbsp;x&nbsp;y&nbsp;z)))])<br>
+
+&nbsp;&nbsp;(let&nbsp;([x&nbsp;'not-sam])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(f&nbsp;'i&nbsp;'am)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(sam&nbsp;i&nbsp;am)</tt>
+</p><p>В обоих случаях, значение <tt>x</tt> внутри процедуры именуемой
+<tt>f</tt> будет <tt>sam</tt>.
+
+</p><p>
+</p><p>Кстати, выражение <tt>let</tt> представляет собой не что иное, как прямое
+применение <tt>lambda</tt> выражения к набору аргументов выражений.
+Например, два приведенных ниже выражения эквивалентны.
+
+</p><p>
+</p><p><tt>(let&nbsp;([x&nbsp;'a])&nbsp;(cons&nbsp;x&nbsp;x))</tt>&nbsp;&#8801;&nbsp;<tt>((lambda&nbsp;(x)&nbsp;(cons&nbsp;x&nbsp;x))&nbsp;'a)</tt>
+
+</p><p>
+</p><p>Фактически, выражение <a name="./start:s69"></a><tt>let</tt> является синтаксическим
+расширениением, определенным в терминах <tt>lambda</tt> и применения процедуры, в свою очередь
+оба этих термина являются базовыми синтаксическими формами.
+В общем случае любое выражение вида(формы)
+
+</p><p>
+
+</p><p><tt>(let&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>эквивалентно следующему.
+
+</p><p>
+
+</p><p><tt>((lambda&nbsp;(<i>var</i>&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)<br>
+
+&nbsp;<i>expr</i>&nbsp;...)</tt>
+</p><p>См Раздел&nbsp;<a href="further.html#g50">3.1</a> для получения более подробной информации о
+основных формах и синтаксических расширениях.
+
+</p><p>
+</p><p>Как упоминалось выше, общий вид
+<a name="./start:s70"></a><a name="./start:s71"></a><tt>lambda</tt> немного
+сложнее, чем форма, которую мы видели ранее, поскольку
+спецификация формальных параметров, <tt>(<i>var</i>&nbsp;...)</tt>, не обязательно должна
+быть правильным списком, или даже списком вообще.
+Спецификация формальных параметров может быть в любой из следующих трех форм:
+
+</p><p>
+</p><ul>
+<li>правильный список переменных, <tt>(<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</sub></i>)</tt>, как
+мы уже видели,
+
+<p>
+</p></li><li>одна переменная, <tt><i>var<sub>r</sub></i></tt>, или
+
+<p>
+</p></li><li>неправильный список переменных,
+<tt>(<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</sub></i>&nbsp;.&nbsp;<i>var<sub>r</sub></i>)</tt>.
+</li></ul>
+<p>
+
+</p><p>
+В первом случае, необходимо указать ровно <i>n</i> фактических параметров
+и какждая переменная связывается с соответствующим фактическим параметром.
+Во втором случае - любое количество фактических параметров правильно; все
+фактические параметры помещаются в один список, и одна переменная связывается
+с этим списком.
+Третий случай это гибрид из первых двух случаев.
+Необходимо предоставить по крайней мере <i>n</i> фактических параметров.
+Переменные <tt><i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</sub></i></tt>
+связываются с соответствующими фактическими параметрами, а
+переменная  <tt><i>var<sub>r</sub></i></tt> связывается со списком
+оставшихся фактических параметров.
+Во втором и третьем случае, <tt><i>var<sub>r</sub></i></tt> иногда упоминается
+как параметр "rest", поскольку он содержит остальные фактические параметры,
+кроме первых фактичесих параметров которые именуются индивидуально.
+
+</p><p>
+Рассмотрим несколько примеров, которые помогут прояснить более
+общий синтаксис <tt>lambda</tt> выражений.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([f&nbsp;(lambda&nbsp;x&nbsp;x)])<br>
+
+&nbsp;&nbsp;(f&nbsp;1&nbsp;2&nbsp;3&nbsp;4))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;3&nbsp;4)
+<br>
+<br>
+(let&nbsp;([f&nbsp;(lambda&nbsp;x&nbsp;x)])<br>
+
+&nbsp;&nbsp;(f))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;()
+<br>
+<br>
+(let&nbsp;([g&nbsp;(lambda&nbsp;(x&nbsp;.&nbsp;y)&nbsp;(list&nbsp;x&nbsp;y))])<br>
+
+&nbsp;&nbsp;(g&nbsp;1&nbsp;2&nbsp;3&nbsp;4))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;(2&nbsp;3&nbsp;4))
+<br>
+<br>
+(let&nbsp;([h&nbsp;(lambda&nbsp;(x&nbsp;y&nbsp;.&nbsp;z)&nbsp;(list&nbsp;x&nbsp;y&nbsp;z))])<br>
+
+&nbsp;&nbsp;(h&nbsp;'a&nbsp;'b&nbsp;'c&nbsp;'d))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;(c&nbsp;d))</tt>
+</p><p>В первых двух примерах, процедура именуемая <tt>f</tt> принимает произвольное число
+аргументов.
+Эти аргументы автоматически формируются в список, с которым связывается переменная <tt>x</tt>;
+значение <tt>f</tt> это список.
+В первом примере, аргументы равны 1, 2, 3, и 4, поэтому ответ <tt>(1&nbsp;2&nbsp;3&nbsp;4)</tt>.
+Во втором случаее аргуметов нет, поэтому ответ - пустой список. <tt>()</tt>.
+Значение процедуры с именем <tt>g</tt> в третьем примере, это список, содержащий
+с в котором первый элемент которого является первым аргументом и вторым элементом
+кторого является список, содержащий остальные аргументы. Процедура с именем
+ <tt>h</tt> аналогична, но отделяет второй аргумент.
+В то время как <tt>f</tt> принимает произвольное количество аргументов, <tt>g</tt> должен
+получить не менее одного, а <tt>h</tt> должен получить не менее двух.
+
+</p><p>
+
+</p><h4>Упражнение <a name="g22"></a>2.5.1</h4>
+<a name="./start:s72"></a>Определите значения приведенных ниже выражений.
+
+<p>
+
+ </p><table>
+<tbody><tr valign="top"><td><i>&nbsp;&nbsp;a</i>.</td><td>
+<p><tt>(let&nbsp;([f&nbsp;(lambda&nbsp;(x)&nbsp;x)])<br>
+
+&nbsp;&nbsp;(f&nbsp;'a))</tt>
+</p><p></p></td></tr><tr valign="top"><td><i>&nbsp;&nbsp;b</i>.</td><td>
+<p><tt>(let&nbsp;([f&nbsp;(lambda&nbsp;x&nbsp;x)])<br>
+
+&nbsp;&nbsp;(f&nbsp;'a))</tt>
+</p><p></p></td></tr><tr valign="top"><td><i>&nbsp;&nbsp;c</i>.</td><td>
+<p><tt>(let&nbsp;([f&nbsp;(lambda&nbsp;(x&nbsp;.&nbsp;y)&nbsp;x)])<br>
+
+&nbsp;&nbsp;(f&nbsp;'a))</tt>
+</p><p></p></td></tr><tr valign="top"><td><i>&nbsp;&nbsp;d</i>.</td><td>
+<p><tt>(let&nbsp;([f&nbsp;(lambda&nbsp;(x&nbsp;.&nbsp;y)&nbsp;y)])<br>
+
+&nbsp;&nbsp;(f&nbsp;'a))</tt>
+</p><p></p></td></tr></tbody></table>
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g23"></a>2.5.2</h4>
+<a name="./start:s73"></a>Как можно определить <tt>список</tt> примитивных процедур?
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g24"></a>2.5.3</h4>
+<a name="./start:s74"></a>Перечислите переменные которые являются <a name="./start:s75"></a>свободными
+для каждого <tt>lambda</tt> выражения ниже.
+Не опускайте переменные которые называют примитивными процедурами, таким как
+<tt>+</tt> или <tt>cons</tt>.
+
+<p>
+
+ </p><table>
+<tbody><tr valign="top"><td><i>&nbsp;&nbsp;a</i>.</td><td><tt>(lambda&nbsp;(f&nbsp;x)&nbsp;(f&nbsp;x))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;b</i>.</td><td><tt>(lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;x))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;c</i>.</td><td><tt>(lambda&nbsp;(x&nbsp;y)&nbsp;(f&nbsp;x&nbsp;y))</tt>
+</td></tr><tr valign="top"><td><i>&nbsp;&nbsp;d</i>.</td><td>
+<p><tt>(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;(cons&nbsp;x&nbsp;(f&nbsp;x&nbsp;y)))</tt>
+</p><p></p></td></tr><tr valign="top"><td><i>&nbsp;&nbsp;e</i>.</td><td>
+<p><tt>(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;(let&nbsp;([z&nbsp;(cons&nbsp;x&nbsp;y)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(x&nbsp;y&nbsp;z)))</tt>
+</p><p></p></td></tr><tr valign="top"><td><i>&nbsp;&nbsp;f</i>.</td><td>
+<p><tt>(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;(let&nbsp;([y&nbsp;(cons&nbsp;x&nbsp;y)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(x&nbsp;y&nbsp;z)))</tt>
+</p><p></p></td></tr></tbody></table>
+
+<p>
+
+</p><p>
+
+</p><h3><a name="g25"></a><a name="./start:h6"></a>Section 2.6. Определения Верхнего Уровня
+<a name="SECTGSTOPLEVEL"></a></h3>
+
+<p>
+<a name="./start:s76"></a><a name="./start:s77"></>Переменные, связанные выражениями <tt>let</tt> и <tt>lambda</tt>,
+ не видны вне тел этих выражений.
+Предположим, вы создали объект, вомзожно, процедуру, которая должна быть доступна в любом месте,
+например, <tt>+</tt> или <tt>cons</tt>.
+Вам нужно <i>определиние верхнего уровня</i>, которое может быть установлено
+с помощью <a name="./start:s78"></a><tt>define</tt>.
+Определения верхнего уровня, которые поддерживаются большинством интерактивных систем
+Scheme, видны в каждом введенном вами выражении, за исключением случаев,
+затенения их другой привязкой.
+
+</p><p>
+Давайте установим определение верхнего уровня для процедуры <a name="./start:s79"></a><tt>double-any</tt>
+из последнего раздела.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;double-any<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(f&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(f&nbsp;x&nbsp;x)))</tt>
+</p><p>Переменная <tt>double-any</tt> теперь имеет тот же статус, что и <tt>cons</tt>
+или имя любой другой примитивной процедуры,
+как если бы <tt>double-any</tt> была примитивной процедурой.
+
+</p><p>
+
+</p><p><tt>(double-any&nbsp;+&nbsp;10)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;20<br>
+
+(double-any&nbsp;cons&nbsp;'a)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;.&nbsp;a)</tt>
+</p><p>Определение верхнего уровня может быть установлено для любого объекта, 
+а не только для процедуры.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;sandwich&nbsp;"peanut-butter-and-jelly")
+<br>
+<br>
+sandwich&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"peanut-butter-and-jelly"</tt>
+</p><p><a name="./start:s80"></a>Чаще всего, однако, определения верхнего уровня
+используются для процедур.
+
+</p><p>
+<a name="./start:s81"></a>Как было сказано выше, опредения верхнего уровня могут быть
+затенены привязками в выражениях <tt>let</tt> или <tt>lambda</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;xyz&nbsp;'(x&nbsp;y&nbsp;z))<br>
+
+(let&nbsp;([xyz&nbsp;'(z&nbsp;y&nbsp;x)])<br>
+
+&nbsp;&nbsp;xyz)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(z&nbsp;y&nbsp;x)</tt>
+</p><p>Переменные определенные на верхнем уровне действуют почти также как если бы 
+они были связаны выражением  <tt>let</tt> охватывающим все введенные вами
+выражения.
+
+</p><p>
+<a name="defn:list"></a>Учитывая только простые инструменты, котрые
+вы узнали до этого момента, уже можно определить некоторые из
+примитивных процедур, предоставляемых Scheme и описанных ниже в этой
+книге.
+Если вы завершили упражнения из последнего раздела, вы уже должны знать,
+как определить<a name="./start:s82"></a><tt>список</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;list&nbsp;(lambda&nbsp;x&nbsp;x))</tt>
+</p><p>Кроме того, Scheme предоставляет абревиатуры <a name="./start:s83"></a><tt>cadr</tt> и <a name="./start:s84"></a><tt>cddr</tt> для композиций <tt>car</tt> с <tt>cdr</tt> и <tt>cdr</tt> с <tt>cdr</tt>.
+То есть, <tt>(cadr&nbsp;<i>list</i>)</tt> эквивалентен
+<tt>(car&nbsp;(cdr&nbsp;<i>list</i>))</tt>, и, аналогично,
+<tt>(cddr&nbsp;<i>list</i>)</tt> эквивалентен
+<tt>(cdr&nbsp;(cdr&nbsp;<i>list</i>))</tt>.
+Они легко определяются следующим образом.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;cadr<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;(cdr&nbsp;x))))
+<br>
+<br>
+(define&nbsp;cddr<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cdr&nbsp;(cdr&nbsp;x))))</tt>
+</p><p>
+</p><p><tt>(cadr&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;b<br>
+
+(cddr&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(c)</tt>
+</p><p>Любое определение <tt>(define&nbsp;<i>var</i>&nbsp;<i>expr</i>)</tt> где <tt><i>expr</i></tt> 
+является <tt>lambda</tt> выражением, может быть записано в более короткой форме которая скрывает
+<tt>lambda</tt>.
+Точный синтаксис зависит от формата формального спецификатора параметров <tt>lambda</tt> выражения,
+т.е., является ли он правильным списком переменных, или одной переменной, или неправильным
+списком переменных. Определение формы
+
+</p><p>
+
+</p><p><tt>(define&nbsp;<i>var<sub>0</sub></i><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</sub></i>)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<i>e<sub>1</sub></i>&nbsp;<i>e<sub>2</sub></i>&nbsp;...))</tt>
+</p><p>может быть сокращено
+
+</p><p>
+
+</p><p><tt>(define&nbsp;(<i>var<sub>0</sub></i>&nbsp;<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</sub></i>)<br>
+
+&nbsp;&nbsp;<i>e<sub>1</sub></i>&nbsp;<i>e<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>в то время как
+
+</p><p>
+
+</p><p><tt>(define&nbsp;<i>var<sub>0</sub></i><br>
+
+&nbsp;&nbsp;(lambda&nbsp;<i>var<sub>r</sub></i><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<i>e<sub>1</sub></i>&nbsp;<i>e<sub>2</sub></i>&nbsp;...))</tt>
+</p><p>может быть сокращено
+
+</p><p>
+
+</p><p><tt>(define&nbsp;(<i>var<sub>0</sub></i>&nbsp;.&nbsp;<i>var<sub>r</sub></i>)<br>
+
+&nbsp;&nbsp;<i>e<sub>1</sub></i>&nbsp;<i>e<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>и
+
+</p><p>
+
+</p><p><tt>(define&nbsp;<i>var<sub>0</sub></i><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</sub></i>&nbsp;.&nbsp;<i>var<sub>r</sub></i>)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<i>e<sub>1</sub></i>&nbsp;<i>e<sub>2</sub></i>&nbsp;...))</tt>
+</p><p>может быть сокращено
+
+</p><p>
+
+</p><p><tt>(define&nbsp;(<i>var<sub>0</sub></i>&nbsp;<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</sub></i>&nbsp;.&nbsp;<i>var<sub>r</sub></i>)<br>
+
+&nbsp;&nbsp;<i>e<sub>1</sub></i>&nbsp;<i>e<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>Например, определения <a name="./start:s85"></a><tt>cadr</tt> и <a name="./start:s86"></a><tt>list</tt> могут быть записаны следующим образом.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;(cadr&nbsp;x)<br>
+
+&nbsp;&nbsp;(car&nbsp;(cdr&nbsp;x)))
+<br>
+<br>
+(define&nbsp;(list&nbsp;.&nbsp;x)&nbsp;x)</tt>
+</p><p>В этой книге не часто используется альтернативный синтаксис.
+Хотя он короче, он как правило маскирует реальность, что процедуры не
+тесно связаны с переменными или именами, как это происходит
+на многих других языках.
+Этот синтаксис часто упоминается, несколько уничижительно, как
+<a name="./start:s87"></a>"defun" синтаксис для <tt>define</tt>, после
+<tt>defun</tt> формы предоставляемой языками Lisp, в которых процедуры
+более тесно связаны с их именами.
+
+</p><p>
+</p><p>Определения верхнего уровня облегчают нам эксперементы с процедурами
+в интерактивном режиме, поскольку нам не нужно повторять ввод процедур каждый
+раз, когда они используются.
+Давайте попробуем определить несколько более сложный вариант <tt>double-any</tt>,
+который превращает "обычную" процедуру двух аргументов в процедуру "удвоения"
+одного аргумента <a name="./start:s88"></a>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;doubler<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(f)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)&nbsp;(f&nbsp;x&nbsp;x))))</tt>
+</p><p><tt>doubler</tt> принимает один аргумент, <tt>f</tt>, который должен
+быть процедурой, которая принимает два аргумента.
+Процедура возвращаемая <tt>doubler</tt> принимает один аргумент, который 
+он использует для обоих аргументов при применении <tt>f</tt>.
+Мы можем определить, с <tt>doubler</tt>, простые процедуры
+<a name="./start:s89"></a><tt>double</tt> и
+<a name="./start:s90"></a><tt>double-cons</tt> из последнего
+раздела.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;double&nbsp;(doubler&nbsp;+))<br>
+
+(double&nbsp;13/2)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;13
+<br>
+<br>
+(define&nbsp;double-cons&nbsp;(doubler&nbsp;cons))<br>
+
+(double-cons&nbsp;'a)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;.&nbsp;a)</tt>
+</p><p>Мы также можем определить <tt>double-any</tt> с <tt>doubler</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;double-any<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(f&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;((doubler&nbsp;f)&nbsp;x)))</tt>
+</p><p>В пределах <tt>double</tt> и
+<tt>double-cons</tt>, <tt>f</tt> имеет соответствующее значение, т.е., <tt>+</tt>
+или <tt>cons</tt>, хотя процедуры явно применяются вне области <tt>f</tt>.
+
+</p><p>
+</p><p>Что произойдет, если вы попытаетесь использовать переменную, не связанную
+выражениеями <tt>let</tt> или <tt>lambda</tt> и которая не имеет определения
+верхнего уровня?
+Попробуйте использовать переменную <tt>i-am-not-defined</tt> чтобы увидеть,
+что произойдет.
+
+</p><p>
+
+</p><p><tt>(i-am-not-defined&nbsp;3)</tt>
+</p><p>Большинство систем Scheme напечатают сообщение о том,
+что произошло исключение несвязанной или неопределенной переменной.
+
+</p><p>
+Однако система не должна жаловаться на появление неопределенной переменной
+в <tt>lambda</tt> выражении, пока результирующая процедура не будет
+применена.
+Следующее <i>НЕ</i> должно вызвать исключения, даже если мы еще не установили
+определение верхнего уровня для <tt>proc2</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;proc1<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(proc2&nbsp;y&nbsp;x)))</tt>
+</p><p>Если попробовать применить <tt>proc1</tt> перед определением <tt>proc2</tt>, вы должны получить
+сообщение об исключении неопределенная переменная.
+Давайте дадим определение верхнего уровня для <tt>proc2</tt> и повторим вызов <tt>proc1</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;proc2&nbsp;cons)<br>
+
+(proc1&nbsp;'a&nbsp;'b)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;.&nbsp;a)</tt>
+</p><p>Когда вы определяете <tt>proc1</tt>, система принимает ваше обещание определить
+<tt>proc2</tt>, и не жалуется, если вы не используете <tt>proc1</tt> до определенения <tt>proc2</tt>.
+Это позволяет вам определять процедуры в любом порядке.
+Это особенно полезно, когда вы пытаетесь организовать файл, полный описаний процедур,
+таким образом, чтобы ваша программа была более читаемой.
+Это необходимо, когда две процедуры, определенные на верхнем уровне,
+зависят друг от друга; мы увидим несполько примеров этого позже.
+
+</p><p>
+
+</p><h4>Упражнение <a name="g26"></a>2.6.1</h4>
+<a name="./start:s91"></a>Что произойдет, еси вы наберете
+
+<p>
+
+</p><p><tt>(double-any&nbsp;double-any&nbsp;double-any)</tt>
+</p><p>учитывая определение <tt>double-any</tt> из начала этого раздела.
+
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g27"></a>2.6.2</h4>
+<a name="./start:s92"></a>Более элегантный (хотя, возможно, менее эффективный) способ
+определения<a name="./start:s93"></a><tt>cadr</tt>
+и <a name="./start:s94"></a><tt>cddr</tt> чем приведенный в этом разделе,
+заключается в определении процедуры, которая состоит из двух процедур для создания
+третьей.
+Напишите процедуру <a name="./start:s95"></a><tt>compose</tt>, такую что б
+<tt>(compose&nbsp;<i>p<sub>1</sub></i>&nbsp;<i>p<sub>2</sub></i>)</tt> являлось композицией
+<tt><i>p<sub>1</sub></i></tt> and <tt><i>p<sub>2</sub></i></tt> (предполагая, что обе они
+имеют один аргумент).
+То есть, <tt>(compose&nbsp;<i>p<sub>1</sub></i>&nbsp;<i>p<sub>2</sub></i>)</tt> должно возвращать
+новую процедуру одного аргумента, которая применяет <tt><i>p<sub>1</sub></i></tt> к результату
+применения <tt><i>p<sub>2</sub></i></tt> к аргументу.
+Используйте <tt>compose</tt>для определения <tt>cadr</tt> и <tt>cddr</tt>.
+
+<p>
+
+</p><p>
+
+</p><h4>Exercise <a name="g28"></a>2.6.3</h4>
+<a name="./start:s96"></a>Scheme также предоставляет
+<a name="./start:s97"></a><tt>caar</tt>, <tt>cdar</tt>, <tt>caaar</tt>, <tt>caadr</tt>,
+и т.д. в любой комбинации до четырех<tt>a</tt>'s (представляющих
+<tt>car</tt>) и <tt>d</tt> (представляющих <tt>cdr</tt>) между <tt>c</tt>
+и  <tt>r</tt> (см Раздел&nbsp;<a href="objects.html#g109">6.3</a>).
+Определите каждую из них с помощью процедуры <tt>compose</tt>, описанную в предыдущем 
+упражнении.
+
+<p>
+
+</p><p>
+
+</p><h3><a name="g29"></a><a name="./start:h7"></a>Section 2.7. Условные Выражения<a name="SECTGSCONDITIONALS"></a></h3>
+
+<p>
+До сих пор мы рассматривали выражения, выполняющие получаемую задачу
+безусловно.
+Предположим, что мы хотим написать процедуру <a name="./start:s98"></a><tt>abs</tt>.
+Если ее аргумент <i>x</i> отритцательный, <tt>abs</tt>
+возвращает -<i>x</i>; иначе, она вернет <i>x</i>.
+Самый простой способ написать <tt>abs</tt> это определить,
+является ли аргумент отритцательным или нет и если он отритцательный
+вернуть его отритцание, используя для этого синтаксическую форму 
+<a name="./start:s99"></a><tt>if</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;abs<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(&lt;&nbsp;n&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(-&nbsp;0&nbsp;n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n)))
+<br>
+<br>
+(abs&nbsp;77)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;77<br>
+
+(abs&nbsp;-77)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;77</tt>
+</p><p>Выражение <tt>if</tt> имеет форму
+<tt>(if&nbsp;<i>test</i>&nbsp;<i>consequent</i>&nbsp;<i>alternative</i>)</tt>, где
+<tt><i>consequent</i></tt> это выражение вычисляемое если <tt><i>test</i></tt> равно истине
+и  вычисялемое выражение <tt><i>alternative</i></tt> если  <tt><i>test</i></tt> равен лжи.
+В вышеприведенном выражении <tt><i>test</i></tt> это <tt>(&lt;&nbsp;n&nbsp;0)</tt>, <tt><i>consequent</i></tt>
+это <tt>(-&nbsp;0&nbsp;n)</tt>, и <tt><i>alternative</i></tt> это <tt>n</tt>.
+
+</p><p>
+Процедура <tt>abs</tt> может ыбть написана и множеством других способов.
+Любое из следующих является допустимым определением <tt>abs</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;abs<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(&gt;=&nbsp;n&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(-&nbsp;0&nbsp;n))))
+<br>
+<br>
+(define&nbsp;abs<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(not&nbsp;(&lt;&nbsp;n&nbsp;0))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(-&nbsp;0&nbsp;n))))
+<br>
+<br>
+(define&nbsp;abs<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(or&nbsp;(&gt;&nbsp;n&nbsp;0)&nbsp;(=&nbsp;n&nbsp;0))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(-&nbsp;0&nbsp;n))))
+<br>
+<br>
+(define&nbsp;abs<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;n&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(&lt;&nbsp;n&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(-&nbsp;0&nbsp;n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n))))
+<br>
+<br>
+(define&nbsp;abs<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;((if&nbsp;(&gt;=&nbsp;n&nbsp;0)&nbsp;+&nbsp;-)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n)))</tt>
+</p><p>В первом из этих определений запрашивается, если <tt>n</tt> больше
+или равно нулю, инвертируя test.
+Во втором проверяется запрашивается если <tt>n</tt> не меньше нуля, используя
+процедуру <a name="./start:s100"></a><tt>not</tt> с <tt>&lt;</tt>.
+Третья проверяет, если <tt>n</tt>  больше нуля или <tt>n</tt> равно нулю,
+используя синтаксическую форму  <a name="./start:s101"></a><tt>or</tt>.
+Четвертое проверяет ноль отдельно, хотя в этом и нет никакой пользы.
+Пятая несколько сложная; <tt>n</tt> либо добавляется, либо вычитается из нуля,
+в зависимо от того  <tt>n</tt> больше или равно нулю.
+
+</p><p>
+Почему <a name="./start:s102"></a><tt>if</tt> это синтаксическая форма а не процедура?
+Чтобы ответить на этот вопрос, давайте перейдем к определению
+<tt>reciprocal</tt> из первого раздела этой главы.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;reciprocal<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;n&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"oops!"<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(/&nbsp;1&nbsp;n))))</tt>
+</p><p>Второй аргумент процедуры деления не должен быть равен нулю,
+так как математически результат не определен.
+Наше определение <tt>reciprocal</tt> позволяет избежать этой проблемы путем
+проверки на ноль делителя до деления.
+Если бы <tt>if</tt> была процедурой, ее аргументы (включая <tt>(/&nbsp;1&nbsp;n)</tt>)
+были бы вычислены до того, как у нее была бы возможность выбрать между
+следствием(consequent) и альтернативой(alternative).
+Как и <tt>quote</tt>, которая не вычисляет свое подвыражение,
+<tt>if</tt> не вычисляет все свои подвыражения и поэтому не может быть
+процедурой.
+
+</p><p>
+Синтаксическая форма <a name="./start:s103"></a><tt>or</tt> работает аналогично <tt>if</tt>.
+Общей формой выражения <tt>or</tt> является <tt>(or&nbsp;<i>expr</i>&nbsp;...)</tt>.
+Если подвыражений нет, т.е., выражение просто  <tt>(or)</tt>,
+значение его ложно.
+Иначе, каждое <tt><i>expr</i></tt> вычисляется  по очереди пока либо (a) одно из
+выражений не примет значение true или (b) не остатется больше выражений для вычисления.
+В случае (a), значение истинно(true); в случае (b), значение ложно(false).
+
+</p><p>
+Точнее, в случае (a), значение выражения <tt>or</tt>
+представляет собой значение последнего вычисляемого подвыражения.
+Это разъяснение необходимо, потому что существует много возможных
+истинных значений.
+Обычно значение тестового выражения является одним из двух объектов
+<a name="./start:s104"></a><tt>#t</tt>, для истины, или <a name="./start:s105"></a><tt>#f</tt>, для лжи.
+
+</p><p>
+
+</p><p><tt>(&lt;&nbsp;-1&nbsp;0)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(&gt;&nbsp;-1&nbsp;0)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f</tt>
+</p><p>Каждый объект Scheme, считается, либо  <a name="./start:s106"></a>истинным(true)
+либо <a name="./start:s107"></a>ложным(false) для условных выражений, а для процедур <tt>нет</tt>.
+Только <tt>#f</tt> считается ложным; все остальные объекты считаются истинными.
+
+</p><p>
+
+</p><p><tt>(if&nbsp;#t&nbsp;'true&nbsp;'false)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;true<br>
+
+(if&nbsp;#f&nbsp;'true&nbsp;'false)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;false<br>
+
+(if&nbsp;'()&nbsp;'true&nbsp;'false)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;true<br>
+
+(if&nbsp;1&nbsp;'true&nbsp;'false)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;true<br>
+
+(if&nbsp;'(a&nbsp;b&nbsp;c)&nbsp;'true&nbsp;'false)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;true
+<br>
+<br>
+(not&nbsp;#t)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(not&nbsp;"false")&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(not&nbsp;#f)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t
+<br>
+<br>
+(or)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(or&nbsp;#f)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(or&nbsp;#f&nbsp;#t)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(or&nbsp;#f&nbsp;'a&nbsp;#f)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a</tt>
+</p><p></p><p>Синтаксическая форма <a name="./start:s108"></a><tt>and</tt> похожа на форму <tt>or</tt>, 
+но выражение  <tt>and</tt> истинно когда все его подвыражения истинны, и ложно если есть хоть одно ложное.
+В случае, когда нет подвыражений, т.е, выражение это простое <tt>(and)</tt>, его значение истинно(true).
+Иначе, подвыражения вычисляются в порядке следования, пока не будет больше подвыражений  или значение
+подвыражения не вернет ложь(false).
+Значение выражения <tt>and</tt> это значение последнего вычисленного подвыражения.
+
+</p><p>
+Используя <tt>and</tt>, мы можем определить несколько иную версию
+<a name="./start:s109"></a><tt>reciprocal</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;reciprocal<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(not&nbsp;(=&nbsp;n&nbsp;0))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(/&nbsp;1&nbsp;n))))
+<br>
+<br>
+(reciprocal&nbsp;3)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1/3<br>
+
+(reciprocal&nbsp;0.5)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2.0<br>
+
+(reciprocal&nbsp;0)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f</tt>
+</p><p>В этой версии значение равно <tt>#f</tt> если <tt>n</tt> равно нулю, иначе <tt>1/n</tt>.
+
+</p><p>
+</p><p>Процедуры <tt>=</tt>, <tt>&lt;</tt>, <tt>&gt;</tt>, <tt>&lt;=</tt>, и <tt>&gt;=</tt> называются
+<a name="./start:s110"></a><i>предикатами</i>.
+Предикат это процедура, которая отвечает на конкретный вопрос о своих аргументах и возвращает
+одно из двух значение <tt>#t</tt> или <tt>#f</tt>.
+Имена большинства предикатов заканчиваются  
+<a name="./start:s111"></a><a name="./start:s112"></a>вопросительным знаком (&nbsp;<tt>?</tt>&nbsp;); 
+общие числовые процедуры, перечисленные выше являются исключениями из этого правила.
+Конечно, не все предикаты требуют числовых аргументов.
+Предикат <a name="./start:s113"></a><tt>null?</tt> возвращает истину если его аргументом
+являтся пустой список. <tt>()</tt> и ложь(false) в противном случае.
+
+</p><p>
+
+</p><p><tt>(null?&nbsp;'())&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(null?&nbsp;'abc)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(null?&nbsp;'(x&nbsp;y&nbsp;z))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(null?&nbsp;(cdddr&nbsp;'(x&nbsp;y&nbsp;z)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t</tt>
+</p><p>Процедуре <a name="./start:s114"></a><tt>cdr</tt> не должно передаваться ничего, кроме пары,
+и если это произойдет, возникает исключение.
+Common Lisp, определяет результат <tt>(cdr&nbsp;'())</tt> как <tt>()</tt>.
+Следующая процедура, <a name="./start:s115"></a><tt>lisp-cdr</tt>, определенная
+с помощью <tt>null?</tt> возвращает <tt>()</tt> если ее аргумент равен <tt>()</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;lisp-cdr<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cdr&nbsp;x))))
+<br>
+<br>
+(lisp-cdr&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;c)<br>
+
+(lisp-cdr&nbsp;'(c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;()<br>
+
+(lisp-cdr&nbsp;'())&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;()</tt>
+</p><p>Другим полезным предикатом является <a name="./start:s116"></a><tt>eqv?</tt>, ему
+требуются два аргумента.
+Если два аргумента эквивалентны, <tt>eqv?</tt> возвращает истину(true).
+В противном случае, <tt>eqv?</tt> возвращает ложь(false).
+
+</p><p>
+
+</p><p><tt>(eqv?&nbsp;'a&nbsp;'a)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(eqv?&nbsp;'a&nbsp;'b)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(eqv?&nbsp;#f&nbsp;#f)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(eqv?&nbsp;#t&nbsp;#t)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(eqv?&nbsp;#f&nbsp;#t)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(eqv?&nbsp;3&nbsp;3)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(eqv?&nbsp;3&nbsp;2)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(let&nbsp;([x&nbsp;"Hi&nbsp;Mom!"])<br>
+
+&nbsp;&nbsp;(eqv?&nbsp;x&nbsp;x))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(let&nbsp;([x&nbsp;(cons&nbsp;'a&nbsp;'b)])<br>
+
+&nbsp;&nbsp;(eqv?&nbsp;x&nbsp;x))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(eqv?&nbsp;(cons&nbsp;'a&nbsp;'b)&nbsp;(cons&nbsp;'a&nbsp;'b))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f</tt>
+</p><p>Как вы можете видеть, <tt>eqv?</tt> возвращает истину если аргументы являются одним и
+тем же сиволом, логической величиной, числом, парой или строкой.
+Две пары не одинаковы по <tt>eqv?</tt> если они созданы разными вызовами <tt>cons</tt>, 
+даже если они имеют одинаковое содержимое.
+Подробные правила эквивалентности для <tt>eqv?</tt> приведены в разделе
+&nbsp;<a href="objects.html#g108">6.2</a>.
+
+</p><p>
+Scheme также предоставляет набор
+<a name="./start:s117"></a><i>предикатов проверки типа</i> которые возвращают истину
+или ложь в зависимости от типа объекта, например <a name="./start:s118"></a><tt>pair?</tt>,
+<a name="./start:s119"></a><tt>symbol?</tt>, <a name="./start:s120"></a><tt>number?</tt>, и <a name="./start:s121"></a><tt>string?</tt>.
+Например, предикат <a name="./start:s122"></a><tt>pair?</tt>, возвращает истину, только если аргументом
+является пара.
+
+</p><p>
+
+</p><p><tt>(pair?&nbsp;'(a&nbsp;.&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(pair?&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(pair?&nbsp;'())&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(pair?&nbsp;'abc)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(pair?&nbsp;"Hi&nbsp;Mom!")&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(pair?&nbsp;1234567890)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f</tt>
+</p><p>Предикаты проверки типа полезны для принятия решения о том, соответствует ли аргумент процедуре
+соответствующего типа.
+Например, следующая версия  <a name="./start:s123"></a><tt>reciprocal</tt> проверяет первый аргумент
+что бы увидеть является ли он числом перед проверкой его является ли он нулем или выполнением деления.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;reciprocal<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(and&nbsp;(number?&nbsp;n)&nbsp;(not&nbsp;(=&nbsp;n&nbsp;0)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(/&nbsp;1&nbsp;n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"oops!")))
+<br>
+<br>
+(reciprocal&nbsp;2/3)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3/2<br>
+
+(reciprocal&nbsp;'a)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"oops!"</tt>
+</p><p>Кстати, код, который использует <tt>reciprocal</tt> должен проверять, чтобы
+возвращаемое значени было числом, а не строкой.
+Чтобы освободить вызывающий код, от этой необходимости, предпочтительнее сообщать об
+ошибке, используя <tt>assertion-violation</tt>,
+следующим оборазом..
+
+</p><p>
+
+</p><p><tt>(define&nbsp;reciprocal<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(and&nbsp;(number?&nbsp;n)&nbsp;(not&nbsp;(=&nbsp;n&nbsp;0)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(/&nbsp;1&nbsp;n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assertion-violation&nbsp;'reciprocal<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"improper&nbsp;argument"<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n))))
+<br>
+<br>
+(reciprocal&nbsp;.25)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4.0<br>
+
+(reciprocal&nbsp;0)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>exception&nbsp;in&nbsp;reciprocal:&nbsp;improper&nbsp;argument&nbsp;0</i><br>
+
+(reciprocal&nbsp;'a)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>exception&nbsp;in&nbsp;reciprocal:&nbsp;improper&nbsp;argument&nbsp;a</i></tt>
+</p><p>Первый аргумент для <tt>assertion-violation</tt> это символ определяющий, откуда
+приходит сообщение об ошибке, второй это строка описывающая ошибку,
+а третьий и последующие аргументы являются "раздражителями(irritants)", которые должны быть включены
+в сообщение об ошибке.
+
+</p><p>
+Давайте посмотрим еще одно условное выражение, <a name="./start:s124"></a><tt>cond</tt>, которое
+очень часто полезно использовать вместо <a name="./start:s125"></a><tt>if</tt>.
+<tt>cond</tt> аналогичен <tt>if</tt> за исключением того, что он допускает множественные
+тестовые и альтернативные выражения.
+Рассмотрим следующее определение <tt>sign</tt>, который возвращает <tt>-1</tt> для отритцательного
+ввода,
+<tt>+1</tt> для позитивного ввода, и
+<tt>0</tt> для нуля.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;sign<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(&lt;&nbsp;n&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(&gt;&nbsp;n&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0))))</tt>
+</p><p>
+</p><p><tt>(sign&nbsp;-88.3)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;-1<br>
+
+(sign&nbsp;0)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0<br>
+
+(sign&nbsp;333333333333)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+(*&nbsp;(sign&nbsp;-88.3)&nbsp;(abs&nbsp;-88.3))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;-88.3</tt>
+</p><p>Два выражения <tt>if</tt> можно заменить одним выражением <tt>cond</tt>
+следующим образом.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;sign<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(&lt;&nbsp;n&nbsp;0)&nbsp;-1]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(&gt;&nbsp;n&nbsp;0)&nbsp;+1]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;0])))</tt>
+</p><p>Выражение <tt>cond</tt> обычно принимает форму
+
+</p><p>
+
+</p><p><tt>(cond&nbsp;(<i>test</i>&nbsp;<i>expr</i>)&nbsp;...&nbsp;(else&nbsp;<i>expr</i>))</tt>
+</p><p>хотя предложение  <tt>else</tt> может быть опущено.
+Это должно быть сделано только тогда, когда нет вероятности, что все тесты потерпят неудачу, как в новой
+версии <tt>sign</tt> ниже.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;sign<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(&lt;&nbsp;n&nbsp;0)&nbsp;-1]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(&gt;&nbsp;n&nbsp;0)&nbsp;+1]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(=&nbsp;n&nbsp;0)&nbsp;0])))</tt>
+</p><p>Это определение <tt>sign</tt> не зависит от порядка выполнения
+тестов, так как только один из тестов может быть истинным для любого
+значения <tt>n</tt>.
+Следующая процедура вычисляет налог на определенную сумму дохода в 
+прогрессивной налоговой системе с точками останова в  10,000, 20,000, и 30,000
+долларов.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;income-tax<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(income)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(&lt;=&nbsp;income&nbsp;10000)&nbsp;(*&nbsp;income&nbsp;.05)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(&lt;=&nbsp;income&nbsp;20000)&nbsp;(+&nbsp;(*&nbsp;(-&nbsp;income&nbsp;10000)&nbsp;.08)&nbsp;500.00)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(&lt;=&nbsp;income&nbsp;30000)&nbsp;(+&nbsp;(*&nbsp;(-&nbsp;income&nbsp;20000)&nbsp;.13)&nbsp;1300.00)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(+&nbsp;(*&nbsp;(-&nbsp;income&nbsp;30000)&nbsp;.21)&nbsp;2600.00)])))</tt>
+</p><p>
+</p><p><tt>(income-tax&nbsp;5000)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;250.0<br>
+
+(income-tax&nbsp;15000)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;900.0<br>
+
+(income-tax&nbsp;25000)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1950.0<br>
+
+(income-tax&nbsp;50000)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;6800.0</tt>
+</p><p>В этом примере порядок, в котором выполняются тесты, слева направо(сверху вниз), является
+важным.
+
+</p><p>
+
+</p><h4>Упражнение <a name="g30"></a>2.7.1</h4>
+<a name="./start:s126"></a>Определите предикат <a name="./start:s127"></a><tt>atom?</tt>, который возвращает
+истину если его аргумент не является парой и ложь если это пара.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g31"></a>2.7.2</h4>
+<a name="./start:s128"></a><a name="EXSHORTER1"></a>Процедура <tt>length</tt> возвращает длину аргумента,
+который должен быть списком.
+Например, <tt>(length&nbsp;'(a&nbsp;b&nbsp;c))</tt> равна 3.
+Используя <tt>length</tt>, определите процедуру <a name="./start:s129"></a><tt>shorter</tt>, которая возвращает
+более короткий из двух аргументов.
+Верните первый список если они имеют одинаковую длину.
+
+<p>
+
+</p><p><tt>(shorter&nbsp;'(a&nbsp;b)&nbsp;'(c&nbsp;d&nbsp;e))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b)<br>
+
+(shorter&nbsp;'(a&nbsp;b)&nbsp;'(c&nbsp;d))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b)<br>
+
+(shorter&nbsp;'(a&nbsp;b)&nbsp;'(c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(c)</tt>
+</p><p>
+
+</p><p>
+
+</p><h3><a name="g32"></a><a name="./start:h8"></a>Section 2.8. Простая Рекурсия <a name="SECTGSRECURSION"></a></h3>
+
+<p>
+<a name="./start:s130"></a>Мы видели, как мы можем контролировать,
+вычисление выражений с помощью <tt>if</tt>, <tt>and</tt>, <tt>or</tt>,
+и <tt>cond</tt>.
+Мы также можем выполнять выражения несколько раз, создавая процедуру,
+содержащую выражение и вызывающую процедуру более одного раза.
+Что делать, если нам нужно выполнить некоторое выражение несколько раз,
+скажем для всех элементов списка или всех чисел от одного до десяти?
+Мы можем сделать это через <a name="./start:s131"></a>рекурсию.
+Рекурсия это простая концепция применения процедуры изнутри самой
+процедуры.
+Вначале может быть сложно справиться с рекурсией, но как только вы
+ее освоите, она обеспечит выразительную силу далеко выходящую за
+рамки конструкций циклов.
+
+</p><p>
+<a name="./start:s132"></a><i>Рекурсивная процедура</i> это процедура которая применяет(вызвает)
+саму себя.
+Возможно, самая простая рекурсивная процедура - следующая, мы назовем ее
+ <a name="./start:s133"></a><tt>goodbye</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;goodbye<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(goodbye)))
+<br>
+<br>
+(goodbye)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;"></tt>
+</p><p>Эта процедура не приниает аргументов и сразу же применяет себя.
+Она не имеет возвращаемого значения the <img src="./start_files/0.gif" alt="&lt;graphic&gt;"> поскольку <tt>goodbye</tt> 
+никогда не возвращается.
+
+</p><p>
+Очевидно, что на практике используется возврат из рекурсивной процедуры, мы должны
+каким то оборазом прекратить рекурсию.
+Большинство рекурсивных процедур должны иметь как минимум два основных элемента:
+<a name="./start:s134"></a><i>базовый случай</i> и <a name="./start:s135"></a><i>шаг рекурсии</i>.
+Базовый случай завершает рекурсию, выдавая значение процедуры для некоторого базового аргумента.
+Шаг рекурсии дает значение в терминах значений процедуры, применяемой к другому аргументу. Чтобы рекурсия
+завершилась, другой аргумент каким-то образом должен приближаться к базовому аргументу.
+
+</p><p>
+<a name="./start:s136"></a>Рассмотрим проблему поиска длины правильного списка
+через рекурсию
+Нам нужен базовый случай и шаг рекурсии.
+Логически базовый случай для рекурсии по списку это почти всегда пустой список.
+Длина пустого списка равна нулю, поэтому базовый случай должен выдать 0 для 
+пустого списка.
+Чтобы стать ближе к пустому списку, естественный шаг рекурсии включает cdr аргумента.
+Не пустой спискок на один элемент длиннее чем его cdr, поэтому шаг рекурсии
+дает значение которое на один больше, чем длина  cdr списка.
+<a name="defn:simplelength"></a>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;length<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;(length&nbsp;(cdr&nbsp;ls))&nbsp;1))))</tt>
+</p><p>
+</p><p><tt>(length&nbsp;'())&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0<br>
+
+(length&nbsp;'(a))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+(length&nbsp;'(a&nbsp;b))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2</tt>
+</p><p>Выражение <tt>if</tt> проверяет не пустой ли передан список.
+Если это так, значение равно нулю.
+Это базовый случай.
+Если нет, это значение больше чем длина cdr списка.
+Это шаг рекурсии.
+
+</p><p>
+Многие реализации Scheme позволяют отслеживать выполнение процедуры, чтобы увидеть
+как она работает.<a name="./start:s137"></a><a name="./start:s138"></a>В
+<a name="./start:s139"></a>Chez&nbsp;Scheme, например, одним из способов отслеживания
+является трассировка процедуры, наберите <tt>(trace&nbsp;<i>name</i>)</tt>, где
+<tt><i>name</i></tt> это имя процедуры, которая определена на верхнем уровне.
+В Guile это команда: <tt>,trace (length '(a b c d))</tt>.
+Если вы трассируете <tt>length</tt> как указано выше и передадите ей аргумент
+<tt>'(a&nbsp;b&nbsp;c&nbsp;d)</tt>, вы должны увидеть чтото вроде этого:
+
+</p><p>
+
+</p><p><tt>|(length&nbsp;(a&nbsp;b&nbsp;c&nbsp;d))<br>
+
+|&nbsp;(length&nbsp;(b&nbsp;c&nbsp;d))<br>
+
+|&nbsp;|(length&nbsp;(c&nbsp;d))<br>
+
+|&nbsp;|&nbsp;(length&nbsp;(d))<br>
+
+|&nbsp;|&nbsp;|(length&nbsp;())<br>
+
+|&nbsp;|&nbsp;|0<br>
+
+|&nbsp;|&nbsp;1<br>
+
+|&nbsp;|2<br>
+
+|&nbsp;3<br>
+
+|4</tt>
+</p><p>Отступ указывает уровень вложенности рекурсии; вертикальные линии
+визуально связывают предложения с их значениями.
+Обратите внимание, что при каждом применении <tt>length</tt> список становится меньше,
+пока он не достигнет <tt>()</tt>.
+Значение длины для <tt>()</tt> равно 0, и каждый внешний уровень добавляет 1 для
+достижения конечного значения.
+
+</p><p>
+Давайте напишем процедуру, <a name="./start:s140"></a><tt>list-copy</tt>, которая возвращает копию
+своего аргумента, который должен быть списком.
+То есть, <tt>list-copy</tt> возвращает новый список состоящий из элементов(но не пар) старого списка.
+Создание копии может быть полезно, если исходный список или его копия могут быть изменены с помощью
+ <tt>set-car!</tt> или <tt>set-cdr!</tt>, которые мы обсудим позже.
+
+</p><p>
+
+</p><p><tt>(list-copy&nbsp;'())&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;()<br>
+
+(list-copy&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)</tt>
+</p><p>Посмотрите, можете ли вы определить <tt>list-copy</tt> перед изучением определения ниже.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;list-copy<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(car&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list-copy&nbsp;(cdr&nbsp;ls))))))</tt>
+</p><p>Определение <tt>list-copy</tt> аналогично определению <tt>length</tt>.
+Проверка в базовом случае таже, <tt>(null?&nbsp;ls)</tt>.
+Значение в базовом случае будет <tt>()</tt>, а не  0, поскольку мы
+собираем список а не число.
+Рекурсивный вызов один и тот же, но вместо того чтобы добавлять единицу
+ <tt>list-copy</tt> создает пару из car спика и значения возвращаемого рекурсивным вызовом.
+
+</p><p>
+Нет причин, по которым не может быть более одного базового случая.
+Процедура <a name="./start:s141"></a><tt>memv</tt> получает два аргумента, объект и список.
+Она возвращает первый подсписок или <i>хвост(tail)</i> списка,
+car списка которого равен объекту, или <tt>#f</tt> если объект
+не найден в списке.
+Значение <tt>memv</tt> может использоваться как список или значение истины
+в условном выражении.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;memv<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;ls)&nbsp;#f]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(eqv?&nbsp;(car&nbsp;ls)&nbsp;x)&nbsp;ls]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(memv&nbsp;x&nbsp;(cdr&nbsp;ls))])))</tt>
+</p><p>
+</p><p><tt>(memv&nbsp;'a&nbsp;'(a&nbsp;b&nbsp;b&nbsp;d))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;b&nbsp;d)<br>
+
+(memv&nbsp;'b&nbsp;'(a&nbsp;b&nbsp;b&nbsp;d))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;b&nbsp;d)<br>
+
+(memv&nbsp;'c&nbsp;'(a&nbsp;b&nbsp;b&nbsp;d))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(memv&nbsp;'d&nbsp;'(a&nbsp;b&nbsp;b&nbsp;d))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(d)<br>
+
+(if&nbsp;(memv&nbsp;'b&nbsp;'(a&nbsp;b&nbsp;b&nbsp;d))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;"yes"<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;"no")&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"yes"</tt>
+</p><p>Здесь есть два условия проверки, следовательно используем <a name="./start:s142"></a><tt>cond</tt>.
+Первое условие cond проверяет базовый случай, значение <tt>()</tt>; ни один объект не является
+членом <tt>()</tt>, поэтому ответ равен <tt>#f</tt>.
+Второе условие проверяет, если car списка это искомый объект, в этом случае возвращается найденый список, т.е.
+являющийся первым хвостом первый элемент которого(car от хвоста списка) содержит объект.
+Шаг рекусрии просто спускается вниз по списку.
+
+</p><p>
+Также может быть более одного случая рекурсии.
+Как и <tt>memv</tt>, процедура <a name="./start:s143"></a><tt>remv</tt> определенная ниже
+принимает два аргумента, объект и спиок.
+Она возвращает новый список в котором удалены все вхождения переданного в качестве аргумента
+объекта.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;remv<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;ls)&nbsp;'()]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(eqv?&nbsp;(car&nbsp;ls)&nbsp;x)&nbsp;(remv&nbsp;x&nbsp;(cdr&nbsp;ls))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(cons&nbsp;(car&nbsp;ls)&nbsp;(remv&nbsp;x&nbsp;(cdr&nbsp;ls)))])))</tt>
+</p><p>
+</p><p><tt>(remv&nbsp;'a&nbsp;'(a&nbsp;b&nbsp;b&nbsp;d))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;b&nbsp;d)<br>
+
+(remv&nbsp;'b&nbsp;'(a&nbsp;b&nbsp;b&nbsp;d))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;d)<br>
+
+(remv&nbsp;'c&nbsp;'(a&nbsp;b&nbsp;b&nbsp;d))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;b&nbsp;d)<br>
+
+(remv&nbsp;'d&nbsp;'(a&nbsp;b&nbsp;b&nbsp;d))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;b)</tt>
+</p><p>Это определение аналогично определению <tt>memv</tt> выше,
+за исключением того, что <tt>remv</tt> не завершается после того как он находит элемент
+в car(начале) списка.
+Скорее , он продолжается, просто игнорируя элемент.
+Если элемент не найден в car списка, <tt>remv</tt> делает тоже самое что и
+<tt>list-copy</tt> показаный выше: он создает пару из car списка и значения
+возвращаемого рекурсией.
+
+</p><p>
+До сих пор рекурсия была только в cdr  списка.
+Иногда бывает полезно, чтобы процедура повторялась и для car списка,
+также как и на cdr списка.
+Процедура <a name="./start:s144"></a><tt>tree-copy</tt>, определенная
+ниже, рассматривает структуру пар как дерево, а не как список, причем
+левое поддерево является car пары и правое поддерево является  cdr пары.
+Процедура выполняет аналогичную операцию <tt>list-copy</tt>, создавая новые
+пары, оставляя только элементы (листья).
+
+</p><p>
+
+</p><p><tt>(define&nbsp;tree-copy<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(tr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(not&nbsp;(pair?&nbsp;tr))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tr<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(tree-copy&nbsp;(car&nbsp;tr))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(tree-copy&nbsp;(cdr&nbsp;tr))))))</tt>
+</p><p>
+</p><p><tt>(tree-copy&nbsp;'((a&nbsp;.&nbsp;b)&nbsp;.&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((a&nbsp;.&nbsp;b)&nbsp;.&nbsp;c)</tt>
+</p><p>Естественныем базовым аргументом для древовидной структуры, будет
+все что не является парой, поскольк рекурсия проходит по парам, а не по списку.
+Шаг рекурсии в этом случае является <i>дважды рекурсивным</i>, ища рекурсивно
+значение для car , а также для cdr аргумента.
+
+</p><p>
+</p><p>В данной точке, читатели, знакомые с другми языками, которые предоставляют
+специальные конструкции итераций, например, <i>while</i> или <i>for</i> циклы, могут
+задаться вопросом, нужны ли подобные конструкции в Scheme.
+Такие констуркции не нужны; <a name="./start:s145"></a>итерация в Scheme
+выражается более четко и лаконично через рекурсию.
+Рекурсия является более общей и устраняет необходимость присваивания переменных,
+требуемая конструкциями интераций многих других языков, что приводит к более надежному
+и удобному коду.
+Некоторые рекурсии по сущестсву являются итерацией и выполняются как таковые;
+В разделе&nbsp;<a href="further.html#g55">3.2</a> об этом говориться больше.
+Однако часто нет необходимости проводить различие. Вместо этого сконцентрируйтесь на
+написании четких, сжатых и правльных программ.
+
+</p><p>
+Прежде чем оставить тему рекурсии, рассмотрим специальную форму
+повторения, назваеую <a name="./start:s146"></a><i>отображением(mapping)</i>.
+Рассмотрим следующую процедуру <tt>abs-all</tt>, которая принимает список чисел
+в качестве входных данных и возвращает список их абсолютных 
+значений.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;abs-all<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(abs&nbsp;(car&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(abs-all&nbsp;(cdr&nbsp;ls))))))</tt>
+</p><p>
+</p><p><tt>(abs-all&nbsp;'(1&nbsp;-2&nbsp;3&nbsp;-4&nbsp;5&nbsp;-6))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6)</tt>
+</p><p>Эта процедура формирует новый список из входного списка, применяя
+процедуру <tt>abs</tt> к каждому элементу.
+Мы говорим, что <tt>abs-all</tt> <i>выполняет отображение(maps)</i> <tt>abs</tt> над входным списком
+для получения выходного списка.
+Отображение списка с помощью процедуры является довольно распространенной задачей, поэтому
+Scheme предоставляет процедуру <tt>map</tt>, которая отображает свой первый аргумент,
+с помощью процедуры, являющейся вторым аргументом, в список.
+Мы можем использовать <a name="./start:s147"></a><tt>map</tt> для определения <tt>abs-all</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;abs-all<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;abs&nbsp;ls)))</tt>
+</p><p>Однако в действительности нам не нужен <tt>abs-all</tt>, поскольку соответствующее
+прямое применение <tt>map</tt> также коротко и, возможно, более ясное.
+
+</p><p>
+
+</p><p><tt>(map&nbsp;abs&nbsp;'(1&nbsp;-2&nbsp;3&nbsp;-4&nbsp;5&nbsp;-6))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6)</tt>
+</p><p>Конечно, мы можем использовать <tt>lambda</tt> для создания аргумента процедуры для
+<tt>map</tt>, например, для  квадрата элементов списка чисел.
+
+</p><p>
+
+</p><p><tt>(map&nbsp;(lambda&nbsp;(x)&nbsp;(*&nbsp;x&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(1&nbsp;-3&nbsp;-5&nbsp;7))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;9&nbsp;25&nbsp;49)</tt>
+</p><p>Мы можем отображать процедуры нескольких аргументов по нескольким спискам, как в следующем
+примере.
+
+</p><p>
+
+</p><p><tt>(map&nbsp;cons&nbsp;'(a&nbsp;b&nbsp;c)&nbsp;'(1&nbsp;2&nbsp;3))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((a&nbsp;.&nbsp;1)&nbsp;(b&nbsp;.&nbsp;2)&nbsp;(c&nbsp;.&nbsp;3))</tt>
+</p><p>Списки должны иметь одинаковыую длину, и процедура должна принимать столько аргументов, сколько
+имеется списков. Каждый элемент выходного списка является результатом применения
+процедуры к соотвествующим членам входных списков.
+
+</p><p>
+Рассматривая первое определение <tt>abs-all</tt> выше, вы должны вывести перед его
+изучением, следующее опредление <a name="./start:s148"></a><tt>map1</tt>, ограниченную
+версию <tt>map</tt> для отображения одного списка через процедуру одного аргумента.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;map1<a name="defn:map1"></a><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(p&nbsp;(car&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map1&nbsp;p&nbsp;(cdr&nbsp;ls))))))</tt>
+</p><p>
+</p><p><tt>(map1&nbsp;abs&nbsp;'(1&nbsp;-2&nbsp;3&nbsp;-4&nbsp;5&nbsp;-6))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6)</tt>
+</p><p>Все что мы сделали, это заменили вызов <tt>abs</tt> в <tt>abs-all</tt>
+вызовом нового параметра <tt>p</tt>.
+Определение более общей процедуры <tt>map</tt> приведено в разделе&nbsp;<a href="control.html#g100">5.4</a>.
+
+</p><p>
+
+</p><h4>Упражнение <a name="g33"></a>2.8.1</h4>
+<a name="./start:s149"></a>Опишите, что произойдет, если вы измените порядок аргументов для <tt>cons</tt> 
+в определении <tt>tree-copy</tt>.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g34"></a>2.8.2</h4>
+<a name="./start:s150"></a>Обратитесь к разделу&nbsp;<a href="objects.html#g109">6.3</a> для описания
+<a name="./start:s151"></a><tt>append</tt> и
+определите его двух аргументную версию.
+Что произойдет если вы измените порядок аргументов в вызове <tt>append</tt> в вашем
+определении <tt>append</tt>?
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g35"></a>2.8.3</h4>
+<a name="./start:s152"></a>Определите процедуру <a name="./start:s153"></a><tt>make-list</tt>, которая
+принимает неотритцательное целое число
+<tt><i>n</i></tt> и объект и возвращает новый список, длиной <tt><i>n</i></tt>, каждый элемент
+которого является объектом.
+
+<p>
+
+</p><p><tt>(make-list&nbsp;7&nbsp;'())&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(()&nbsp;()&nbsp;()&nbsp;()&nbsp;()&nbsp;()&nbsp;())</tt>
+</p><p>[<i>Подсказка</i>: базовая проверка(случай) должна быть <tt>(=&nbsp;<i>n</i>&nbsp;0)</tt>, а шаг рекурсии
+должен включать <tt>(-&nbsp;<i>n</i>&nbsp;1)</tt>.
+В то время как <tt>()</tt> является естественным базовы случаем для рекурсии в списках, 0
+это естественный базовый случай для рекурсии на неотритцательных целых числах.
+Точно также, вычитание  1 является естественным способом приблизить целое неотритцательное число к  0.]
+
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g36"></a>2.8.4</h4>
+<a name="./start:s154"></a>Процедуры <tt>list-ref</tt> и <tt>list-tail</tt> возвращают
+<i>n</i>-й элемент и <i>n</i>-й хвост списка <i>ls</i>.
+
+<p>
+
+</p><p><tt>(list-ref&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4)&nbsp;0)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+(list-tail&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4)&nbsp;0)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;3&nbsp;4)<br>
+
+(list-ref&nbsp;'(a&nbsp;short&nbsp;(nested)&nbsp;list)&nbsp;2)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(nested)<br>
+
+(list-tail&nbsp;'(a&nbsp;short&nbsp;(nested)&nbsp;list)&nbsp;2)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((nested)&nbsp;list)</tt>
+</p><p>Определите обе процедуры.
+
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g37"></a>2.8.5</h4>
+<a name="./start:s155"></a>Упражнение&nbsp;<a href="start.html#g31">2.7.2</a> испоьзовало бы <tt>length</tt> в
+определении более коротких элементов
+<a name="./start:s156"></a><tt>shorter</tt>,
+которое возвращает более короткие из двух аргументов списка, или первое, если оба имеют одинаковую
+длину.
+Напишите <tt>shorter</tt> без использования <tt>length</tt>.
+[<i>Подсказка</i>: Определите рекурсивный помощник,
+<a name="./start:s157"></a><tt>shorter?</tt>, и используйте его вместо
+сравнения длины.]
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g38"></a>2.8.6</h4>
+<a name="./start:s158"></a><a name="EXEVENODD"></a>Все рекурсивные процедуры, показанные до сих пор, 
+были прямо рекурсивными.
+То есть, каждая процедура НЕПОСРЕДСТВЕННО применяла себя к новому аргументу.
+Так же можно написать две процедуры, которые используют друг друга, что приведет к косвенной
+рекурсии.
+Определите процедуры <a name="./start:s159"></a><tt>odd?</tt> и <a name="./start:s160"></a><tt>even?</tt>, одну в терминах другого.
+[<i>Подсказка</i>: Что каждая процедура должна возвращать, когда аргумент равен 0?]
+
+<p>
+
+</p><p><tt>(even?&nbsp;17)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(odd?&nbsp;17)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t</tt>
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g39"></a>2.8.7</h4>
+<a name="./start:s161"></a>Используйте <a name="./start:s162"></a><tt>map</tt> для определения процедуры, <tt>transpose</tt>, которая берет список пар и возвращает пару списков следующим образом.
+
+<p>
+
+</p><p><tt>(transpose&nbsp;'((a&nbsp;.&nbsp;1)&nbsp;(b&nbsp;.&nbsp;2)&nbsp;(c&nbsp;.&nbsp;3)))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((a&nbsp;b&nbsp;c)&nbsp;1&nbsp;2&nbsp;3)</tt>
+</p><p>[<i>Подсказка</i>: <tt>((a&nbsp;b&nbsp;c)&nbsp;1&nbsp;2&nbsp;3)</tt> тоже что и
+<tt>((a&nbsp;b&nbsp;c)&nbsp;.&nbsp;(1&nbsp;2&nbsp;3))</tt>.]
+
+</p><p>
+
+</p><p>
+
+</p><h3><a name="g40"></a><a name="./start:h9"></a>Section 2.9. Присваивание<a name="SECTGSASSIGNMENT"></a></h3>
+
+<p>
+Хотя многие программы могут быть записаны без него, полезно использовать 
+<a name="./start:s163"></a>присваивание на верхнем уровне
+<a name="./start:s164"></a>переменным или <tt>let</tt>-связывание и <tt>lambda</tt>-связывание переменных. Присваивания не создают новые привязки, как <tt>let</tt> или
+<tt>lambda</tt>, а скорее заменяют значения существующих привязок.
+Присваивание выполняется с помощью <a name="./start:s165"></a><tt>set!</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;abcde&nbsp;'(a&nbsp;b&nbsp;c&nbsp;d&nbsp;e))<br>
+
+abcde&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c&nbsp;d&nbsp;e)<br>
+
+(set!&nbsp;abcde&nbsp;(cdr&nbsp;abcde))<br>
+
+abcde&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;c&nbsp;d&nbsp;e)<br>
+
+(let&nbsp;([abcde&nbsp;'(a&nbsp;b&nbsp;c&nbsp;d&nbsp;e)])<br>
+
+&nbsp;&nbsp;(set!&nbsp;abcde&nbsp;(reverse&nbsp;abcde))<br>
+
+&nbsp;&nbsp;abcde)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(e&nbsp;d&nbsp;c&nbsp;b&nbsp;a)</tt>
+</p><p>Многие языки требуют использовать присваивание для инициализации локальных переменных,
+отдельно от объявления или связывания переменных.
+В Scheme, всем локальным переменных присваивается значение сразу после связывания.
+Помимо того, что отдельного присваивания для инициализации локальных переменных не требуется,
+это гарантирует, что программист не сможет забыть инициализировать их,
+что является общим источником ошибок во многих языках.
+
+</p><p>
+Фактически, большинство присваиваний, которые необходимы или удобны на других
+языках, являются неужными и неудобными в Scheme, поскольку обычно сущестует
+более четкий способ выражения одного и того же алгоритма без присваиваний.
+Одной из распространенных практик на некоторых языках является последовательность
+вычисления выражений с помощью ряда присваиваний, как в следующей процедуре,
+которая находит корни квадратного уравнения.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;quadratic-formula<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(a&nbsp;b&nbsp;c)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([root1&nbsp;0]&nbsp;[root2&nbsp;0]&nbsp;[minusb&nbsp;0]&nbsp;[radical&nbsp;0]&nbsp;[divisor&nbsp;0])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;minusb&nbsp;(-&nbsp;0&nbsp;b))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;radical&nbsp;(sqrt&nbsp;(-&nbsp;(*&nbsp;b&nbsp;b)&nbsp;(*&nbsp;4&nbsp;(*&nbsp;a&nbsp;c)))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;divisor&nbsp;(*&nbsp;2&nbsp;a))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;root1&nbsp;(/&nbsp;(+&nbsp;minusb&nbsp;radical)&nbsp;divisor))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;root2&nbsp;(/&nbsp;(-&nbsp;minusb&nbsp;radical)&nbsp;divisor))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;root1&nbsp;root2))))</tt>
+</p><p>Корни вычисляются в соответствии с известной квадратичной формулы,
+
+</p><p>
+</p><p>
+<img src="./start_files/4.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+которая дает решение уравнения 0 = <i>ax</i><sup>2</sup> + <i>bx</i> + <i>c</i>.
+Выражение <tt>let</tt> в этом определении используется только для установления связей переменных,
+соответствующих объявлениям, требуемым на дургих языках.
+Первые три выражения присваивания вычисляют подзаголовки формулы, а именно
+ -<i>b</i>, <img src="./start_files/5.gif" alt="&lt;graphic&gt;">, и 2<i>a</i>.
+Последние два выражения присваивания вычисляют два корня в терминах подзаголовков.
+Пара двух корней - это значение <a name="./start:s166"></a><tt>квадратичной формулы</tt>.
+Например, два корня 2<i>x</i><sup>2</sup> - 4<i>x</i> - 6 это <i>x</i> = 3 и <i>x</i> = -1.
+
+</p><p>
+
+</p><p><tt>(quadratic-formula&nbsp;2&nbsp;-4&nbsp;-6)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(3&nbsp;.&nbsp;-1)</tt>
+</p><p>Приведенное выше определение работает, но оно может быть написано более четко без присвоений, 
+как показано ниже.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;quadratic-formula<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(a&nbsp;b&nbsp;c)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([minusb&nbsp;(-&nbsp;0&nbsp;b)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[radical&nbsp;(sqrt&nbsp;(-&nbsp;(*&nbsp;b&nbsp;b)&nbsp;(*&nbsp;4&nbsp;(*&nbsp;a&nbsp;c))))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[divisor&nbsp;(*&nbsp;2&nbsp;a)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([root1&nbsp;(/&nbsp;(+&nbsp;minusb&nbsp;radical)&nbsp;divisor)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[root2&nbsp;(/&nbsp;(-&nbsp;minusb&nbsp;radical)&nbsp;divisor)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;root1&nbsp;root2)))))</tt>
+</p><p>В этой версии, выражения <tt>set!</tt> исчезли, и мы остались по существу с
+темже алгоритмом.
+Однако, используя два выражения <tt>let</tt>, определение ясно показывает зависимость
+ <tt>root1</tt> и <tt>root2</tt> от значений
+<tt>minusb</tt>, <tt>radical</tt>, и <tt>divisor</tt>.
+Не менее важно, что выражения <tt>let</tt> указывают на <i>отсутствие</i> зависимостей
+между <tt>minusb</tt>, <tt>radical</tt>, и <tt>divisor</tt> и между
+<tt>root1</tt> и <tt>root2</tt>.
+
+</p><p>
+</p><p>У присваиваний есть некотрые варианты использования в Scheme, иначе язык бы
+их не поддерживал.
+Рассмотрим следующую версию <tt>cons</tt> которая подсчитывает какое число раз  она
+вызывается, сохраняя счетчик в переменной с именем <tt>cons-count</tt>.
+Она использует <tt>set!</tt> чтобы увеличить счетчик; нет никакого способа добиться
+такого же поведения без присваиваний.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;kons-count&nbsp;0)<br>
+
+(define&nbsp;kons<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;kons-count&nbsp;(+&nbsp;kons-count&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;x&nbsp;y)))
+<br>
+<br>
+(kons&nbsp;'a&nbsp;'(b&nbsp;c))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)<br>
+
+kons-count&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+(kons&nbsp;'a&nbsp;(kons&nbsp;'b&nbsp;(kons&nbsp;'c&nbsp;'())))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)<br>
+
+kons-count&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4</tt>
+</p><p>Присваивания обычно используются для реализации процедур, которые должны
+поддерживать некоторое <a name="./start:s167"></a>внутренне состояние.
+Например, предположим, что мы хотели бы определить процедуру, которая возвращает 0
+при первом вызове, 1 во второй раз, 2 в третий,
+и т.д.
+Мы могли бы написать нечто похожее на определенное выше <tt>cons-count</tt>:
+
+</p><p>
+
+</p><p><tt>(define&nbsp;next&nbsp;0)<br>
+
+(define&nbsp;count<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([v&nbsp;next])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;next&nbsp;(+&nbsp;next&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v)))
+<br>
+<br>
+(count)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0<br>
+
+(count)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1</tt>
+</p><p>Это решение немного не желательно в том смысле, что переменная <tt>next</tt> видна
+на верхнем уровне, хотя в этом не требуется.
+Поскольку она отображается на верхнем уровне, любой код в системе может изменить ее значение,
+возможно, непреднамеренно влияя на поведение <tt>count</tt> незаметным образом.
+Мы можем решить эту проблему путем <tt>let</tt>-связывания <tt>next</tt> находящейся за 
+пределами <tt>lambda</tt> выражения:
+
+</p><p>
+
+</p><p><tt>(define&nbsp;count<br>
+
+&nbsp;&nbsp;(let&nbsp;([next&nbsp;0])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([v&nbsp;next])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;next&nbsp;(+&nbsp;next&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v))))</tt>
+</p><p>Последнее решение также легко обобщается, для того чтобы предоставить несколько счетчиков,
+каждый из которых имеет свой собственный локальный счетчик.
+Процедура <a name="./start:s168"></a><tt>make-counter</tt>, определенная ниже, возвращает новую
+процедуру счета каждый раз, когда она вызывается.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;make-counter<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([next&nbsp;0])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([v&nbsp;next])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;next&nbsp;(+&nbsp;next&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v)))))</tt>
+</p><p>Поскольку <tt>next</tt> связывается внутри <tt>make-counter</tt>, но ВНЕ
+процедуры, возвращаемой <tt>make-counter</tt>, каждая процедура возвращаемая им
+поддерживает свой собственный уникальный счетчик.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;count1&nbsp;(make-counter))<br>
+
+(define&nbsp;count2&nbsp;(make-counter))
+<br>
+<br>
+(count1)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0<br>
+
+(count2)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0<br>
+
+(count1)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+(count1)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2<br>
+
+(count2)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1</tt>
+</p><p>Если переменная состояния должна разделяться несколькими процедурами, определенными
+на верхнем уровне, но мы не хотим, чтобы эта переменная состояния была видимой на
+верхнем уровне, мы можем использовать <tt>let</tt>
+для связывания этой переменной и <tt>set!</tt> чтобы сделать процедуры видиммыми
+на верхнем уровне.<a name="./start:s169"></a><a name="./start:s170"></a>
+
+</p><p>
+
+</p><p><tt>(define&nbsp;shhh&nbsp;#f)<br>
+
+(define&nbsp;tell&nbsp;#f)<br>
+
+(let&nbsp;([secret&nbsp;0])<br>
+
+&nbsp;&nbsp;(set!&nbsp;shhh<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(message)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;secret&nbsp;message)))<br>
+
+&nbsp;&nbsp;(set!&nbsp;tell<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;secret)))
+<br>
+<br>
+(shhh&nbsp;"sally&nbsp;likes&nbsp;harry")<br>
+
+(tell)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"sally&nbsp;likes&nbsp;harry"<br>
+
+secret&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>exception:&nbsp;variable&nbsp;secret&nbsp;is&nbsp;not&nbsp;bound</i></tt>
+</p><p>Переменные должны быть определены до того, как 
+им можно присваивать значения, поэтому мы определяем
+<tt>shhh</tt> и <tt>tell</tt> и говорим, тобы они были
+<tt>#f</tt> изначально.
+(Подошло бы любое начальное значение.)
+Мы увидим эту стурктуру снова в Разделе&nbsp;<a href="further.html#g79">3.5</a>
+и лучший способ структурировать такой код сделать как библиотеку в Разделе
+&nbsp;<a href="further.html#g84">3.6</a>.
+
+</p><p>
+<a name="./start:s171"></a>Локальные состояния иногда полезны для кеширования
+вычисленных значений или возможности вычислять значения  <i>лениво</i>, т.е.,
+только один раз и только по требованию.
+Процедура <a name="./start:s172"></a><tt>lazy</tt> ниже, принимает в 
+качестве аргумента <a name="./start:s173"></a><i>thunk</i>, или
+процедуру без аргументов.
+Thunks часто используется для "замораживания" вычислений, которые по какой то
+причине должны быть отложены, и именно это нам нужно сделать в этой ситуации.
+Когда передано thunk <tt><i>t</i></tt>, <tt>lazy</tt> возвращает новый thunk, который
+при вызове возвращает значение вызова <tt><i>t</i></tt>.
+После вычисления, значение сохраняется  в локальной переменной, так что вычисление
+не должно выполняться снова.
+Булевский флаг используется для записи того, был ли <tt><i>t</i></tt> вызван и
+его значение сохранено.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;lazy<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(t)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([val&nbsp;#f]&nbsp;[flag&nbsp;#f])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(not&nbsp;flag)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin&nbsp;(set!&nbsp;val&nbsp;(t))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;flag&nbsp;#t)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;val))))</tt>
+</p><p>Синтаксическая форма <a name="./start:s174"></a><tt>begin</tt>, использующаяся здесь в первый раз,
+вычисляет последовательность подвыражений слева на право и возвращает значение
+последнего подвыражения подобно телу  <tt>let</tt> или <tt>lambda</tt> выражению.
+Мы также видим, что <tt><i>альтернативное</i></tt> подвыражение <a name="./start:s175"></a><tt>if</tt>
+может быть опущено.
+Это нужно делать только тогда, когда значение <tt>if</tt> отбрасывается, как в этом случае.
+
+</p><p>
+Ленивые(Lazy) вычисления особенно полезны для значений, требующих
+значительного времени для вычисления.
+Задерживая вычисления, мы могли бы вообще не вычислять значение, и запомния значение,
+мы избегаем вычислений более одного раза.
+
+</p><p>
+Лучше всего проилюстрировать операцию <tt>lazy</tt> напечатав сообщение
+из переданного в <tt>lazy</tt> thunk.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;p<br>
+
+&nbsp;&nbsp;(lazy&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(display&nbsp;"Ouch!")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(newline)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"got&nbsp;me")))</tt>
+</p><p>В первый раз, вызов <tt>p</tt> печатает сообщениеe <tt>Ouch!</tt>  и
+возвращает строку <tt>"got&nbsp;me"</tt>.
+После этого, возвращается <tt>"got&nbsp;me"</tt>, а сообщение не печатается.
+Процедуры <tt>display</tt> и <tt>newline</tt> являются первыми примерами
+явного ввода/вывода, которые мы видели; <tt>display</tt> печатает строку
+без кавычек, и <tt>newline</tt> печатает знак перевода строки.
+
+</p><p>
+Для дополнительной илюстрации использования <tt>set!</tt>,
+рассмотрим реализацию  <a name="./start:s176"></a>стековых объектов, внутренняя
+работа которых не видна с наружи.
+Стековый объект принимает одно из четырех  
+<a name="./start:s177"></a><i>сообщений</i>: <tt>empty?</tt>, которое 
+возвращает <tt>#t</tt> если стек пустой; <tt>push!</tt>, которое добавляет
+объект к вершине стека; <tt>top</tt>, которое возвращает объект в верхней
+части стека; и <tt>pop!</tt>, которое удаляет объект из вершины стека.
+Приведенная ниже процедура <a name="./start:s178"></a><tt>make-stack</tt> создает
+новый стек каждый раз, когда она вызывается, способом аналогичным работе
+<tt>make-counter</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;make-stack<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([ls&nbsp;'()])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(msg&nbsp;.&nbsp;args)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(eqv?&nbsp;msg&nbsp;'empty?)&nbsp;(null?&nbsp;ls)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(eqv?&nbsp;msg&nbsp;'push!)&nbsp;(set!&nbsp;ls&nbsp;(cons&nbsp;(car&nbsp;args)&nbsp;ls))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(eqv?&nbsp;msg&nbsp;'top)&nbsp;(car&nbsp;ls)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(eqv?&nbsp;msg&nbsp;'pop!)&nbsp;(set!&nbsp;ls&nbsp;(cdr&nbsp;ls))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;"oops"])))))</tt>
+</p><p>Каждый стек хранится как список, связанный с переменной <tt>ls</tt>; <tt>set!</tt>
+используется для изменения этой привязки для <tt>push!</tt> и <tt>pop!</tt>.
+Обратите внимание, что список аргументов внутреннего <tt>lambda</tt> выражения использует
+синтаксис неправильного списка для связывания <tt>args</tt> со списком всех аргументов,
+кроме первого.
+Это полезно здесь, потому что в случае <tt>empty?</tt>, <tt>top</tt>, и
+<tt>pop!</tt> есть только один аргумент (сообщение), но в случаях
+<tt>push!</tt> есть два аргумента (сообщение и объект, который нужно поместить
+в стек).
+
+</p><p>
+
+</p><p><tt>(define&nbsp;stack1&nbsp;(make-stack))<br>
+
+(define&nbsp;stack2&nbsp;(make-stack))<br>
+
+(list&nbsp;(stack1&nbsp;'empty?)&nbsp;(stack2&nbsp;'empty?))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#t&nbsp;#t)
+<br>
+<br>
+(stack1&nbsp;'push!&nbsp;'a)<br>
+
+(list&nbsp;(stack1&nbsp;'empty?)&nbsp;(stack2&nbsp;'empty?))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#f&nbsp;#t)
+<br>
+<br>
+(stack1&nbsp;'push!&nbsp;'b)<br>
+
+(stack2&nbsp;'push!&nbsp;'c)<br>
+
+(stack1&nbsp;'top)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;b<br>
+
+(stack2&nbsp;'top)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;c
+<br>
+<br>
+(stack1&nbsp;'pop!)<br>
+
+(stack1&nbsp;'top)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a<br>
+
+(list&nbsp;(stack1&nbsp;'empty?)&nbsp;(stack2&nbsp;'empty?))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#f&nbsp;#f)
+<br>
+<br>
+(stack1&nbsp;'pop!)<br>
+
+(list&nbsp;(stack1&nbsp;'empty?)&nbsp;(stack2&nbsp;'empty?))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#t&nbsp;#f)</tt>
+</p><p>Как и для счетчиков, созданных <tt>make-counter</tt>, состояние,
+поддерживаемое каждым стековым объектом, доступно напрямую только внутри
+объекта.
+Каждая ссылка или изменение этого состояния производиться явно самим объектом.
+Одним из важных преимуществ(инкапсуляции) является то, что мы можем изменить внутреннюю
+структуру стека, например, использовать вектор.(см. Раздел&nbsp;<a href="objects.html#g115">6.9</a>) instead
+вместо списка для хранения элементов,
+без изменения его внешнего поведения.
+Поскольку поведение объекта известно абстрактно (не оперативно),
+он известен как <i>абстрактный объект</i>.
+См. Раздел&nbsp;<a href="examples.html#g193">12.8</a> для получения подробной
+информаии о создании <a name="./start:s179"></a>абстрактных объектов.
+
+</p><p>
+В дополнение к изменению значений переменных мы также можем изменить
+значения полей car и cdr пары, спользуя процедуры
+<tt>set-car!</tt> и <tt>set-cdr!</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;p&nbsp;(list&nbsp;1&nbsp;2&nbsp;3))<br>
+
+(set-car!&nbsp;(cdr&nbsp;p)&nbsp;'two)<br>
+
+p&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;two&nbsp;3)<br>
+
+(set-cdr!&nbsp;p&nbsp;'())<br>
+
+p&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1)</tt>
+</p><p><a name="queue-datatype"></a><a name="./start:s180"></a>Мы можем использовать эти
+операторы для определения типа данных очередь, который похож на стек, за исключением
+того, что новые элементы добавляются с одного конца, и извлекаются с другого конца.
+В следующей реализации очереди используется структура <a name="./start:s181"></a><i>tconc</i>.
+tconc состоит из непустого списка и заголовка.
+Заголовок представляет собой пару, car которой указывает на первую пару(голову)
+списка и чей cdr указывает на последнюю пару(конец) списка.
+
+</p><p>
+</p><p>
+<img src="./start_files/6.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+Последний элемент списка является заполнителем и считается частью очереди.
+
+</p><p>
+Ниже приведены четыре операции над очередями:
+<a name="./start:s182"></a><tt>make-queue</tt>, которая создает очередь;
+<a name="./start:s183"></a><tt>putq!</tt>, которая добавляет элемент в 
+конец очереди;
+<a name="./start:s184"></a><tt>getq</tt>, которая извлекает элемен из начала очереди; 
+и <a name="./start:s185"></a><tt>delq!</tt>, которая удаляет элемент из 
+передней части очереди.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;make-queue<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([end&nbsp;(cons&nbsp;'ignored&nbsp;'())])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;end&nbsp;end))))
+<br>
+<br>
+(define&nbsp;putq!<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(q&nbsp;v)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([end&nbsp;(cons&nbsp;'ignored&nbsp;'())])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-car!&nbsp;(cdr&nbsp;q)&nbsp;v)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-cdr!&nbsp;(cdr&nbsp;q)&nbsp;end)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-cdr!&nbsp;q&nbsp;end))))
+<br>
+<br>
+(define&nbsp;getq<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(q)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;(car&nbsp;q))))
+<br>
+<br>
+(define&nbsp;delq!<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(q)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set-car!&nbsp;q&nbsp;(cdr&nbsp;(car&nbsp;q)))))</tt>
+</p><p>Все это простые операции, за исключением <tt>putq!</tt>, которая
+изменяет конечную пару, чтобы та содержала новое значение, и добавляет
+новую конечную пару.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;myq&nbsp;(make-queue))
+<br>
+<br>
+(putq!&nbsp;myq&nbsp;'a)<br>
+
+(putq!&nbsp;myq&nbsp;'b)<br>
+
+(getq&nbsp;myq)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a<br>
+
+(delq!&nbsp;myq)<br>
+
+(getq&nbsp;myq)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;b<br>
+
+(delq!&nbsp;myq)<br>
+
+(putq!&nbsp;myq&nbsp;'c)<br>
+
+(putq!&nbsp;myq&nbsp;'d)<br>
+
+(getq&nbsp;myq)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;c<br>
+
+(delq!&nbsp;myq)<br>
+
+(getq&nbsp;myq)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;d</tt>
+</p><p>
+</p><h4>Упражнение <a name="g41"></a>2.9.1</h4>
+<a name="./start:s186"></a>Измените <a name="./start:s187"></a><tt>make-counter</tt> чтобы она принимала
+два аргумента: начальное значение для счетчика, используемого вместо 0 и количество, чтобы увеличивать
+счетчик каждый раз.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g42"></a>2.9.2</h4>
+<a name="./start:s188"></a>Посмотрите описание <a name="./start:s189"></a><tt>case</tt> в разделе&nbsp;<a href="control.html#g99">5.3</a>.
+Замените выражение <tt>cond</tt> в <a name="./start:s190"></a><tt>make-stack</tt> эквивалентным
+выражением <tt>case</tt>.
+Добавьте <tt>mt?</tt> как второе имя для сообщения <tt>empty?</tt>.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g43"></a>2.9.3</h4>
+<a name="./start:s191"></a><a name="EXSTACKREFANDSET"></a>Измените объект <tt>stack</tt>, чтобы разрешить
+два сообщения <tt>ref</tt> и
+<tt>set!</tt>.
+<tt>(<i>stack</i>&nbsp;'ref&nbsp;<i>i</i>)</tt> должен возвращать <tt><i>i</i></tt>-й элемент из 
+вершины стека; <tt>(<i>stack</i>&nbsp;'ref&nbsp;0)</tt> должен быть эвивалентен <tt>(<i>stack</i>&nbsp;'top)</tt>.
+<tt>(<i>stack</i>&nbsp;'set!&nbsp;<i>i</i>&nbsp;<i>v</i>)</tt> должен изменить <tt><i>i</i></tt>-й
+элемент из вершины стека на <tt><i>v</i></tt>.
+
+<p>
+
+</p><p><tt>(define&nbsp;stack&nbsp;(make-stack))
+<br>
+<br>
+(stack&nbsp;'push!&nbsp;'a)<br>
+
+(stack&nbsp;'push!&nbsp;'b)<br>
+
+(stack&nbsp;'push!&nbsp;'c)
+<br>
+<br>
+(stack&nbsp;'ref&nbsp;0)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;c<br>
+
+(stack&nbsp;'ref&nbsp;2)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a<br>
+
+(stack&nbsp;'set!&nbsp;1&nbsp;'d)<br>
+
+(stack&nbsp;'ref&nbsp;1)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;d<br>
+
+(stack&nbsp;'top)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;c<br>
+
+(stack&nbsp;'pop!)<br>
+
+(stack&nbsp;'top)&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;d</tt>
+</p><p>[<i>Hint</i>: Используйте <tt>list-ref</tt> для реализации <tt>ref</tt> и <tt>list-tail</tt>
+с <tt>set-car!</tt> для реализации <tt>set!</tt>.]
+
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g44"></a>2.9.4</h4>
+<a name="./start:s192"></a><a name="./start:s193"></a>Scheme поддерживает <i>вектора</i> также как и списки.
+Подобно спискам, вектора представляют собой контейнерные объекты, которые содержат другие объекты.
+В отличии от списков, вектора имеют фиксированный размер и размещаются в одном плоском блоке памяти, как правило, с заголовком, содержащим длину вектора, как десяти-элементном векторе ниже.
+
+<p>
+</p><p>
+<img src="./start_files/7.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+Это делает вектора более подходящими для приложений, которым
+необходим быстрый доступ к любому элементу контейнера, но менее
+подходит для приложений, трубующих структуры данных которые растут
+и сжимаются по мере необходимости.
+
+</p><p>
+Посмотрите основные векторные операции в разделе
+&nbsp;<a href="objects.html#g115">6.9</a> и реализуйте объект
+<tt>stack</tt> чтобы использовать вектор вместо списка для
+хранения содержимого стека.
+Включите сообщения <tt>ref</tt> и <tt>set!</tt> упражнения&nbsp;<a href="start.html#g43">2.9.3</a>.
+Сделайте новый <tt>make-stack</tt> принимающий аргумент размера <i>n</i>
+и создающий вектор длины <i>n</i>, но иначе не изменить внешний(абстрактный)
+интерфейс.
+
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g45"></a>2.9.5</h4>
+<a name="./start:s194"></a>Определите предикат, <tt>emptyq?</tt>, для определения, является ли очередь
+устой.
+Измените <tt>getq</tt> и <tt>delq!</tt> чтобы вызывалось исключение, когда найдена пустая очередь,
+используйте <tt>assertion-violation</tt>.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g46"></a>2.9.6</h4>
+<a name="./start:s195"></a>В реализации очереди, последняя пара во внутреннем списке
+является заполнителем, т.е никогда не содержит ничего полезного.
+Перекодируйте операторы очереди, чтобы избежать этой пустой пары.
+Убедитесь, что серия операций с очередями, приведенная ранее, работает с новой раализацией.
+Какую реализацию предпочтете вы?
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g47"></a>2.9.7</h4>
+<a name="./start:s196"></a>Используя <a name="./start:s197"></a><tt>set-cdr!</tt>, можно создавать <a name="./start:s198"></a><i>циклические списки</i>.
+Например, следующее выражение вычисляет список, чей car это символ <tt>a</tt> и чей cdr является самим списком.
+
+<p>
+
+</p><p><tt>(let&nbsp;([ls&nbsp;(cons&nbsp;'a&nbsp;'())])<br>
+
+&nbsp;&nbsp;(set-cdr!&nbsp;ls&nbsp;ls)<br>
+
+&nbsp;&nbsp;ls)</tt>
+</p><p>Что произойдет, когда вы введете указанное выражение во время интерактивной сессии
+Scheme?
+Какова будет реализация <tt>length</tt> на странице&nbsp;<a href="start.html#defn:simplelength">42</a>
+при предоставлении циклического списка?
+Что делает встроенный примитив <tt>length</tt>?
+
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g48"></a>2.9.8</h4>
+<a name="./start:s199"></a><a name="EXLIST?"></a>Определите предикат <a name="./start:s200"></a><tt>list?</tt>, который возвращает
+<tt>#t</tt> если аргумент является <a name="./start:s201"></a>правильным списком и <tt>#f</tt> иначе
+(см раздел&nbsp;<a href="objects.html#g109">6.3</a>).
+Он должен возвращать <tt>#f</tt> для циклических списков, заканчивающихся объектами, отличными от <tt>()</tt>.
+
+<p>
+
+</p><p><tt>(list?&nbsp;'())&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(list?&nbsp;'(1&nbsp;2&nbsp;3))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(list?&nbsp;'(a&nbsp;.&nbsp;b))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(list?&nbsp;(let&nbsp;([ls&nbsp;(cons&nbsp;'a&nbsp;'())])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-cdr!&nbsp;ls&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ls))&nbsp;<img src="./start_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f</tt>
+</p><p>Снача напишите упрощенную версию <tt>list?</tt> которая не обрабатывает
+циклические списки, а затем расширьте ее чтобы правильно обрабатывались циклические списки.
+Пересмотрите свое определение пока не убедитесь, что оно максимально ясное и краткое.
+[<i>Подсказка</i>: Используйте алгоритм "<a name="./start:s202"></a>заяц и черепаха" для
+обнаружения циклов.
+Определите рекурсивную процедуру при помощи двух аргументов, зайца и черепахи.
+Оба и заяц и черепаха начинают с начала списка. Попросите зайца продвигаться на два cdr каждый раз,
+как черепаха продвинется на один cdr.
+Если заяц поймает черепаху, здесь должен быть цикл.]
+
+</p><p>
+
+</p><p>
+
+</p><hr class="copyright" align="left">
+<p>
+R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</it><br>
+Copyright © 2009 <a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">The MIT Press</a>.  Electronically reproduced by permission.<br>
+Illustrations © 2009 <a class="plain" href="http://hebert.kitp.ucsb.edu/">Jean-Pierre Hébert</a><br>
+ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>
+<a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">to order this book</a> / <a class="plain" href="canned/about.html">about this book</a>
+</p>
+<p><a class="plain" href="http://www.scheme.com/">http://www.scheme.com</a></p>
+
+</body></html>

@@ -1,0 +1,1364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0056)exceptions.html#./exceptions:h0 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<title>Исключения и Условия</title>
+<link href="./exceptions_files/tspl.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a name="g147"></a>
+<a name="./exceptions:h0"></a>
+
+<div>
+<img src="./exceptions_files/ch11.png">
+</div>
+<h1>Chapter 11. Исключения и Условия<a name="CHPTEXCEPTIONS"></a></h1>
+
+<p>
+<a name="./exceptions:s0"></a><a name="./exceptions:s1"></a><i>Исключения</i> и
+<i>условия</i> предоставляют средства для системного и пользовательского кода для
+сигнализации, обнаружения и восстановления после ошибок, возникающих при работе
+программы.
+
+</p><p>
+Исключения выбрасываются стандартными синтаксическими формами и процедурами в
+самых разных обстоятельствах , например когда неправильное количество аргументов
+передаётся процедуре, когда синтаксис, переданного <tt>eval</tt> неверен или
+когда файл не может быть открыт одной из процедур открытия файлов.
+В этих ситуациях исключение выбрасывается со стандартным типом условия.
+
+</p><p>
+Исключения также могут быть "выброшены" пользовательским кодом посредством
+процедур <tt>raise</tt> или <tt>raise-continuable</tt>.
+В этом случае исключение может быть выброшено с помощью одного из стандартных
+типов условий, определяемого пользователем подтипа стандартного условия 
+(возможно определенного с использованием <tt>define-condition-type</tt>), или
+произвольного значения Scheme, которое не является типом условия.
+
+</p><p>
+<a name="./exceptions:s2"></a>В произвольной точке выполнения программы,
+существует один обработчик исключений, называемый <i>текущий обработчик исключений</i>,
+выполняющий обработку всех возникающих исключений.
+По умолчанию, текущий обработчик исключений, это тот, который обеспечивается
+реализацией.
+Обработчик исключений по умолчанию обычно печатает сообщение, описывающее условие
+или другое значение с которым было создано исключение, и для любого серьезного
+условия завершает программу.
+В интерактивных системах, это обычно означает сброс цикла
+чтение-выполнение-печать(read-eval-print).
+
+</p><p>
+Пользовательский код может установить новый текущий обработчик исключений
+через синтаксис <tt>guard</tt> или  процедуру <tt>with-exception-handler</tt>.
+В любом случае, пользовательский код сможет обрабатывать все исключения или,
+основываясь на условии или другом значении, с которым было вызвано исключение, 
+только некоторые из исключений, повторно выбрасывая исключение для обработки
+старым текущим обработчиком исключений.
+Когда форма <tt>guard</tt> или вызовы <tt>with-exception-handler</tt> являются
+динамически вложенными, создается цепочка обработчиков исключений, и каждый может
+может отложить обработку до следующего обработчика по цепочке.
+
+</p><p>
+
+</p><h3><a name="g148"></a><a name="./exceptions:h1"></a>Section 11.1. Выброс и Обработка Исключений</h3>
+
+<p>
+<a name="./exceptions:s3"></a><span class="formdef"><b>procedure</b>: <tt>(raise&nbsp;<i>obj</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(raise-continuable&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b>см ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;exceptions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Обе эти процедуры выбрасывают исключение, эффективно вызывая текущий
+обработчик исключений, передавая <tt><i>obj</i></tt> как единственный аргумент.
+Для <tt>raise</tt>, исключение является <i>non-continuable</i>, в то время как
+для<tt>raise-continuable</tt>, исключение является <i>continuable</i>.
+Обработчик исключений может возвращать (ноль или больше значений) в 
+продолжение для  continuable исключений.
+Если обработчик исключний пытается вернуться в продолжение
+non-continuable исключение, возникает(выбрасывается) новое исключение с условием 
+типа <tt>&amp;non-continuable</tt>.
+Таким образом, <tt>raise</tt> никогда не возвращается, в то время как <tt>raise-continuable</tt>
+может возвратить ноль или больше значений, в зависимости от обработчика исключений.
+
+</p><p>
+Если текущий обработчик ислючений <tt><i>p</i></tt>, был установлен через
+форму <tt>guard</tt> или вызов <tt>with-exception-handler</tt>, текущий
+обработчик исключений будет сброшен в обработчик, который был текущим, когда
+<tt><i>p</i></tt> был установлен до выброса исключения <tt>raise</tt> или
+<tt>raise-continuable</tt> вывавшего <tt><i>p</i></tt>.
+Это позволяет <tt><i>p</i></tt> отложить обработку до предыдущего обработчика исключений
+простым выбрасыванием исключения и это помогает предотвратить бесконечную
+регрессию когда обработчик исключений непреднамеренно вызывает другое исключение.
+Если <tt><i>p</i></tt> возвращается и исключение является (продолжаемым)continuable, <tt><i>p</i></tt> 
+востанавливается как текущий обработчик исключений.
+
+</p><p>
+
+</p><p><tt>(raise<br>
+
+&nbsp;&nbsp;(condition<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(make-error)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(make-message-condition&nbsp;"no&nbsp;go")))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>error:&nbsp;no&nbsp;go</i><br>
+
+(raise-continuable<br>
+
+&nbsp;&nbsp;(condition<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(make-violation)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(make-message-condition&nbsp;"oops")))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>violation:&nbsp;oops</i><br>
+
+(list<br>
+
+&nbsp;&nbsp;(call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(with-exception-handler<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)&nbsp;(k&nbsp;(+&nbsp;x&nbsp;5)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(+&nbsp;(raise&nbsp;17)&nbsp;8)))))))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(22)<br>
+
+(list<br>
+
+&nbsp;&nbsp;(vector<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(with-exception-handler<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;5))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(+&nbsp;(raise-continuable&nbsp;17)&nbsp;8)))))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#(30))<br>
+
+(list<br>
+
+&nbsp;&nbsp;(vector<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(with-exception-handler<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;5))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(+&nbsp;(raise&nbsp;17)&nbsp;8)))))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>violation:&nbsp;non-continuable</i></tt>
+</p><p><a name="./exceptions:s4"></a><span class="formdef"><b>procedure</b>: <tt>(error&nbsp;<i>who</i>&nbsp;<i>msg</i>&nbsp;<i>irritant</i>&nbsp;...)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(assertion-violation&nbsp;<i>who</i>&nbsp;<i>msg</i>&nbsp;<i>irritant</i>&nbsp;...)</tt></span>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>error</tt> выбрасывает non-continuable исключение с типом условия
+<tt>&amp;error</tt> и должно использоваться для описания ситуаций, для которых
+подходит тип условия <tt>&amp;error</tt>, как правило, ситуация связанная
+с взаимодействием программы с чем-то вне программы.
+<tt>assertion-violation</tt> выбрасывает non-continuable исключение с типом
+условия <tt>&amp;assertion</tt> и должно использоваться для описания
+ситуаций для которых подходит тип условия <tt>&amp;assertion</tt>, обычно это
+недопустимый аргумент для процедуры или недопустимое значение подвыражения
+синтаксической формы.
+
+</p><p>
+Объект продолжение, с которым возникло исключение, также включает
+условие <tt>&amp;who</tt> чье поле есть <tt><i>who</i></tt> если <tt><i>who</i></tt> не
+является <tt>#f</tt>, условие <tt>&amp;message</tt> чье поле сообщение(message) есть
+<tt><i>msg</i></tt>, и условие <tt>&amp;irritants</tt> чье поле irritants является
+списком <tt>(<i>irritant</i>&nbsp;...)</tt>.
+
+</p><p>
+<tt><i>who</i></tt> должен быть строкой, символом или <tt>#f</tt> идентифицирующим
+процедуру или синтаксическую форму, сообщающую об ошибке, от имени которой
+сообщается об ошибке.
+Обычно лучше всего идентифицировать процедуру которую вызвал программист, а не 
+какую то другую процедуру, которую программист может не знать.
+<tt><i>msg</i></tt> должно быть строкой и должен описывать исключительную ситуацию
+irritants может быть любым объектом Scheme и должен включать в себя значения, которые
+могли вызывать или были существенным образом вовлечены в исключительную ситуацию.
+
+</p><p>
+<a name="./exceptions:s5"></a><span class="formdef"><b>syntax</b>: <tt>(assert&nbsp;<i>expression</i>)</tt></span>
+<br>
+<b>returns: </b>см ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>assert</tt> вычисляет <tt><i>expression</i></tt> и возвращает значение
+<tt><i>expression</i></tt> если значение не равно <tt>#f</tt>.
+Если значение <tt><i>expression</i></tt> равно <tt>#f</tt>, <tt>assert</tt> выбрасывает
+non-continuable исключение с условием типа <tt>&amp;assertion</tt> и сообщением
+<tt>&amp;message</tt>, с зависимым от реализации значением в своем поле
+сообщения.
+Реализациям рекомендуется сообщать информацию о местонахождении вызвова <tt>assert</tt>
+с условием, когда это возможно.
+
+</p><p>
+<a name="./exceptions:s6"></a><span class="formdef"><b>procedure</b>: <tt>(syntax-violation&nbsp;<i>who</i>&nbsp;<i>msg</i>&nbsp;<i>form</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(syntax-violation&nbsp;<i>who</i>&nbsp;<i>msg</i>&nbsp;<i>form</i>&nbsp;<i>subform</i>)</tt></span>
+<br>
+<b>returns: </b>не имеет возврата
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта процедура выбрасывает non-continuable исключение с условием типа
+<tt>&amp;syntax</tt>.
+Она должна использоваться для сообщения о синтаксических ошибках обнаруженных
+преобразователем синтаксических расширений.
+Значение поля формы условия это <tt><i>form</i></tt>, и значение поля ее подформ
+это <tt><i>subform</i></tt>, или <tt>#f</tt> если <tt><i>subform</i></tt> не
+предоставляется.
+
+</p><p>
+Объект продолжения, с которым возникло исключение также включает
+условие <tt>&amp;who</tt> чье поле является  <tt><i>who</i></tt>, если <tt><i>who</i></tt> не
+равно <tt>#f</tt> или выведено из <tt><i>form</i></tt>, и условие <tt>&amp;message</tt>
+полем сообщения которого является <tt><i>msg</i></tt>.
+
+</p><p>
+<tt><i>who</i></tt> должно быть строкой, символом или <tt>#f</tt>.
+Если <tt><i>who</i></tt> равно <tt>#f</tt>, то предполагается, что это символическое имя
+<tt><i>form</i></tt> если <tt><i>form</i></tt> является идентификатором или смволическим
+именем первой подформы из формы <tt><i>form</i></tt> если <tt><i>form</i></tt> является
+видом списковой структуры, чья первая подформа это идентификатор.
+<tt><i>message</i></tt> должно быть строкой.
+<tt><i>form</i></tt> должна быть синтаксическим объектом или представлением исходной формы
+синтаксической формы, в которой произошло нарушение синтаксиса, и <tt><i>subform</i></tt>, 
+если не <tt>#f</tt>, должна быть синтаксическим объектом или представлением исходной подформы,
+более близко связанной с нарушением.
+Например, если в выражении <tt>lambda</tt> обнаружен дублирующий формальный параметр,
+<tt><i>form</i></tt> может быть выражение <tt>lambda</tt> или <tt><i>subform</i></tt> содержащая
+дублирующий параметр.
+
+</p><p>
+Некоторые реализации связывают исходную информацию с синтаксическим объектом, например,
+со строкой, знаком или именем файла для форм происходящих из файла, и в этом случае эта
+информация может также присутствовать в качестве некоторого типа условия, зависящего
+от реализации, в объект условия.
+
+</p><p>
+<a name="./exceptions:s7"></a><span class="formdef"><b>procedure</b>: <tt>(with-exception-handler&nbsp;<i>procedure</i>&nbsp;<i>thunk</i>)</tt></span>
+<br>
+<b>returns: </b>см ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;exceptions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта процедура устанавиливает <tt><i>procedure</i></tt>, которая должна принимать один
+аргумент, в качестве текущего обработчика исключений, вмето старого текущего
+обработчика исключений 
+<tt><i>old-proc</i></tt>, и вызывает <tt><i>thunk</i></tt> без аргументов.
+Если вызов <tt><i>thunk</i></tt> возвращается, <tt><i>old-proc</i></tt> востанавливается как
+текущий обработчик исключений и возвращаются значения возвращаемые <tt><i>thunk</i></tt>.
+Если управление уходит или затем повторно вызывает <tt><i>thunk</i></tt> посредством 
+вызова продолжения полученного с помощью <tt>call/cc</tt>, процедура, которая была
+текущим обработчиком исключений при захвате продолжения, восстанавливается.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;(try&nbsp;thunk)<br>
+
+&nbsp;&nbsp;(call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(with-exception-handler<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)&nbsp;(if&nbsp;(error?&nbsp;x)&nbsp;(k&nbsp;#f)&nbsp;(raise&nbsp;x)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thunk))))<br>
+
+(try&nbsp;(lambda&nbsp;()&nbsp;17))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;17<br>
+
+(try&nbsp;(lambda&nbsp;()&nbsp;(raise&nbsp;(make-error))))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(try&nbsp;(lambda&nbsp;()&nbsp;(raise&nbsp;(make-violation))))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>violation</i><br>
+
+(with-exception-handler<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(raise<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;condition<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(make-message-condition&nbsp;"oops")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(simple-conditions&nbsp;x))))<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(try&nbsp;(lambda&nbsp;()&nbsp;(raise&nbsp;(make-violation))))))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>violation:&nbsp;oops</i></tt>
+</p><p><a name="./exceptions:s8"></a><span class="formdef"><b>syntax</b>: <tt>(guard&nbsp;(<i>var</i>&nbsp;<i>clause<sub>1</sub></i>&nbsp;<i>clause<sub>2</sub></i>&nbsp;...)&nbsp;<i>b1</i>&nbsp;<i>b2</i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>см ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;exceptions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Выражение <tt>guard</tt> устанавливает новый текущий обработчик исключений,
+процедуру <tt><i>procedure</i></tt> (описанную ниже), вместо старого текущего обработчика
+исключений, <tt><i>old-proc</i></tt>,
+и вычисляет тело <tt><i>b1</i>&nbsp;<i>b2</i>&nbsp;...</tt>.
+Если тело возвращается, <tt>guard</tt> восстанавает старый обработчик <tt><i>old-proc</i></tt> 
+в качестве текущего обработчика исключений.
+Если управление уходит или затем повторно входи в тело через вызов продолжения, полученного
+посредством вызова <tt>call/cc</tt>, процедура, которая была текущим обработчиком исключений при
+захвате продолжения, восстанавливается.
+
+</p><p>
+Процедура <tt><i>procedure</i></tt> установленная <tt>guard</tt> связывает <tt><i>var</i></tt>
+с полученным значением и, в рамках этой привязки, обрабатывает предложения <tt><i>clause<sub>1</sub></i>&nbsp;<i>clause<sub>2</sub></i>&nbsp;...</tt> в свою очередь, как если бы они
+содержались в неявном выражении <tt>cond</tt>.
+Это неявное выражение <tt>cond</tt> вычисляется в продолжении выражения
+ <tt>guard</tt>, с процедурой <tt><i>old-proc</i></tt> как текущим обработчиком
+исключений.
+
+</p><p>
+Если отсутствует предложение <tt>else</tt>, которые поставляет <tt>guard</tt>,
+повторно выбрасывается исключение с тем же значением, как если бы
+с вызовом <tt>raise-continuable</tt>, в продолжении вызова <tt><i>procedure</i></tt>,
+с процедурой <tt><i>old-proc</i></tt> в качестве текущего обработчика исключений.
+
+</p><p>
+
+</p><p><tt>(guard&nbsp;(x&nbsp;[else&nbsp;x])&nbsp;(raise&nbsp;"oops"))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"oops"<br>
+
+(guard&nbsp;(x&nbsp;[#f&nbsp;#f])&nbsp;(raise&nbsp;(make-error)))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;&nbsp;<i>error</i><br>
+
+(define-syntax&nbsp;try<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(guard&nbsp;(x&nbsp;[(error?&nbsp;x)&nbsp;#f])&nbsp;e1&nbsp;e2&nbsp;...)]))<br>
+
+(define&nbsp;open-one<br>
+
+&nbsp;&nbsp;(lambda&nbsp;fn*<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;loop&nbsp;([ls&nbsp;fn*])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(error&nbsp;'open-one&nbsp;"all&nbsp;open&nbsp;attempts&nbsp;failed"&nbsp;fn*)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(try&nbsp;(open-input-file&nbsp;(car&nbsp;ls)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;(cdr&nbsp;ls)))))))<br>
+
+;&nbsp;say&nbsp;bar.ss&nbsp;exists&nbsp;but&nbsp;not&nbsp;foo.ss:<br>
+
+(open-one&nbsp;"foo.ss"&nbsp;"bar.ss")&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#&lt;input&nbsp;port&nbsp;bar.ss&gt;</tt>
+</p><p>
+</p><h3><a name="g149"></a><a name="./exceptions:h2"></a>Section 11.2. Определение Типов Условий</h3>
+
+<p>
+<a name="./exceptions:s9"></a><a name="./exceptions:s10"></a>В то время как
+программа может передавать <tt>raise</tt> или <tt>raise-continuable</tt>
+любое значение Scheme, лучшим способом описать исключительную ситуацию
+является создание и передача <i>объекта условия(condition object)</i>.
+Если в Revised<sup>6</sup> Report требуется, чтобы реализация выбрасывала
+исключение, значение передаваемое в текущий обработчик исключений, всегда
+является объектом условия одного или более стандартных <i>типов условий(condition types)</i>
+определенных в разделе&nbsp;<a href="exceptions.html#g150">11.3</a>.
+Пользовательский код может создать объект условия, являющийся экземпляром одного или
+нескольких стандартных типов условий или он может создавать расширенный тип условия
+и создать объект условия этого типа.
+
+</p><p>
+<a name="./exceptions:s11"></a><a name="./exceptions:s12"></a>
+Типы условий аналогичны типам записей, но более гибки в том, что объект
+условия может быть экземпляром двух и более типов условий, даже если ни
+один из них не является подтипом другого.
+Когда условия является экземпляром нескольких типов, оно упоминается
+как составное условие( <i>compound condition</i>).
+Составные условия полезны для передачи нескольких фрагментов
+информации об исключении в обработчик исключений.
+Условие, которое не является составным условием, назывется
+простым условием(<i>simple condition</i>).
+В большинстве случаев, различие между ними не важно, и простое
+условие трактуется так, как если бы оно было составным условием
+с самим собой как единственным простым условием.
+
+</p><p>
+<a name="./exceptions:s13"></a><span class="formdef"><b>syntax</b>: <tt>&amp;condition</tt></span>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>&amp;condition</tt> это имя типа записи (Глава&nbsp;<a href="records.html#g138">9</a>) и
+корень иерархии типов условий.
+Все простые типы условий являются расширениями этого типа, и все условия,
+будь то простые или сложные, считаются экземплярами этого типа.
+
+</p><p>
+<a name="./exceptions:s14"></a><span class="formdef"><b>procedure</b>: <tt>(condition?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> это объект условия, в противном случае <tt>#f</tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Объектом условия является экземпляр подтипа <tt>&amp;condition</tt>
+или составное условие, возможно созданное пользовательским кодом процедурой
+<tt>condition</tt>.
+
+</p><p>
+
+</p><p><tt>(condition?&nbsp;'stable)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(condition?&nbsp;(make-error))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(condition?&nbsp;(make-message-condition&nbsp;"oops"))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(condition?<br>
+
+&nbsp;&nbsp;(condition<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(make-error)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(make-message-condition&nbsp;"no&nbsp;such&nbsp;element")))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t</tt>
+</p><p><a name="./exceptions:s15"></a><span class="formdef"><b>procedure</b>: <tt>(condition&nbsp;<i>condition</i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>условие, возможно составное
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>condition</tt> используется для создания объектов условий, которые могут
+состоять из нескольких простых условий.
+Каждый аргумент <tt><i>condition</i></tt> может быть простым или сложным; если простое,
+оно рассматривается как составное условие с самим собой как единственное простое
+условие.
+Простые условия возвращаемые condition являются аргументами простыми условиями процедуры
+<tt><i>condition</i></tt>, помещенными в простой список и появляющиеся по порядку, 
+за первым простым условием <tt><i>condition</i></tt>, следуют
+второе простое условие, и т.д.
+
+</p><p>
+Если список имеет ровно один элемент, результат condition может быть простым
+или составным; в противном случае составным.
+Различие между простым и составным условиями обычно не важно, но может быть
+обнаружено, если для расширения существующегося типа условия использовалось 
+<tt>define-record-type</tt>, а не <tt>define-condition-type</tt>, 
+через предикат определенный в <tt>define-record-type</tt>.
+
+</p><p>
+
+</p><p><tt>(condition)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#&lt;condition&gt;<br>
+
+(condition<br>
+
+&nbsp;&nbsp;(make-error)<br>
+
+&nbsp;&nbsp;(make-message-condition&nbsp;"oops"))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#&lt;condition&gt;
+<br>
+<br>
+(define-record-type&nbsp;(&amp;xcond&nbsp;make-xcond&nbsp;xcond?)&nbsp;(parent&nbsp;&amp;condition))<br>
+
+(xcond?&nbsp;(make-xcond))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(xcond?&nbsp;(condition&nbsp;(make-xcond)))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t&nbsp;<i>or</i>&nbsp;#f<br>
+
+(xcond?&nbsp;(condition))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(xcond?&nbsp;(condition&nbsp;(make-error)&nbsp;(make-xcond)))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f</tt>
+</p><p><a name="./exceptions:s16"></a><span class="formdef"><b>procedure</b>: <tt>(simple-conditions&nbsp;<i>condition</i>)</tt></span>
+<br>
+<b>returns: </b>список простых уловий <tt><i>condition</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+</p><p><tt>
+(simple-conditions&nbsp;(condition))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;'()<br>
+
+(simple-conditions&nbsp;(make-error))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#&lt;condition&nbsp;&amp;error&gt;)<br>
+
+(simple-conditions&nbsp;(condition&nbsp;(make-error)))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#&lt;condition&nbsp;&amp;error&gt;)<br>
+
+(simple-conditions<br>
+
+&nbsp;&nbsp;(condition<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(make-error)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(make-message-condition<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"oops")))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#&lt;condition&nbsp;&amp;error&gt;&nbsp;#&lt;condition&nbsp;&amp;message&gt;)
+<br>
+<br>
+(let&nbsp;([c1&nbsp;(make-error)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[c2&nbsp;(make-who-condition&nbsp;"f")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[c3&nbsp;(make-message-condition&nbsp;"invalid&nbsp;argument")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[c4&nbsp;(make-message-condition<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"error&nbsp;occurred&nbsp;while&nbsp;reading&nbsp;from&nbsp;file")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[c5&nbsp;(make-irritants-condition&nbsp;'("a.ss"))])<br>
+
+&nbsp;&nbsp;(equal?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(simple-conditions<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(condition<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(condition&nbsp;(condition&nbsp;c1&nbsp;c2)&nbsp;c3)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(condition&nbsp;c4&nbsp;(condition&nbsp;c5))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;c4&nbsp;c5)))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t</tt>
+</p><p><a name="./exceptions:s17"></a><span class="formdef"><b>syntax</b>: <tt>(define-condition-type&nbsp;<i>name</i>&nbsp;<i>parent</i>&nbsp;<i>constructor</i>&nbsp;<i>pred</i>&nbsp;<i>field</i>&nbsp;...)</tt></span>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Форма <tt>define-condition-type</tt> является определением и может появляться везде, где
+могут появляться другие определения.
+Она используется для определения новых типов простых условий.
+
+</p><p>
+Подформы <tt><i>name</i></tt>, <tt><i>parent</i></tt>, <tt><i>constructor</i></tt>, и <tt><i>pred</i></tt>
+должны быть идентификаторами.
+Каждое поле <tt><i>field</i></tt> должно иметь вид
+<tt>(<i>field-name</i>&nbsp;<i>accessor-name</i>)</tt>,
+где <tt><i>field-name</i></tt> и <tt><i>accessor-name</i></tt> это идентификаторы.
+
+</p><p>
+<tt>define-condition-type</tt> определяет <tt><i>name</i></tt> как новый тип записи, родительский
+тип записи которой является <tt><i>parent</i></tt>, имя конструктора которой это
+<tt><i>constructor</i></tt>, имя предиката которой это <tt><i>pred</i></tt>, имена полей которой
+это <tt><i>field-name</i>&nbsp;...</tt>, и чьи процедуры доступа к полю называются
+ <tt><i>accessor-name</i>&nbsp;...</tt>.
+
+</p><p>
+За исключением предикатов и процедур доступа к полям,
+<tt>define-condition-type</tt> по существу является обычным определением
+записи, эквивалентным
+
+</p><p>
+
+</p><p><tt>(define-record-type&nbsp;(<i>name</i>&nbsp;<i>constructor</i>&nbsp;<i>pred</i>)<br>
+
+&nbsp;&nbsp;(parent&nbsp;<i>parent</i>)<br>
+
+&nbsp;&nbsp;(fields&nbsp;((immutable&nbsp;<i>field-name</i>&nbsp;<i>accessor-name</i>)&nbsp;...)))</tt>
+</p><p>Предикат отличается от того, который будет сгенерирован формой
+<tt>define-record-type</tt>, поскольку он возрващает <tt>#t</tt> не только
+для экземпляра нового типа, но также для сложных условий, простые условия
+которого включают экземпляр нового типа.
+Аналогичным образом, процедуры доступа к полям экземпляра нового типа
+допускают условия составного типа, в которые входит по крайней мере
+один экземпляр нового типа записи.
+Если процедура доступа получает составное условие, спискок простых условий
+которого включает один или больше экземпляров нового типа, процедура доступа
+работает с первым экземпляром в списке.
+
+</p><p>
+
+</p><p><tt>(define-condition-type&nbsp;&amp;mistake&nbsp;&amp;condition&nbsp;make-mistake&nbsp;mistake?<br>
+
+&nbsp;&nbsp;(type&nbsp;mistake-type))
+<br>
+<br>
+(mistake?&nbsp;'booboo)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f
+<br>
+<br>
+(define&nbsp;c1&nbsp;(make-mistake&nbsp;'spelling))<br>
+
+(mistake?&nbsp;c1)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(mistake-type&nbsp;c1)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;spelling
+<br>
+<br>
+(define&nbsp;c2&nbsp;(condition&nbsp;c1&nbsp;(make-irritants-condition&nbsp;'(eggregius))))<br>
+
+(mistake?&nbsp;c2)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(mistake-type&nbsp;c2)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;spelling<br>
+
+(irritants-condition?&nbsp;c2)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(condition-irritants&nbsp;c2)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(eggregius)</tt>
+</p><p><a name="./exceptions:s18"></a><span class="formdef"><b>procedure</b>: <tt>(condition-predicate&nbsp;<i>rtd</i>)</tt></span>
+<br>
+<b>returns: </b>предикат условия
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(condition-accessor&nbsp;<i>rtd</i>&nbsp;<i>procedure</i>)</tt></span>
+<br>
+<b>returns: </b>процедура доступа к условию
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эти процедуры могут использоваться для создания таких же специальных
+предикатов и процедур доступа, какие создаются формой <tt>define-record-type</tt>
+с помощью дескриптора типа записи <tt><i>rtd</i></tt>, простого типа условия или
+другого типа полученного из простого типа условия.
+
+</p><p>
+Для обеих процедур, <tt><i>rtd</i></tt> должен быть дескриптором типа записи
+с подтипом <tt>&amp;condition</tt>, и для <tt>condition-accessor</tt>,
+<tt><i>procedure</i></tt> должна принимать один аргумент.
+
+</p><p>
+Предикат возвращаемый <tt>condition-predicate</tt> принимает один
+аргумент, который может быть любым значением Scheme.
+Предикат возвращает <tt>#t</tt> если значение является типом условия, описываемого
+<tt><i>rtd</i></tt>, т.е. экземпляром типа определяемого <tt><i>rtd</i></tt> 
+(или одним из его подтипов) или составным условием, простые условия которого
+включают экземпляр типа, определяемого <tt><i>rtd</i></tt>.
+В противном случае, предикат возвращает <tt>#f</tt>.
+
+</p><p>
+Процедура доступа возвращаемая <tt>condition-accessor</tt> принимает один аргумент,
+<tt><i>c</i></tt>, который должен быть условием типа определяемого <tt><i>rtd</i></tt>.
+Процедура доступа применяет <tt><i>procedure</i></tt> к одиному аргументу, первому элементу
+списку простых условий <tt><i>c</i></tt>, который является экземпляром определяемый
+<tt><i>rtd</i></tt> (это будет сам <tt><i>c</i></tt> если <tt><i>c</i></tt> это простое
+условие), и возвращает результат этого применения.
+В большинстве ситуаций, <tt><i>procedure</i></tt> это процедура доступа к полю типа записи
+определяемого <tt><i>rtd</i></tt>.
+
+</p><p>
+
+</p><p><tt>(define-record-type&nbsp;(&amp;mistake&nbsp;make-mistake&nbsp;$mistake?)<br>
+
+&nbsp;&nbsp;(parent&nbsp;&amp;condition)<br>
+
+&nbsp;&nbsp;(fields&nbsp;(immutable&nbsp;type&nbsp;$mistake-type)))
+<br>
+<br>
+;&nbsp;define&nbsp;predicate&nbsp;and&nbsp;accessor&nbsp;as&nbsp;if&nbsp;we'd&nbsp;used&nbsp;define-condition-type<br>
+
+(define&nbsp;rtd&nbsp;(record-type-descriptor&nbsp;&amp;mistake))<br>
+
+(define&nbsp;mistake?&nbsp;(condition-predicate&nbsp;rtd))<br>
+
+(define&nbsp;mistake-type&nbsp;(condition-accessor&nbsp;rtd&nbsp;$mistake-type))
+<br>
+<br>
+(define&nbsp;c1&nbsp;(make-mistake&nbsp;'spelling))<br>
+
+(define&nbsp;c2&nbsp;(condition&nbsp;c1&nbsp;(make-irritants-condition&nbsp;'(eggregius))))<br>
+
+(list&nbsp;(mistake?&nbsp;c1)&nbsp;(mistake?&nbsp;c2))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#t&nbsp;#t)<br>
+
+(list&nbsp;($mistake?&nbsp;c1)&nbsp;($mistake?&nbsp;c2))&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#t&nbsp;#f)<br>
+
+(mistake-type&nbsp;c1)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;spelling<br>
+
+($mistake-type&nbsp;c1)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;spelling<br>
+
+(mistake-type&nbsp;c2)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;spelling<br>
+
+($mistake-type&nbsp;c2)&nbsp;<img src="./exceptions_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>violation</i></tt>
+</p><p>
+</p><h3><a name="g150"></a><a name="./exceptions:h3"></a>Section 11.3. Стандартные Типы Условий<a name="SECTEXCCONDTYPES"></a></h3>
+
+<p>
+<a name="./exceptions:s19"></a><span class="formdef"><b>syntax</b>: <tt>&amp;serious</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-serious-condition)</tt></span>
+<br>
+<b>returns: </b>условие тип - "серьезное" <tt>&amp;serious</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(serious-condition?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> является условием типа <tt>&amp;serious</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условия этого типа указывают на ситуации серьезного характера,
+которые, если не пойманы, обычно приводят к прекращению выполнения
+программы.
+Условия этого типа обычно встречаются ка один или более специфичных
+подтипов <tt>&amp;error</tt> или <tt>&amp;violation</tt>.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;serious&nbsp;&amp;condition<br>
+
+&nbsp;&nbsp;make-serious-condition&nbsp;serious-condition?)</tt>
+</p><p><a name="./exceptions:s20"></a><span class="formdef"><b>syntax</b>: <tt>&amp;violation</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-violation)</tt></span>
+<br>
+<b>returns: </b>условие типа "нарушение"- <tt>&amp;violation</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(violation?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> является условием типа <tt>&amp;violation</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условия этого типа указывают на то, что программа нарушила некоторые
+требования, обычно из-за ошибки в программе. Этот тип условия может быть пределен
+следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;violation&nbsp;&amp;serious<br>
+
+&nbsp;&nbsp;make-violation&nbsp;violation?)</tt>
+</p><p><a name="./exceptions:s21"></a><span class="formdef"><b>syntax</b>: <tt>&amp;assertion</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-assertion-violation)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;assertion</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(assertion-violation?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;assertion</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Этот тип условия указывает на конкретное нарушение, при котором программа
+передала процедуре неправильное количество или тип аргументов.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;assertion&nbsp;&amp;violation<br>
+
+&nbsp;&nbsp;make-assertion-violation&nbsp;assertion-violation?)</tt>
+</p><p><a name="./exceptions:s22"></a><span class="formdef"><b>syntax</b>: <tt>&amp;error</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-error)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;error</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;error</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условия этого типа указывают на то, что произошла ошибка взаимодействия
+программы со своей операционной средой, например с попыткой отрыть файл.
+Она не используется для описания ситуаций, в которых обнаружена ошибка в программе.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;error&nbsp;&amp;serious<br>
+
+&nbsp;&nbsp;make-error&nbsp;error?)</tt>
+</p><p><a name="./exceptions:s23"></a><span class="formdef"><b>syntax</b>: <tt>&amp;warning</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-warning)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;warning</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(warning?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;warning</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условия предупреждения указывают на ситуации, которые не мешают программе
+продолжать ее выполнение, но в некоторых случаях могут привести к более серьезной
+проблеме в какой-то более поздний момент.
+Например, компилятор может использовать условие этого типа, чтобы указать, что он
+обработал вызов стандартной процедуры с неправильным количеством аргументов; это не
+станет серьезной проблемой, если вызов не будет выполнен в какой-то более поздней
+точке.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;warning&nbsp;&amp;condition<br>
+
+&nbsp;&nbsp;make-warning&nbsp;warning?)</tt>
+</p><p><a name="./exceptions:s24"></a><span class="formdef"><b>syntax</b>: <tt>&amp;message</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-message-condition&nbsp;<i>message</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;message</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(message-condition?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;message</tt>, <tt>#f</tt> в противном случае
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(condition-message&nbsp;<i>condition</i>)</tt></span>
+<br>
+<b>returns: </b>the contents of <tt><i>condition</i></tt>'s <tt>message</tt> field
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условия этого типа обычно включаются с условием <tt>&amp;warning</tt>
+или с одним из подтипов условия <tt>&amp;serious</tt>, чтобы пердоставить более
+конкретное описание исключительной ситуации.
+Аргумент <tt><i>message</i></tt> для конструктора может быть любым значением
+Scheme но обычно это строка.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;message&nbsp;&amp;condition<br>
+
+&nbsp;&nbsp;make-message-condition&nbsp;message-condition?<br>
+
+&nbsp;&nbsp;(message&nbsp;condition-message))</tt>
+</p><p><a name="./exceptions:s25"></a><span class="formdef"><b>syntax</b>: <tt>&amp;irritants</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-irritants-condition&nbsp;<i>irritants</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;irritants</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(irritants-condition?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;irritants</tt>, <tt>#f</tt> в противном случае
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(condition-irritants&nbsp;<i>condition</i>)</tt></span>
+<br>
+<b>returns: </b>the contents of <tt><i>condition</i></tt>'s <tt>irritants</tt> field
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условия этого типа обычно влючаются в условие <tt>&amp;message</tt>
+для предоставления информации о значениях Scheme, которые могли вызвать
+или были существенным образом вовлечены в исключительную ситуацию.
+Например, если процедура поулчает неверный тип аргумента, она может вызвать
+исключеие с состоавным условием, состоящим из условия утверждения(assertion),
+условия "кто"(who) именующим процедуру, условия сообщения(message) указывающего,
+что был получен неправильный тип аргумента, и условия раздражителей(irritants)
+содержащего список агрументов.
+Аргумент <tt><i>irritants</i></tt> для конструктора должен быть списком.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;irritants&nbsp;&amp;condition<br>
+
+&nbsp;&nbsp;make-irritants-condition&nbsp;irritants-condition?<br>
+
+&nbsp;&nbsp;(irritants&nbsp;condition-irritants))</tt>
+</p><p><a name="./exceptions:s26"></a><span class="formdef"><b>syntax</b>: <tt>&amp;who</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-who-condition&nbsp;<i>who</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;who</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(who-condition?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;who</tt>, <tt>#f</tt> в противном случае
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(condition-who&nbsp;<i>condition</i>)</tt></span>
+<br>
+<b>returns: </b>the contents of <tt><i>condition</i></tt>'s <tt>who</tt> field
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условия этого типа включаются с условием типа <tt>&amp;message</tt>
+для идентификации синтаксической формы или процедуры, которая обнаружила ошибку.
+Аргумент передаваемый <tt><i>who</i></tt> конструктору должен быть символом или
+строкой.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;who&nbsp;&amp;condition<br>
+
+&nbsp;&nbsp;make-who-condition&nbsp;who-condition?<br>
+
+&nbsp;&nbsp;(who&nbsp;condition-who))</tt>
+</p><p><a name="./exceptions:s27"></a><span class="formdef"><b>syntax</b>: <tt>&amp;non-continuable</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-non-continuable-violation)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;non-continuable</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(non-continuable-violation?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;non-continuable</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условия этого типа указывают на то, что произошло не продолжаемое(non-continuable)
+нарушение(violation).
+<tt>raise</tt> выбрасывает исключение с данным типом, если текущий обработчик исключений
+выполняет возврат.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;non-continuable&nbsp;&amp;violation<br>
+
+&nbsp;&nbsp;make-non-continuable-violation<br>
+
+&nbsp;&nbsp;non-continuable-violation?)</tt>
+</p><p><a name="./exceptions:s28"></a><span class="formdef"><b>syntax</b>: <tt>&amp;implementation-restriction</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-implementation-restriction-violation)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;implementation-restriction</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(implementation-restriction-violation?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;implementation-restriction</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условие ограничения реализации(implementation-restriction) указывает, что программа
+попыталась выйти за некоторые ограничения реализации, например, когда значение операции
+сложения операндов типа fixnum приводят к числу, которое превышает диапазон реализации
+fixnum.
+Обычно это не указывает на недостаток в реализации, а скорее на несоответствие между тем
+что программа пытается сделать и то что может поддержать реализация.
+Во многих случаях ограничения реализации диктуются базовым оборудованием.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;implementation-restriction&nbsp;&amp;violation<br>
+
+&nbsp;&nbsp;make-implementation-restriction-violation<br>
+
+&nbsp;&nbsp;implementation-restriction-violation?)</tt>
+</p><p><a name="./exceptions:s29"></a><span class="formdef"><b>syntax</b>: <tt>&amp;lexical</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-lexical-violation)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;lexical</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(lexical-violation?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;lexical</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условия этого типа указывают на то, что при анализе программы Scheme или элемента данных, произошла
+лексическая ошибка, например несогласованные круглые скобки или недопустимый символ, появляющийся
+в числовой константе.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;lexical&nbsp;&amp;violation<br>
+
+&nbsp;&nbsp;make-lexical-violation&nbsp;lexical-violation?)</tt>
+</p><p><a name="./exceptions:s30"></a><span class="formdef"><b>syntax</b>: <tt>&amp;syntax</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-syntax-violation&nbsp;<i>form</i>&nbsp;<i>subform</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;syntax</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(syntax-violation?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;syntax</tt>, <tt>#f</tt> в противном случае
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(syntax-violation-form&nbsp;<i>condition</i>)</tt></span>
+<br>
+<b>returns: </b>the contents of <tt><i>condition</i></tt>'s <tt>form</tt> field
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(syntax-violation-subform&nbsp;<i>condition</i>)</tt></span>
+<br>
+<b>returns: </b>the contents of <tt><i>condition</i></tt>'s <tt>subform</tt> field
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условия этого типа указывают на синтаксическую ошибку при анализе программы Scheme.
+В большинствп реализаций синтаксические ошибки обнаруживаются с помощь расширителя макросов.
+Каждый из аргументов <tt><i>form</i></tt> и <tt><i>subform</i></tt> для
+<tt>make-syntax-violation</tt> должен быть синтаксическим объектом
+(Раздел&nbsp;<a href="syntax.html#g136">8.3</a>) или элементом данных, причем первый указывает
+на содержащую форму, а последний указывает на конкретныюу подчиненную подформу.
+Например, если в выражении <tt>lambda</tt> обнаружен дублирующий формальный параметр,
+формой <tt><i>form</i></tt> может быть <tt>lambda</tt> выражение, а подформой <tt><i>subform</i></tt> 
+может быть дублирующий параметр.
+Если нет необходимости идентифицировать подформу, <tt><i>subform</i></tt> должен быть <tt>#f</tt>.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;syntax&nbsp;&amp;violation<br>
+
+&nbsp;&nbsp;make-syntax-violation&nbsp;syntax-violation?<br>
+
+&nbsp;&nbsp;(form&nbsp;syntax-violation-form)<br>
+
+&nbsp;&nbsp;(subform&nbsp;syntax-violation-subform))</tt>
+</p><p><a name="./exceptions:s31"></a><span class="formdef"><b>syntax</b>: <tt>&amp;undefined</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-undefined-violation)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;undefined</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(undefined-violation?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;undefined</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;conditions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условие неопределенный(undefined) указывает на попытку ссылки на несвязанную
+переменную.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;undefined&nbsp;&amp;violation<br>
+
+&nbsp;&nbsp;make-undefined-violation&nbsp;undefined-violation?)</tt>
+</p><p></p><p>Следующие несколько типов условий описывают условия, которые возникают при
+некорректном выполнении операций ввода или вывода.
+
+</p><p>
+<a name="./exceptions:s32"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-error)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условие типа <tt>&amp;i/o</tt> указывает на то, что произошла ошибка
+ввода/вывода. Условия этого типа обычно встречаются как один из специфичных
+подтипов, описанных ниже.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o&nbsp;&amp;error<br>
+
+&nbsp;&nbsp;make-i/o-error&nbsp;i/o-error?)</tt>
+</p><p><a name="./exceptions:s33"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o-read</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-read-error)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o-read</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-read-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o-read</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Это условие указывает на то, что при чтении из порта произошла ошибка.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o-read&nbsp;&amp;i/o<br>
+
+&nbsp;&nbsp;make-i/o-read-error&nbsp;i/o-read-error?)</tt>
+</p><p><a name="./exceptions:s34"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o-write</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-write-error)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o-write</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-write-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o-write</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Этот тип условия указывает на то, что при записи в порт произошла ошибка.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o-write&nbsp;&amp;i/o<br>
+
+&nbsp;&nbsp;make-i/o-write-error&nbsp;i/o-write-error?)</tt>
+</p><p><a name="./exceptions:s35"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o-invalid-position</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-invalid-position-error&nbsp;<i>position</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o-invalid-position</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-invalid-position-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o-invalid-position</tt>, <tt>#f</tt> в противном случае
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-error-position&nbsp;<i>condition</i>)</tt></span>
+<br>
+<b>returns: </b>the contents of <tt><i>condition</i></tt>'s <tt>position</tt> field
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Этот тип условия указывает на попытку установить позицию порта в положение,
+которе находиться за пределами диапазона файла или другого объекта.
+Аргумент <tt><i>position</i></tt> для конструктора должен быть недопстимой позицией.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o-invalid-position&nbsp;&amp;i/o<br>
+
+&nbsp;&nbsp;make-i/o-invalid-position-error<br>
+
+&nbsp;&nbsp;i/o-invalid-position-error?<br>
+
+&nbsp;&nbsp;(position&nbsp;i/o-error-position))</tt>
+</p><p><a name="./exceptions:s36"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o-filename</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-filename-error&nbsp;<i>filename</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o-filename</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-filename-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o-filename</tt>, <tt>#f</tt> в противном случае
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-error-filename&nbsp;<i>condition</i>)</tt></span>
+<br>
+<b>returns: </b>the contents of <tt><i>condition</i></tt>'s <tt>filename</tt> field
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Этот тип условия указыает на ошибку ввода/вывода, возникшую во время
+работы с файлом.
+Аргумент <tt><i>filename</i></tt> для конструктора должен быть именем файла.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o-filename&nbsp;&amp;i/o<br>
+
+&nbsp;&nbsp;make-i/o-filename-error&nbsp;i/o-filename-error?<br>
+
+&nbsp;&nbsp;(filename&nbsp;i/o-error-filename))</tt>
+</p><p><a name="./exceptions:s37"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o-file-protection</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-file-protection-error&nbsp;<i>filename</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o-file-protection</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-file-protection-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o-file-protection</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условие этого типа указывает, что была сделана попытка выполнить
+некоторую операцию ввода/вывода в файле, для которого программа не имеет
+соответствующего разрешения.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o-file-protection&nbsp;&amp;i/o-filename<br>
+
+&nbsp;&nbsp;make-i/o-file-protection-error<br>
+
+&nbsp;&nbsp;i/o-file-protection-error?)</tt>
+</p><p><a name="./exceptions:s38"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o-file-is-read-only</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-file-is-read-only-error&nbsp;<i>filename</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o-file-is-read-only</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-file-is-read-only-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o-file-is-read-only</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условие этого типа укзаывает на попытку произвести запись в файл доступный только для чтения.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o-file-is-read-only&nbsp;&amp;i/o-file-protection<br>
+
+&nbsp;&nbsp;make-i/o-file-is-read-only-error<br>
+
+&nbsp;&nbsp;i/o-file-is-read-only-error?)</tt>
+</p><p><a name="./exceptions:s39"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o-file-already-exists</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-file-already-exists-error&nbsp;<i>filename</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o-file-already-exists</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-file-already-exists-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o-file-already-exists</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условие этого типа указывает на ситуацию, когда операция с файлом завершилась не удачно,
+поскольку файл уже существует, например попытка открыть существующий файл для вывода без
+файловой опции <tt>no-fail</tt>.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o-file-already-exists&nbsp;&amp;i/o-filename<br>
+
+&nbsp;&nbsp;make-i/o-file-already-exists-error<br>
+
+&nbsp;&nbsp;i/o-file-already-exists-error?)</tt>
+</p><p><a name="./exceptions:s40"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o-file-does-not-exist</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-file-does-not-exist-error&nbsp;<i>filename</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o-file-does-not-exist</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-file-does-not-exist-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o-file-does-not-exist</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условие этого типа указыает на ситуацию, когда операция с файлом завершилась
+неудачно, потому что файл не существует, например, делается попытка отрыть несуществующий
+файл только для ввода.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o-file-does-not-exist&nbsp;&amp;i/o-filename<br>
+
+&nbsp;&nbsp;make-i/o-file-does-not-exist-error<br>
+
+&nbsp;&nbsp;i/o-file-does-not-exist-error?)</tt>
+</p><p><a name="./exceptions:s41"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o-port</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-port-error&nbsp;<i>pobj</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o-port</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-port-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o-port</tt>, <tt>#f</tt> в противном случае
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-error-port&nbsp;<i>condition</i>)</tt></span>
+<br>
+<b>returns: </b>the contents of <tt><i>condition</i></tt>'s <tt>pobj</tt> field
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs&nbsp;io&nbsp;simple)</tt>, <tt>(rnrs&nbsp;files)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условие этого типа обычно включаются с условием одного из других подтипов <tt>&amp;i/o</tt>,
+чтобы указать порт, учавствующий в исключительной ситуации, если задействован порт.
+Аргумент <tt><i>pobj</i></tt> для конструктора должен быть портом.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o-port&nbsp;&amp;i/o<br>
+
+&nbsp;&nbsp;make-i/o-port-error&nbsp;i/o-port-error?<br>
+
+&nbsp;&nbsp;(pobj&nbsp;i/o-error-port))</tt>
+</p><p><a name="./exceptions:s42"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o-decoding</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-decoding-error&nbsp;<i>pobj</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o-decoding</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-decoding-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o-decoding</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условие этого типа указывает, что при перекодировке байтов в символьные знаки
+произошла ошибка декодирования.
+Аргумент <tt><i>pobj</i></tt> для конструктора должен быть задействованный порт, если он есть.
+Порт должен быть позиционирован за неправильной кодировкой.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o-decoding&nbsp;&amp;i/o-port<br>
+
+&nbsp;&nbsp;make-i/o-decoding-error&nbsp;i/o-decoding-error?)</tt>
+</p><p><a name="./exceptions:s43"></a><span class="formdef"><b>syntax</b>: <tt>&amp;i/o-encoding</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-i/o-encoding-error&nbsp;<i>pobj</i>&nbsp;<i>cobj</i>)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;i/o-encoding</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-encoding-error?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;i/o-encoding</tt>, <tt>#f</tt> в противном случае
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(i/o-encoding-error-char&nbsp;<i>condition</i>)</tt></span>
+<br>
+<b>returns: </b>the contents of <tt><i>condition</i></tt>'s <tt>cobj</tt> field
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;io&nbsp;ports)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Условие этого типа указывает, что при перекодировке символьных знаков в байты
+произошла ошибка кодирования.
+Аргумент <tt><i>pobj</i></tt> для конструктора должен быть задействованный порт, если он есть,
+и аргумент <tt><i>cobj</i></tt> должен быть символьным знаком для которого не удалось выполнить
+кодировку.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;i/o-encoding&nbsp;&amp;i/o-port<br>
+
+&nbsp;&nbsp;make-i/o-encoding-error&nbsp;i/o-encoding-error?<br>
+
+&nbsp;&nbsp;(cobj&nbsp;i/o-encoding-error-char))</tt>
+</p><p></p><p>Последние два типа условий описывают условия, которые возникают, когда
+реализации необходимо создать NaN или бесконечность, но они не имеют представления
+для этих значений.
+
+</p><p>
+<a name="./exceptions:s44"></a><span class="formdef"><b>syntax</b>: <tt>&amp;no-infinities</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-no-infinities-violation)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;no-infinities</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(no-infinities-violation?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;no-infinities</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;arithmetic&nbsp;flonums)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Это условие указывает, что реализация не имеет представления для бесконечности
+(infinity).
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;no-infinities&nbsp;&amp;implementation-restriction<br>
+
+&nbsp;&nbsp;make-no-infinities-violation<br>
+
+&nbsp;&nbsp;no-infinities-violation?)</tt>
+</p><p><a name="./exceptions:s45"></a><span class="formdef"><b>syntax</b>: <tt>&amp;no-nans</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(make-no-nans-violation)</tt></span>
+<br>
+<b>returns: </b>условие типа <tt>&amp;no-nans</tt>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(no-nans-violation?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> Если <tt><i>obj</i></tt> является типом условия <tt>&amp;no-nans</tt>, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;arithmetic&nbsp;flonums)</tt>, <tt>(rnrs)</tt>
+
+</p><p>
+
+</p><p>Это условие указывает, что реализация не имеет представления для бесконечности
+NaN.
+Этот тип условия может быть определен следующим образом.
+
+</p><p><tt>(define-condition-type&nbsp;&amp;no-nans&nbsp;&amp;implementation-restriction<br>
+
+&nbsp;&nbsp;make-no-nans-violation&nbsp;no-nans-violation?)</tt>
+</p><p>
+
+</p><hr class="copyright" align="left">
+<p>
+R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</it><br>
+Copyright © 2009 <a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">The MIT Press</a>.  Electronically reproduced by permission.<br>
+Illustrations © 2009 <a class="plain" href="http://hebert.kitp.ucsb.edu/">Jean-Pierre Hébert</a><br>
+ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>
+<a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">to order this book</a> / <a class="plain" href="canned/about.html">about this book</a>
+</p>
+<p><a class="plain" href="http://www.scheme.com/">http://www.scheme.com</a></p>
+
+</body></html>

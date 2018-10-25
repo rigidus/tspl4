@@ -1,0 +1,2276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0048)syntax.html#./syntax:h0 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<title>Синтаксические Расширения</title>
+<link href="./syntax_files/tspl.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a name="g133"></a>
+<a name="./syntax:h0"></a>
+
+<div>
+<img  src="./syntax_files/ch8.png">
+</div>
+<h1>Chapter 8. Синтаксические Расширения<a name="CHPTSYNTAX"></a></h1>
+
+<p>
+<a name="./syntax:s0"></a><a name="./syntax:s1"></a><i>Синтаксические расширения</i>,
+или <a name="./syntax:s2"></a><i>Макросы</i>, используются для упрощения и регуляризации
+повторяющихся шаблонов в программе, внедряют синтаксические формы с новыми
+правилами вычисления, и выполняющими преобразования, помогающие сделать программы
+более эффективными.
+
+</p><p>
+Синтаксическое расширение чаще всего принимает форму
+<tt>(<i>keyword</i>&nbsp;<i>subform</i>&nbsp;...)</tt>,
+где ключевое словое- <tt><i>keyword</i></tt> это идентификатор, т.е. имя
+синтаксического расширения.
+Синтаксис каждой подформы <tt><i>subform</i></tt> варьируется(изменяется) от
+одного синтаксического расширения к другому.
+Синтаксические расширения также могут принимать форму неправильных списков или
+даже одноэлементных идентификаторов.
+
+</p><p>
+Новые синтаксические расширения определяются путем связывания ключевых
+слов с процедурами преобразования, или преобрзователями - <i>transformers</i>.
+Синтаксические расширения определяются с использованием форм
+<a name="./syntax:s3"></a><tt>define-syntax</tt> или
+использованием
+<a name="./syntax:s4"></a><tt>let-syntax</tt> или
+<a name="./syntax:s5"></a><tt>letrec-syntax</tt>.
+Преобразователи(Transformers) могут быть созданы использованием
+<a name="./syntax:s6"></a><tt>syntax-rules</tt>, которые
+позволяют выполнять простые преобразования на основе образцов.
+Они так же могут быть обычными процедурами, которые принимают один 
+аргумент и выполняют произвольные вычисления.
+В этом случае, <a name="./syntax:s7"></a><tt>syntax-case</tt> обчно используется
+для разбора ввода, а  <a name="./syntax:s8"></a><tt>syntax</tt> обычно используется
+для формирования вывода.
+Форма <a name="./syntax:s9"></a><tt>identifier-syntax</tt>
+и процедура
+<a name="./syntax:s10"></a><tt>make-variable-transformer</tt>
+позволяют создавать преобразователи, которые соответствуют
+идентификаторам одиночных элементов и присваивать этим идентификаторам,
+причем первый из них ограничивается просытыми шаблонами, такими как
+ <tt>syntax-rules</tt>, а второй позволяет выполнять
+произвольные вычисления.
+
+</p><p>
+Синтаксические расширения разворачиваются в основные формы в начале
+вычисления(перед компиляцией и интерпретацией) с помощью расширителя(<i>expander</i>) синтаксиса.
+Если расширитель синтаксиса сталкивается с синтаксическим расширением, он вызывает
+связанный с синтаксическим расширением преобразователь, а затем повторяет процесс
+расширения для формы возвращенной преобразователем.
+Если расширитель синтаксиса сталкивается с базовой синтаксической формой,
+он рекурсивно обрабатывает подформы, если они есть, и пересоздает(реконструерует)
+форму из расширеных подформ.
+Информция о связанных идентификаторах поддерживается во время расширения для
+обеспечения лексического охвата для переменных и ключевых слов.
+
+</p><p>
+Механизмы синтаксического расширения, описанные в этой главе, являются
+частью системы "syntax-case".
+Переносимая реализация системы, которая также поддерживает
+библиотеки и программы верхнего уровня, доступна по адресу
+<a href="http://www.cs.indiana.edu/syntax-case/">http://www.cs.indiana.edu/syntax-case/</a>.
+Описание причин ее создания и внедрение системы можно найти в статье
+"Syntactic Abstraction in Scheme"&nbsp;[<a class="citation" href="bibliography.html#g230">12</a>].
+Дополнительные фунции, которые еще не были стандартизированы, включая модули
+<tt>modules</tt>, локльный импорт (local <tt>import</tt>), и мета-определения, 
+описаны  в 
+<i>Chez Scheme User's Guide</i>&nbsp;[<a class="citation" href="bibliography.html#g227">9</a>].
+
+</p><p>
+
+</p><h3><a name="g134"></a><a name="./syntax:h1"></a>Section 8.1. Связывание Ключевых Слов<a name="SECTSYNTAXDEFINITIONS"></a></h3>
+
+<p>
+В этом разделе описываются формы, которые
+устанавливают привязки между <a name="./syntax:s11"></a>ключевыми словаи и преобразователями.
+Связывание ключевых слов может быть установлено на верхнем уровне программы
+или тела библиотеки с использованием  <tt>define-syntax</tt> и в любой
+локальной области использованием <tt>define-syntax</tt>, <tt>let-syntax</tt>, или
+<tt>letrec-syntax</tt>.
+
+</p><p>
+<a name="./syntax:s12"></a><span class="formdef"><b>syntax</b>: <tt>(define-syntax&nbsp;<i>keyword</i>&nbsp;<i>expr</i>)</tt></span>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt><i>expr</i></tt> должен вычисляться преобразователем.
+
+</p><p>
+Следующий пример определяет <tt>let*</tt> как синтаксическое расширение,
+задающее преобразователь с <tt>syntax-rules</tt> (см. Раздел&nbsp;<a href="syntax.html#g135">8.2</a>).
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;let*<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;()&nbsp;b1&nbsp;b2&nbsp;...)&nbsp;(let&nbsp;()&nbsp;b1&nbsp;b2&nbsp;...)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((i1&nbsp;e1)&nbsp;(i2&nbsp;e2)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([i1&nbsp;e1])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let*&nbsp;([i2&nbsp;e2]&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...))]))</tt>
+</p><p>Все привязки установленные набором внутренних определений, будь то
+определения ключевых слов или переменных, видны повсюду внутри непосредственно
+охватывающего тела, в том числе и внутри самих определений.
+Например, выражение
+
+</p><p>
+
+</p><p><tt>(let&nbsp;()<br>
+
+&nbsp;&nbsp;(define&nbsp;even?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(=&nbsp;x&nbsp;0)&nbsp;(odd?&nbsp;(-&nbsp;x&nbsp;1)))))<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;odd?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;x)&nbsp;(not&nbsp;(even?&nbsp;x))]))<br>
+
+&nbsp;&nbsp;(even?&nbsp;10))</tt>
+</p><p>действительное и должно вычисляться в <tt>#t</tt>.
+
+</p><p>
+<a name="body-expansion"></a>Расширитель обрабатывает начальные формы в библиотеке(<tt>library</tt>),
+<tt>lambda</tt>, или другом теле слева на право.
+Если он встречает определение переменной, он записывает тот факт, что
+определенный идентификатор является переменной, но отменяет расширение выражения справа, 
+пока не будут обработаны все определения.
+Если он встречает определение ключевого слова, он расширяет и вычисляет правостороннее
+выражение и связывает ключевое слово с полученным преобразователем.
+Если он встречает выражение, он полностью расширяет все отложенные правые выражения
+вместе с текущими и оставшимися выражениями тела.
+
+</p><p>
+Примером обработки слева на право является то, что одно внутреннее
+определение может повлиять на то, является ли последующая форма
+также определением. Например, выражение
+
+</p><p>
+
+</p><p><tt>(let&nbsp;()<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;bind-to-zero<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;id)&nbsp;(define&nbsp;id&nbsp;0)]))<br>
+
+&nbsp;&nbsp;(bind-to-zero&nbsp;x)<br>
+
+&nbsp;&nbsp;x)</tt>
+</p><p>вычисляется до <tt>0</tt>, независимо от привязки для
+<tt>bind-to-zero</tt>, которое может появляться вне выражения <tt>let</tt>
+expression.
+
+</p><p>
+<a name="./syntax:s13"></a><span class="formdef"><b>syntax</b>: <tt>(let-syntax&nbsp;((<i>keyword</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>form<sub>1</sub></i>&nbsp;<i>form<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>(letrec-syntax&nbsp;((<i>keyword</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>form<sub>1</sub></i>&nbsp;<i>form<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>see below
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Каждое выражение <tt><i>expr</i></tt> должно вычисляться преобразователем.
+Для <tt>let-syntax</tt> и <tt>letrec-syntax</tt>, каждое ключевое слово <tt><i>keyword</i></tt>
+привязывается к формам <tt><i>form<sub>1</sub></i>&nbsp;<i>form<sub>2</sub></i>&nbsp;...</tt>.
+Для <tt>letrec-syntax</tt> область связывания также включает в себя каждое выражение <tt><i>expr</i></tt>.
+
+</p><p>
+<a name="letsyntaximplicitbegin"></a>Форма <tt>let-syntax</tt> или <tt>letrec-syntax</tt> 
+может расширяться в одно или несколько выражений, и в этом случае
+полученные выражения обрабатываются так, как если бы они были заключены
+в выражение <tt>begin</tt>.
+Оно может расширяться до нуля или более определений, где допускаются определения,
+и в этом случае определения обрабатываются так, как если бы они
+появились вместо формы <tt>let-syntax</tt> или <tt>letrec-syntax</tt>.
+
+</p><p>
+В следующем примере показано, чем отличаются <tt>let-syntax</tt>
+и <tt>letrec-syntax</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([f&nbsp;(lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;1))])<br>
+
+&nbsp;&nbsp;(let-syntax&nbsp;([f&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;x)&nbsp;x])]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[g&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;x)&nbsp;(f&nbsp;x)])])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;(f&nbsp;1)&nbsp;(g&nbsp;1))))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2)
+<br>
+<br>
+(let&nbsp;([f&nbsp;(lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;1))])<br>
+
+&nbsp;&nbsp;(letrec-syntax&nbsp;([f&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;x)&nbsp;x])]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[g&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;x)&nbsp;(f&nbsp;x)])])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;(f&nbsp;1)&nbsp;(g&nbsp;1))))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;1)</tt>
+</p><p>Два выражения идентичны, за исключением того, что форма <tt>let-syntax</tt>
+в первом выражении, является формой <tt>letrec-syntax</tt> во вотором.
+В первом выражении <tt>f</tt> встречающееся в <tt>g</tt> относиться к
+привязанной  <tt>let</tt> переменной <tt>f</tt>, тогда как во втором оно
+относиться к ключевому слову <tt>f</tt> привязка которого определяется
+формой <tt>letrec-syntax</tt>.
+
+</p><p>
+
+</p><h3><a name="g135"></a><a name="./syntax:h2"></a>Section 8.2. Syntax-Rules Преобразователь<a name="SECTSYNTAXRULES"></a></h3>
+
+<p>
+Форма <tt>syntax-rules</tt>, описанная в этом разделе,
+позволяет указать простые преобразователи удобным образом.
+Эти преобразователи могут быть привязаны к ключевым словам,
+используя механизм, описанный в Разделе &nbsp;<a href="syntax.html#g134">8.1</a>.
+Хотя он гораздо менее выразителен, чем механизм описанный в Разделе
+&nbsp;<a href="syntax.html#g136">8.3</a>, он достаточен для определения
+множества распространенных синтаксических расширений.
+
+</p><p>
+<a name="./syntax:s14"></a><span class="formdef"><b>syntax</b>: <tt>(syntax-rules&nbsp;(<i>literal</i>&nbsp;...)&nbsp;<i>clause</i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>преобразователь
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Каждый <a name="./syntax:s15"></a><tt><i>literal</i></tt> должен быть идентификатором,
+отличным от символа подчеркивания (&nbsp;<tt>_</tt>&nbsp;) или многоточия (&nbsp;<tt>...</tt>&nbsp;).
+Каждое предложение должно иметь указанную ниже форму.
+
+</p><p>
+
+</p><p><tt>(<i>pattern</i>&nbsp;<i>template</i>)</tt>
+</p><p>Каждый образец <tt><i>pattern</i></tt> определяет один из возможных синтаксисов,
+который может принимать входная форма, и каждый  соответствующий шаблон <tt><i>template</i></tt>
+определяет, как должен выглядеть вывод.
+
+</p><p>
+<a name="./syntax:s16"></a>Образцы состоят из списочной структуры, векторной структуры,
+идентификаторов и констант.
+Каждый идентификатор внутри образца является либо литералом(<tt><i>literal</i></tt>),
+либо переменной образца(<a name="./syntax:s17"></a><i>pattern variable</i>),
+либо <a name="./syntax:s18"></a><a name="./syntax:s19"></a><i> подчеркиванием</i>),
+или <a name="./syntax:s20"></a><a name="./syntax:s21"></a><i>многоточием</i>.
+Идентификтор подчеркивания это знак <tt>_</tt>, а идентификатор
+многоточие это знаки 3 точек <tt>...</tt>.
+Любой идентификатор, отличный от <tt>_</tt> или <tt>...</tt> является литералом, если
+он присутствует в списке литералов <tt>(<i>literal</i>&nbsp;...)</tt>;
+в противном случае, это переменная шаблона(pattern variable).
+Литералы служат <a name="./syntax:s22"></a>вспомогательными ключевыми словами, такими как <tt>else</tt> 
+в выражениях <tt>case</tt> и <tt>cond</tt>.
+Список или векторная структура внутри образца задают базовую структуру требуемую от
+входного выражения, знаки подчеркивания и переменные образца(pattern variables) определяют
+произвольную подструктуру, и литералы и константы определяют атомарные кусочки,
+которые должны точно соответствовать(во входной форме образцу).
+Многоточия определяют повторяющиеся вхождения подобразцов, за которыми
+они следуют.
+
+</p><p>
+<a name="patterns"></a>Входная Форма <tt><i>F</i></tt> соответствует образцу <tt><i>P</i></tt> тогда и только
+тогда, когда
+
+</p><p>
+</p><ul>
+<li><tt><i>P</i></tt> является символом подчеркивания или переменной образца,
+
+<p>
+</p></li><li><tt><i>P</i></tt> является литеральным идентификатором,
+а <tt><i>F</i></tt> является идентификатором с тем же связыванием,
+которое определяется предикатом
+<tt>free-identifier=?</tt>
+(Раздел&nbsp;<a href="syntax.html#g136">8.3</a>),
+
+<p>
+</p></li><li><tt><i>P</i></tt> имеет вид
+<tt>(<i>P<sub>1</sub></i>&nbsp;...&nbsp;<i>P<sub>n</sub></i>)</tt>,
+а <tt><i>F</i></tt> представляет собой список из  <i>n</i> элементов, которые соответствуют
+<tt><i>P<sub>1</sub></i></tt> до
+<tt><i>P<sub>n</sub></i></tt>,
+
+<p>
+</p></li><li><tt><i>P</i></tt> имеет вид
+<tt>(<i>P<sub>1</sub></i>&nbsp;...&nbsp;<i>P<sub>n</sub></i>&nbsp;.&nbsp;<i>P<sub>x</sub></i>)</tt>
+и <tt><i>F</i></tt> является списком или неправильным списком <i>n</i> или более элементов
+чьи  первые <i>n</i> элементов соответствуют от <tt><i>P<sub>1</sub></i></tt> до <tt><i>P<sub>n</sub></i></tt>
+и чей <i>n</i>-й cdr соответствует <tt><i>P<sub>x</sub></i></tt>,
+
+<p>
+</p></li><li><tt><i>P</i></tt> имеет вид
+<tt>(<i>P<sub>1</sub></i>&nbsp;...&nbsp;<i>P<sub>k</sub></i>&nbsp;<i>P<sub>e</sub></i>&nbsp;<i>ellipsis</i>&nbsp;<i>P<sub><i>m</i>+1</sub></i>&nbsp;...&nbsp;<i>P<sub>n</sub></i>)</tt>,
+где <tt><i>ellipsis</i></tt> является идентификатором <tt>...</tt>
+и <tt><i>F</i></tt> является правильным списком <i>n</i> элментов,
+чьи первые  <i>k</i> элементов соответствуют от <tt><i>P<sub>1</sub></i></tt> до <tt><i>P<sub>k</sub></i></tt>,
+следующие <i>m</i> - <i>k</i> элементов, каждый из которых соответствует <tt><i>P<sub>e</sub></i></tt>,
+а оставшиеся <i>n</i> - <i>m</i> элментов соответствуют от <tt><i>P<sub><i>m</i>+1</sub></i></tt> до <tt><i>P<sub>n</sub></i></tt>,
+
+<p>
+</p></li><li><tt><i>P</i></tt> имеет вид
+<tt>(<i>P<sub>1</sub></i>&nbsp;...&nbsp;<i>P<sub>k</sub></i>&nbsp;<i>P<sub>e</sub></i>&nbsp;<i>ellipsis</i>&nbsp;<i>P<sub><i>m</i>+1</sub></i>&nbsp;...&nbsp;<i>P<sub>n</sub></i>&nbsp;.&nbsp;<i>P<sub>x</sub></i>)</tt>,
+где <tt><i>ellipsis</i></tt> является идентификатором <tt>...</tt>
+и <tt><i>F</i></tt> является списком или неправильным списком <i>n</i>
+элементов, чьи первые <i>k</i> элементов соответстувуют от <tt><i>P<sub>1</sub></i></tt> до <tt><i>P<sub>k</sub></i></tt>,
+чьи последующие <i>m</i> - <i>k</i> элементов, каждый совпадает с <tt><i>P<sub>e</sub></i></tt>,
+чьи последующие <i>n</i> - <i>m</i> элементов, совпадают от <tt><i>P<sub><i>m</i>+1</sub></i></tt> до <tt><i>P<sub>n</sub></i></tt>,
+и чей <i>n</i>-й и конечный cdr совпадает с <tt><i>P<sub>x</sub></i></tt>,
+
+<p>
+</p></li><li><tt><i>P</i></tt> имеет вид
+<tt>#(<i>P<sub>1</sub></i>&nbsp;...&nbsp;<i>P<sub>n</sub></i>)</tt>
+и <tt><i>F</i></tt> является вектором из <i>n</i> элементов которые соответствуют  <tt><i>P<sub>1</sub></i></tt> - <tt><i>P<sub>n</sub></i></tt>,
+
+<p>
+</p></li><li><tt><i>P</i></tt> имеет вид
+<tt>#(<i>P<sub>1</sub></i>&nbsp;...&nbsp;<i>P<sub>k</sub></i>&nbsp;<i>P<sub>e</sub></i>&nbsp;<i>ellipsis</i>&nbsp;<i>P<sub><i>m</i>+1</sub></i>&nbsp;...&nbsp;<i>P<sub>n</sub></i>)</tt>,
+где <tt><i>ellipsis</i></tt> является идентификатором <tt>...</tt>
+и <tt><i>F</i></tt> является вектором <i>n</i> или более элементов,
+чьи первые <i>k</i> элементов соответствуют <tt><i>P<sub>1</sub></i></tt> - <tt><i>P<sub>k</sub></i></tt>,
+чьи последующие <i>m</i> - <i>k</i> элементов, каждый, соответствуют <tt><i>P<sub>e</sub></i></tt>,
+и чьи оставшиеся <i>n</i> - <i>m</i> элементов совпадают с <tt><i>P<sub><i>m</i>+1</sub></i></tt> - <tt><i>P<sub>n</sub></i></tt>,
+или
+
+<p>
+</p></li><li><tt><i>P</i></tt> это образец данных (любой не списочный(nonlist), не векторный(nonvector), 
+не символьный(nonsymbol) объект) и <tt><i>F</i></tt> равен <tt><i>P</i></tt> в смысле истинности процедуры
+<tt>equal?</tt>.
+</li></ul>
+<p>
+
+</p><p>
+Самая внешняя структура образца(<tt><i>pattern</i></tt>) в <tt>syntax-rules</tt>
+должна фактически находиться в одной из выше перечисленных списковых-структурных форм,
+хотя подобразцы образца могут быть в любой из вышеперечисленных форм.
+Кроме того, первый элемент самого внешнего образца
+игнорируется, поскольку он вседа считается ключевым словом, именующим
+синтаксическую форму.
+(Эти утверждения не применимы к  <tt>syntax-case</tt>; см.
+Раздел&nbsp;<a href="syntax.html#g136">8.3</a>.)
+
+</p><p>
+Если введенная форма, переданная преобразователю <tt>syntax-rules</tt> 
+соответствует образцу  для данного предложения, предложение
+принимается и форма преобразуется в соответсвии с соответствующим
+шаблоном.
+По мере того, как это преобразование происходит, переменные образца,
+появляющиеся в образце привязываются к соответствующим входным подформам.
+Переменные образца, входящие в подобразец, сопровождаемые одним или
+несколькими многоточиями, могут быть связаны с последовательностью или 
+последовательностями нулевой или большей длины входных подформ.
+
+</p><p>
+<a name="./syntax:s23"></a>Шаблон это переменная образца, идентификатор который
+не является переменной образца, данными образца, списоком подшаблонов
+<tt>(<i>S<sub>1</sub></i>&nbsp;...&nbsp;<i>S<sub>n</sub></i>)</tt>, неправильным списоком подшаблонов
+<tt>(<i>S<sub>1</sub></i>&nbsp;<i>S<sub>2</sub></i>&nbsp;...&nbsp;<i>S<sub>n</sub></i>&nbsp;.&nbsp;<i>T</i>)</tt>, или
+вектором подшаблонов <tt>#(<i>S<sub>1</sub></i>&nbsp;...&nbsp;<i>S<sub>n</sub></i>)</tt>.
+Каждый подшаблон <tt><i>S<sub>i</sub></i></tt> представляет собой шаблон, за которым
+следует ноль или более многоточий.
+Последний элемент <tt><i>T</i></tt> неправильного списка подшаблонов это тоже шаблон.
+
+</p><p>
+Переменные образца(Pattern variables), входящие в шалон(template), заменяются
+на выходе входными подформами, с которыми они связаны.
+Данные образца и идентификаторы, которые не являются переменными образца
+вставляются непосредственно в выходную форму.
+Список и векторная структура внутри шаблона остаются списком и векторной структурой
+в выходной форме.
+Подшаблон, за которым следует многоточие, расширяется до нуля или более
+подшаблонов.
+Подшаблон должен содержать по крайней мере одну переменную образца из подобразца, за
+которой следует многоточие.
+(В противном случае расширетель не смог бы определить, сколько раз надпись
+должна быть повторена на выходе.)
+Переменные образца которые встречаются в подобразцах, за которыми следует одно
+или более многоточий могут присутствовать только в подшаблонах, за которыми
+следуют(по крайней мере) столько же многоточий.
+Эти переменные образца заменяются в выходной форме входными подформами с которыми
+они связаны, распределяясь как указано.
+Если за переменной образца следует большее количество многоточий, чем в 
+соответствующем шаблоне, форма ввода повторяется по мере необходимости.
+
+
+</p><p>
+Форма шаблона
+<tt>(...&nbsp;<i>template</i>)</tt> идентична <tt><i>template</i></tt>, за исключением
+того, что многоточия внутри шаблона не имеют особого значения.
+То есть, многоточия содержащиеся в шаблоне <tt><i>template</i></tt>,
+рассматриваются как обычные идентификаторы.
+В частности, шаблон <tt>(...&nbsp;...)</tt> создает одиночное
+многоточие, <tt>...</tt>.
+Это позволяет синтаксическим расширениям разворачиваться в формы,
+содержащие многоточия, включая образцы и шаблоны в 
+<tt>syntax-rules</tt> или <tt>syntax-case</tt>.
+
+</p><p>
+</p><p>Определение ниже <tt>or</tt> демонстрирует использование
+<tt>syntax-rules</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;or<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_)&nbsp;#f]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e)&nbsp;e]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e1&nbsp;e2&nbsp;e3&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([t&nbsp;e1])&nbsp;(if&nbsp;t&nbsp;t&nbsp;(or&nbsp;e2&nbsp;e3&nbsp;...)))]))</tt>
+</p><p>Образцы ввода указывают, что ввод должен состоять из ключевого
+слова и нуля или более подвыражений.
+Знак <a name="./syntax:s24"></a><a name="./syntax:s25"></a>подчеркивания (&nbsp;<tt>_</tt>&nbsp;),
+является специальным знаком образца, который соответствует любому входу,
+часто используется для позиции ключевого слова, чтобы напомнить программисту
+и любому, кто читает определение, что позиция ключевого слова никогда
+не перестает содержать ожидаемое ключевое слово и не нуждается в соответствии.
+(Фактически, как указано выше, <tt>syntax-rules</tt> игнорируют то, что
+появляется в  позиции ключевого слова.)
+Если присутствует более одного подвыражения (третье предложение), 
+расширенный код проверяет значение первого подвыражения и
+возвращает значение, если оно не является ложным.
+Чтобы избежать повторного вычисления выражения, преобразователь
+вводит привязку для временной переменной &nbsp;<tt>t</tt>.
+
+</p><p>
+Алгоритм расширения автоматически поддерживает лексический охват(область),
+переименовывая локальные идентификаторы по мере необходимости.
+Таким образом, привязка для <tt>t</tt> введенная преобразователем, видна
+только внутри кода, введенного трансформатором, а не внутри подформ
+ввода.
+Аналогично, ссылки на идентификаторы <tt>let</tt> и <tt>if</tt> не
+затрагиваются никакими привязками, присутствующими во входном контексте.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([if&nbsp;#f])<br>
+
+&nbsp;&nbsp;(let&nbsp;([t&nbsp;'okay])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;if&nbsp;t)))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;okay</tt>
+</p><p>Это выражение преобразуется при расширении в эквивалент выражения ниже.
+
+</p><p>
+
+</p><p><tt>((lambda&nbsp;(if1)<br>
+
+&nbsp;&nbsp;&nbsp;((lambda&nbsp;(t1)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((lambda&nbsp;(t2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;t2&nbsp;t2&nbsp;t1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;'okay))<br>
+
+&nbsp;#f)&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;okay</tt>
+</p><p>В этом примере расширения <tt>if1</tt>, <tt>t1</tt> и <tt>t2</tt>
+представляют собой идентификаторы, в которые переименовываются <tt>if</tt> и <tt>t</tt>
+из исходного выражения при расширении <tt>or</tt>.
+
+</p><p>
+Определение упрощенной версии <tt>cond</tt> ниже
+(упрощенное, потому что требует по крайней мере одного
+выходного выражения на предложение и не поддерживает
+вспомогательное ключевое слово <tt>=&gt;</tt>)
+демонстрирует, как вспомогательные ключевые слова, такие как <tt>else</tt> распознаются
+во входном выражении преобразователем, посредством включения в список литералов.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;cond<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;(else)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(else&nbsp;e1&nbsp;e2&nbsp;...))&nbsp;(begin&nbsp;e1&nbsp;e2&nbsp;...)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(e0&nbsp;e1&nbsp;e2&nbsp;...))&nbsp;(if&nbsp;e0&nbsp;(begin&nbsp;e1&nbsp;e2&nbsp;...))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(e0&nbsp;e1&nbsp;e2&nbsp;...)&nbsp;c1&nbsp;c2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;e0&nbsp;(begin&nbsp;e1&nbsp;e2&nbsp;...)&nbsp;(cond&nbsp;c1&nbsp;c2&nbsp;...))]))</tt>
+</p><p><a name="./syntax:s26"></a><span class="formdef"><b>syntax</b>: <tt>_</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>...</tt></span>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эти идентификаторы являются вспомогательными ключевыми словами
+для <tt>syntax-rules</tt>, <tt>identifier-syntax</tt>, и <tt>syntax-case</tt>.
+Второй (&nbsp;<tt>...</tt>&nbsp;) также является вспомогательным ключевым словом
+для  <tt>syntax</tt> и <tt>quasisyntax</tt>.
+Будет нарушением синтаксиса ссылаться на данные идентификаторы, за исключением
+контекстов, где они распознаются как вспомогательные ключевые слова.
+
+</p><p>
+<a name="./syntax:s27"></a><span class="formdef"><b>syntax</b>: <tt>(identifier-syntax&nbsp;<i>tmpl</i>)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>(identifier-syntax&nbsp;(<i>id<sub>1</sub></i>&nbsp;<i>tmpl<sub>1</sub></i>)&nbsp;((set!&nbsp;<i>id<sub>2</sub></i>&nbsp;<i>e<sub>2</sub></i>)&nbsp;<i>tmpl<sub>2</sub></i>))</tt></span>
+<br>
+<b>returns: </b>преобразователь
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Когда ключевое слово связывается с преобразователем созданному первой
+формой <tt>identifier-syntax</tt>, ссылки на ключевое слово в пределах
+области связывания заменяется на <tt><i>tmpl</i></tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;()<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;a&nbsp;(identifier-syntax&nbsp;car))<br>
+
+&nbsp;&nbsp;(list&nbsp;(a&nbsp;'(1&nbsp;2&nbsp;3))&nbsp;a))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;#&lt;procedure&gt;)</tt>
+</p><p>Использовать только первую форму  <tt>identifier-syntax</tt> нельзя, т.к. явное присваивание
+связанное с ключевым словом <tt>set!</tt> может вызвать нарушение синтаксиса.
+Вторая, более общаяя форма <tt>identifier-syntax</tt> позволяет
+преобразователю определить, что происходит при использовании <tt>set!</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([ls&nbsp;(list&nbsp;0)])<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;a<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(identifier-syntax<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[id&nbsp;(car&nbsp;ls)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(set!&nbsp;id&nbsp;e)&nbsp;(set-car!&nbsp;ls&nbsp;e)]))<br>
+
+&nbsp;&nbsp;(let&nbsp;([before&nbsp;a])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;a&nbsp;1)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;before&nbsp;a&nbsp;ls)))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(0&nbsp;1&nbsp;(1))</tt>
+</p><p><a name="./syntax:s28"></a>Определение <tt>identifier-syntax</tt> в терминах
+<tt>make-variable-transformer</tt> показано на странице
+&nbsp;<a href="syntax.html#defn:identifier-syntax">307</a>.
+
+</p><p>
+
+</p><h3><a name="g136"></a><a name="./syntax:h3"></a>Section 8.3. Преобразователь Syntax-Case<a name="SECTSYNTAXCASE"></a></h3>
+
+<p>
+В этом разделе описывается более выразительный механизм создания
+преобразователей, основывающийся на <tt>syntax-case</tt>, обобщенной
+версии <tt>syntax-rules</tt>.
+Этот механизм позволяет задавать произвольно сложные преобразования,
+включая преобразоания которые  "изгибают"("bend") лексический охват
+контролируемым образом, позволяя определить борее широкий класс
+синтаксических расширений.
+Любой преобразователь, который может быть определен с использованием
+<tt>syntax-rules</tt> может быть легко переписан с использованием
+<tt>syntax-case</tt>;
+На самом деле, сам <tt>syntax-rules</tt>
+можно легко определить как синтаксическое расширение в терминах
+<tt>syntax-case</tt>, как показано в описании
+<tt>syntax</tt> ниже.
+
+</p><p>
+<a name="./syntax:s29"></a>В этом механизме, преобразователи являются процедурами
+одного аргумента.
+Аргумент этот синтаксический объект(<i>syntax object</i>) представляющий форму подлежащую
+обработке.
+Возвращаемое значение представляет собой выходную форму синтаксического объекта.
+Синтаксичекский объект может быть любым из следующих:
+
+</p><p>
+</p><ul>
+<li>не парное, не векторное, не символьное значение,
+</li><li>пара синтаксических объектов,
+</li><li>вектор синтаксических объектов, или
+</li><li>обернутый объект.
+</li></ul>
+<p>
+
+</p><p>
+Обертка <i>wrap</i> на обернутом синтаксическом объекта содержит контекстную
+информацию о форме в дополнении к ее структуре.
+Этак контекстная информация используется расширителем для поддержки
+лексического охвата.
+Обертка также может содержать информацию, используемую реализацией, для 
+корреляции исходного кода и объектного кода, например трассы файла,
+линий и символьной информациии посредством процесса расширяния и
+компиляции.
+
+</p><p>
+Контекстная информация должна присутствовать для всех идентификаторов,
+поэтому определение синтаксического объекта, описанного выше,
+не допускает символов без обертки.
+Синтаксический объект, представляющий идентификатор, сам по себе
+называется идентификатором; таким образом, термин  <i>identifier</i>
+может относиться либо к синтаксической сущности (символ, переменная или
+ключевое слово) или к конкретному представлению синтаксической сущности
+как синтаксического объекта.
+
+</p><p>
+Преобразователи обычно разбирают свой ввод используя <tt>syntax-case</tt> и
+перестраивают свой вывод с помощью <tt>syntax</tt>.
+Этих двух форм достаточно для определения многих синтаксичеких расширений,
+включая любые, которые могут быть определены с использованием <tt>syntax-rules</tt>.
+Они описаны ниже, вместе с набором дополнительных форм и процедур, которые обеспечивают
+дополнительную функциональность.
+
+</p><p>
+<a name="./syntax:s30"></a><span class="formdef"><b>syntax</b>: <tt>(syntax-case&nbsp;<i>expr</i>&nbsp;(<i>literal</i>&nbsp;...)&nbsp;<i>clause</i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>смотри ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Каждый литерал(<tt><i>literal</i></tt>) должен быть идентификатором.
+Каждое предложение(<tt><i>clause</i></tt>) должно принимать одну из следующих
+двух форм.
+
+</p><p>
+
+</p><p><tt>(<i>pattern</i>&nbsp;<i>output-expression</i>)<br>
+
+(<i>pattern</i>&nbsp;<i>fender</i>&nbsp;<i>output-expression</i>)</tt>
+</p><p><tt>syntax-case</tt> образец(patterns) может быть в любой форме, описанной
+в разделе&nbsp;<a href="syntax.html#g135">8.2</a>.
+
+</p><p>
+<tt>syntax-case</tt> сначала вычисляет <tt><i>expr</i></tt>, затем пытается
+сопоставить полученное значение с образцом из первого предложения
+(<tt><i>clause</i></tt>).
+Это значение может быть любым объектом Scheme.
+Если значение соответствует образцу и нет флага
+<a name="./syntax:s31"></a><tt><i>fender</i></tt>,
+вычисляется значение выражения <tt><i>output-expression</i></tt> и его
+значение возвращается как значение выражения  <tt>syntax-case</tt>.
+Если значение не соответствует образцу, значение сравнивается со
+следующим предложением и т.д.
+Если значение не соответствует ни одному из образцов это будет
+нарушением синтаксиса.
+
+</p><p>
+Если присутствует необязательный параметр <tt><i>fender</i></tt>, он служит дополнительным
+ограничением при принятии предложения.
+Если значение выражения  <tt><i>expr</i></tt> в <tt>syntax-case</tt>  соответствует образцу
+для данного предложения, вычисляется соответствующее выражение <tt><i>fender</i></tt>.
+Если вычисление <tt><i>fender</i></tt> дает истинное значение, предложение принимается;
+В противном случае, предложение отклоняется, как если бы ввод не соответствовал образцу.
+Fender логически является частью процесса сопоставления, то есть оно задает дополнительные
+ограничения на соответствие вне базовой структуры выражения.
+
+</p><p>
+<a name="./syntax:s32"></a>Переменные образца содержащиеся в предложении
+<tt><i>pattern</i></tt> связываются с соответствующими частями входного
+значения в предложении <tt><i>fender</i></tt> (если оно есть) и
+<tt><i>output-expression</i></tt>.
+Переменные образца занимают одно и тоже пространство имен, что и переменные
+программы и ключевые слова; привязки переменных образца созданные <tt>syntax-case</tt>
+могут скрывать(и могут быть скрыты) привязки переменных программы и ключевых слов, а
+так же другие привязки переменных образца.
+Однако на переменные образца можно ссылаться только в выражении <tt>syntax</tt>.
+
+</p><p>
+См примеры следующипе за описанием <tt>syntax</tt>.
+
+</p><p>
+<a name="./syntax:s33"></a><span class="formdef"><b>syntax</b>: <tt>(syntax&nbsp;<i>template</i>)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>#'<i>template</i></tt></span>
+<br>
+<b>returns: </b>см. ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>#'<i>template</i></tt> эквививалентно <tt>(syntax&nbsp;<i>template</i>)</tt>.
+Сокращенная форма преобразуется в более длинную форму при чтении программы, до расширения
+макроса.
+
+</p><p>
+Выражение <tt>syntax</tt> похоже на выражение <tt>quote</tt>, за исключением того,
+что значения переменных образца, входящих в <tt><i>template</i></tt> вставляются
+в шаблон(<tt><i>template</i></tt>), а контекстная информация, связанная как с
+вводом, так и с шаблоном(template), сохраняется в выводе для поддержки
+лексического охвата(области действия).
+Выражение <tt><i>template</i></tt> в <tt>syntax</tt>  идентично выражению <tt><i>template</i></tt> 
+в <tt>syntax-rules</tt> и обрабатывается аналогично.
+
+</p><p>
+Списковые и векторные структуры внутри шаблона становятся настоящими списками
+и векторами (подходящими для непосредственного применения списковыми и
+вектроными операцияи, такими как <tt>map</tt> или <tt>vector-ref</tt>) в той
+мере, в какой списковые и векторные структуры должны быть скопированы для 
+вставки значений переменных образца, а пустые списки никогда не будут обернуты.
+Например, <tt>#'(x&nbsp;...)</tt>, <tt>#'(a&nbsp;b&nbsp;c)</tt>, <tt>#'()</tt> все
+списки, если  <tt>x</tt>, <tt>a</tt>, <tt>b</tt>, и <tt>c</tt> являются
+переменными образца.
+
+</p><p>
+Определение <tt>or</tt> ниже эквивалентно определению приведенному в 
+разделе &nbsp;<a href="syntax.html#g135">8.2</a>, за исключением того, что используется
+<tt>syntax-case</tt> и
+<tt>syntax</tt> вместо <tt>syntax-rules</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;or<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_)&nbsp;#'#f]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e)&nbsp;#'e]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e1&nbsp;e2&nbsp;e3&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(let&nbsp;([t&nbsp;e1])&nbsp;(if&nbsp;t&nbsp;t&nbsp;(or&nbsp;e2&nbsp;e3&nbsp;...)))])))</tt>
+</p><p>В этой версии выражение <tt>lambda</tt>, которое производит преобразователь,
+является явным, как и формы <tt>syntax</tt> в выходной части каждого предложения.
+Любая форма <tt>syntax-rules</tt> может быть выражена с помощью
+<tt>syntax-case</tt> созданием явного <tt>lambda</tt> выражения и явного
+<tt>syntax</tt> выражения.
+Это наблюдение приводит к следующему определению
+<a name="./syntax:s34"></a><tt>syntax-rules</tt> в терминах
+<tt>syntax-case</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;syntax-rules<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(i&nbsp;...)&nbsp;((keyword&nbsp;.&nbsp;pattern)&nbsp;template)&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;(i&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;.&nbsp;pattern)&nbsp;#'template]&nbsp;...))])))</tt>
+</p><p>Знак символа подчеркивания используется вместо
+каждого ключевого слова(<tt>keyword</tt>), так как первая позиция
+в каждом синтаксическом правиле(<tt>syntax-rules</tt>) образца всегда игнорируется.
+
+</p><p>
+Поскольку выражения <tt>lambda</tt> и <tt>syntax</tt> неявные в
+форме <tt>syntax-rules</tt>, определения выраженные с помощью
+<tt>syntax-rules</tt> часто короче эквивалентных определений,
+выраженных с помощью <tt>syntax-case</tt>.
+Выбор того что использовать является делом вкуса, но многие
+преобразователи, которые могут быть легко  написаны с помощью
+<tt>syntax-case</tt> нельзя написать легко или даже невозможно
+с помощью <tt>syntax-rules</tt>
+(см. Раздел &nbsp;<a href="syntax.html#g137">8.4</a>).
+
+</p><p>
+<a name="./syntax:s35"></a><span class="formdef"><b>procedure</b>: <tt>(identifier?&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> является идентификатором, <tt>#f</tt> в противном случае
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>identifier?</tt> часто используется с <a name="./syntax:s36"></a>fenders для проверки
+того, что определенные подформы входной формы являются идентификаторами,
+как в определении неименованного <tt>let</tt> ниже.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;let<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;ids?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(identifier?&nbsp;(car&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(ids?&nbsp;(cdr&nbsp;ls))))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((i&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(ids?&nbsp;#'(i&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'((lambda&nbsp;(i&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)&nbsp;e&nbsp;...)])))</tt>
+</p><p>Синтаксические расширения обычно принимают форму
+<tt>(<i>keyword</i>&nbsp;<i>subform</i>&nbsp;...)</tt>, но система
+<tt>syntax-case</tt> позволяет им также принимать форму одиночных
+идентификаторов.
+Например, ключевое слово <tt>pcar</tt> в приведенном ниже выражении может 
+использоваться как идентификатор (в этом случае он расширяется
+в вызов <tt>car</tt>)
+или как структрная форма (в этом случае он расширяется в вызов
+ <tt>set-car!</tt>).
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([p&nbsp;(cons&nbsp;0&nbsp;#f)])<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;pcar<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[_&nbsp;(identifier?&nbsp;x)&nbsp;#'(car&nbsp;p)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e)&nbsp;#'(set-car!&nbsp;p&nbsp;e)])))<br>
+
+&nbsp;&nbsp;(let&nbsp;([a&nbsp;pcar])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(pcar&nbsp;1)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;a&nbsp;pcar)))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(0&nbsp;1)</tt>
+</p><p>Выражение <tt>(identifier?&nbsp;x)</tt> является дополнительным условием(fender) для поиска по образцу используемое
+для распознавания случая одиночного идентификатора.
+
+</p><p>
+<a name="./syntax:s37"></a><span class="formdef"><b>procedure</b>: <tt>(free-identifier=?&nbsp;<i>identifier<sub>1</sub></i>&nbsp;<i>identifier<sub>2</sub></i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(bound-identifier=?&nbsp;<i>identifier<sub>1</sub></i>&nbsp;<i>identifier<sub>2</sub></i>)</tt></span>
+<br>
+<b>returns: </b>см ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Только символические имена неотличимы от идентификаторов,
+если идентификаторы не должны использоваться только как
+символические данные.
+Предикаты <tt>free-identifier=?</tt> и <tt>bound-identifier=?</tt>
+используются для сравнения идентификаторов в соответствии с их
+предполагаемым использованием(<i>intended use</i>) в данном контексте
+в качестве свободных ссылок или связанных идентификаторов.
+
+
+</p><p>
+<tt>free-identifier=?</tt> используется для определения того, будут ли
+два идентификатора эквивалентными, если они будут отображаться как свободные
+идентификаторы на выходе преобразователя.
+Поскольку ссылки идентификаторов лексически ограничены, это означает, что
+<tt>(free-identifier=?&nbsp;<i>id<sub>1</sub></i>&nbsp;<i>id<sub>2</sub></i>)</tt> является истинным
+тогда и только тогда, когда идентификаторы
+<tt><i>id<sub>1</sub></i></tt> и <tt><i>id<sub>2</sub></i></tt> относятся к одной и той же
+привязке.
+(Для этого сравнения предполагается, что два одинаково названных идентификатора имеют одинаковую
+привязку, если они не связаны)
+Литеральные идентификаторы (вспомогательные ключевые слова), появляющиеся в образце
+<tt>syntax-case</tt> (такие как <tt>else</tt> в <tt>case</tt>
+и <tt>cond</tt>)
+сопоставляются с <tt>free-identifier=?</tt>.
+
+</p><p>
+Аналогично, <tt>bound-identifier=?</tt> используется для определения того, будут ли
+два идентификатора эквивалентными, если они будут отображаться как
+связанные иденификаторы на выходе преобразователя.
+Другими словами, если <tt>bound-identifier=?</tt> возвращает истину для двух
+идентификаторов, привязка для одного будет захватывать сслыки на другой в пределах
+своей области.
+В общем, два идентификатора являются <tt>bound-identifier=?</tt> только если
+оба присутствуют в исходной программе, или оба они вводятся одним и тем же
+применением преобразователя
+(возможно неявно---см <tt>datum-&gt;syntax</tt>).
+<tt>bound-identifier=?</tt> может использоваться для обнаружения повторяющихся
+идентификаторов в конструкции связывания или для другой предварительной
+обработки конструкции связывания, которая требует обнаружения экзепляров
+связанных идентификаторов.
+
+</p><p>
+Ниже приведенное определение эквивалентно более раннему определению
+упрощенной версии <tt>cond</tt> с <tt>syntax-rules</tt>, за исключением
+того, что <tt>else</tt> распознается через явный вызов <tt>free-identifier?</tt> с
+дополнительным условием(fender), а не через включение в список литералов.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;cond<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(e0&nbsp;e1&nbsp;e2&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(identifier?&nbsp;#'e0)&nbsp;(free-identifier=?&nbsp;#'e0&nbsp;#'else))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(begin&nbsp;e1&nbsp;e2&nbsp;...)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(e0&nbsp;e1&nbsp;e2&nbsp;...))&nbsp;#'(if&nbsp;e0&nbsp;(begin&nbsp;e1&nbsp;e2&nbsp;...))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(e0&nbsp;e1&nbsp;e2&nbsp;...)&nbsp;c1&nbsp;c2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(if&nbsp;e0&nbsp;(begin&nbsp;e1&nbsp;e2&nbsp;...)&nbsp;(cond&nbsp;c1&nbsp;c2&nbsp;...))])))</tt>
+</p><p>С этим определением  <tt>cond</tt>, <tt>else</tt> не распознается
+как вспомогательное ключевое слово, если существует окружающая лексическая
+привязка <tt>else</tt>.
+Например,
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([else&nbsp;#f])<br>
+
+&nbsp;&nbsp;(cond&nbsp;[else&nbsp;(write&nbsp;"oops")]))</tt>
+</p><p> <i>НЕ</i> пишет <tt>"oops"</tt>, поскольку <tt>else</tt> связан
+лексически и, следовательно, не является тем же <tt>else</tt> что и
+в определении <tt>cond</tt>.
+
+</p><p>
+Следующее определение неименованного <tt>let</tt>
+использует <tt>bound-identifier=?</tt> для обнаружения повторяющихся идентификаторов.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;let<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;ids?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(identifier?&nbsp;(car&nbsp;ls))&nbsp;(ids?&nbsp;(cdr&nbsp;ls))))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;unique-ids?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(not&nbsp;(memp<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)&nbsp;(bound-identifier=?&nbsp;x&nbsp;(car&nbsp;ls)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cdr&nbsp;ls)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(unique-ids?&nbsp;(cdr&nbsp;ls))))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((i&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(ids?&nbsp;#'(i&nbsp;...))&nbsp;(unique-ids?&nbsp;#'(i&nbsp;...)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'((lambda&nbsp;(i&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)&nbsp;e&nbsp;...)])))</tt>
+</p><p>С определением <tt>let</tt> выше, выражение
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([a&nbsp;3]&nbsp;[a&nbsp;4])&nbsp;(+&nbsp;a&nbsp;a))</tt>
+</p><p>является нарушением, синтаксиса
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([a&nbsp;0])<br>
+
+&nbsp;&nbsp;(let-syntax&nbsp;([dolet&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;b)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(let&nbsp;([a&nbsp;3]&nbsp;[b&nbsp;4])&nbsp;(+&nbsp;a&nbsp;b))]))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(dolet&nbsp;a)))</tt>
+</p><p>вычисляется до <tt>7</tt> поскольку идентификатор <tt>a</tt> введенный в <tt>dolet</tt>
+и идентификатор <tt>a</tt> извлеченный из входной формы, не являются
+<tt>bound-identifier=?</tt>(связаными).
+Так как оба вхождения <tt>a</tt>, однако, если они оставлены как свободные ссылки,
+будут ссылаться на одну и туже привязку для <tt>a</tt>, <tt>free-identifier=?</tt>
+не будет их различать.
+
+</p><p>
+Два идентификатора, которые являются <tt>free-identifier=?</tt> могут не быть
+<tt>bound-identifier=?</tt>.
+Идентификатор введенный преобразователем, может ссылаться на туже охватывающую
+привяку, что и идентификатор, не вводимый преобразователем,
+но введенная привязка для одного не будет захватывать ссылки на другой.
+С другой стороны, идентификаторы, которые являются <tt>bound-identifier=?</tt>
+являются <tt>free-identifier=?</tt>, пока идентификаторы имеют действительные
+привязки в контексте, в котором они сравниваются.
+
+</p><p>
+<a name="./syntax:s38"></a><span class="formdef"><b>syntax</b>: <tt>(with-syntax&nbsp;((<i>pattern</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>значение последнего выражения body
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Иногда полезно построить выход преобразователя в отдельные части,
+а затем собрать куски вместе.
+<tt>with-syntax</tt> облегчает это, позволяя создавать локальные 
+привязки образцов.
+
+</p><p>
+<tt><i>pattern</i></tt> идентичен по форме образцу(patten) в <tt>syntax-case</tt>.
+Значение каждого выражения <tt><i>expr</i></tt> вычисляется и разбирается в соответствии
+с соответствующим образцом(<tt><i>pattern</i></tt>), а переменные образца в образце
+(<tt><i>pattern</i></tt>) связываются также как в <tt>syntax-case</tt> с соответствующими
+частями значенийя внутри тела <tt><i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...</tt>,
+которые обрабатываются и вычисляются как тело <tt>lambda</tt>.
+
+</p><p>
+<tt>with-syntax</tt> может быть определено как синтаксическое расширени в
+терминах <tt>syntax-case</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;with-syntax<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((p&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(syntax-case&nbsp;(list&nbsp;e&nbsp;...)&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(p&nbsp;...)&nbsp;(let&nbsp;()&nbsp;b1&nbsp;b2&nbsp;...)])])))</tt>
+</p><p>Следующее определение полного <a name="./syntax:s39"></a><tt>cond</tt>
+демонстрирует использование <tt>with-syntax</tt> для поддержки преобразователей,
+которые используют внутреннюю рекурсию для построения своего вывода.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;cond<a name="defn:cond"></a><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;c1&nbsp;c2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([c1&nbsp;#'c1]&nbsp;[cmore&nbsp;#'(c2&nbsp;...)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;cmore)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;c1&nbsp;(else&nbsp;=&gt;)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(else&nbsp;e1&nbsp;e2&nbsp;...)&nbsp;#'(begin&nbsp;e1&nbsp;e2&nbsp;...)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(e0)&nbsp;#'(let&nbsp;([t&nbsp;e0])&nbsp;(if&nbsp;t&nbsp;t))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(e0&nbsp;=&gt;&nbsp;e1)&nbsp;#'(let&nbsp;([t&nbsp;e0])&nbsp;(if&nbsp;t&nbsp;(e1&nbsp;t)))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(e0&nbsp;e1&nbsp;e2&nbsp;...)&nbsp;#'(if&nbsp;e0&nbsp;(begin&nbsp;e1&nbsp;e2&nbsp;...))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(with-syntax&nbsp;([rest&nbsp;(f&nbsp;(car&nbsp;cmore)&nbsp;(cdr&nbsp;cmore))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;c1&nbsp;(=&gt;)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(e0)&nbsp;#'(let&nbsp;([t&nbsp;e0])&nbsp;(if&nbsp;t&nbsp;t&nbsp;rest))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(e0&nbsp;=&gt;&nbsp;e1)&nbsp;#'(let&nbsp;([t&nbsp;e0])&nbsp;(if&nbsp;t&nbsp;(e1&nbsp;t)&nbsp;rest))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(e0&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(if&nbsp;e0&nbsp;(begin&nbsp;e1&nbsp;e2&nbsp;...)&nbsp;rest)]))))])))</tt>
+</p><p><a name="./syntax:s40"></a><span class="formdef"><b>syntax</b>: <tt>(quasisyntax&nbsp;<i>template</i>&nbsp;...)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>#`<i>template</i></tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>(unsyntax&nbsp;<i>template</i>&nbsp;...)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>#,<i>template</i></tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>(unsyntax-splicing&nbsp;<i>template</i>&nbsp;...)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>#,@<i>template</i></tt></span>
+<br>
+<b>returns: </b>смотри ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>#`<i>template</i></tt> эквивалентен <tt>(quasisyntax&nbsp;<i>template</i>)</tt>,
+в то время как
+<tt>#,<i>template</i></tt> эквивалентен <tt>(unsyntax&nbsp;<i>template</i>)</tt>, и
+<tt>#,@<i>template</i></tt> эквивалентен <tt>(unsyntax-splicing&nbsp;<i>template</i>)</tt>.
+Сокращенные формы перобразуются в более длинные формы, когда программа считывается,
+до расширения макроса.
+
+</p><p>
+<tt>quasisyntax</tt> аналогичен <tt>syntax</tt>, но позволяет вычислять
+части цитируемого текса способом, подобным
+<tt>quasiquote</tt> (Раздел&nbsp;<a href="objects.html#g107">6.1</a>).
+
+</p><p>
+В рамках шаблона <tt><i>template</i></tt> в <tt>quasisyntax</tt> , подформы
+форм <tt>unsyntax</tt> и <tt>unsyntax-splicing</tt> вычисляются,
+а все остальное рассматривается как обычный материал шаблона, как 
+ <tt>syntax</tt>.
+Значение каждой подформы <tt>unsyntax</tt> вставляется в выход
+вместо формы <tt>unsyntax</tt>, тогда как значение каждой подформы
+<tt>unsyntax-splicing</tt> разделяется в окружающий список или векторную
+структуру.
+<tt>unsyntax</tt> и <tt>unsyntax-splicing</tt> действительны только в
+выражениях <tt>quasisyntax</tt>.
+
+</p><p>
+Выражения <tt>quasisyntax</tt> могут быть вложенными, причем кадый <tt>quasisyntax</tt>
+вводит новый уровень синтаксического цитирования и каждый <tt>unsyntax</tt> и
+<tt>unsyntax-splicing</tt> убирают один уровень цитирования.
+Выражение вложенное в <i>n</i> выражений <tt>quasisyntax</tt> должно быть в пределах
+ <i>n</i> выражений <tt>unsyntax</tt> или <tt>unsyntax-splicing</tt> для вычисления.
+
+</p><p>
+<tt>quasisyntax</tt> можно использовать вместо <tt>with-syntax</tt> во
+многих случаях.
+Например, в следующем определении
+<a name="./syntax:s41"></a><tt>case</tt> используется <tt>quasisyntax</tt> для
+построения выхода, с использованием внутренней рекурсии, способом аналогичным
+определению <tt>cond</tt> приведенному в описании
+<tt>with-syntax</tt> выше.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;case<a name="defn:case"></a><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e&nbsp;c1&nbsp;c2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#`(let&nbsp;([t&nbsp;e])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#,(let&nbsp;f&nbsp;([c1&nbsp;#'c1]&nbsp;[cmore&nbsp;#'(c2&nbsp;...)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;cmore)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;c1&nbsp;(else)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(else&nbsp;e1&nbsp;e2&nbsp;...)&nbsp;#'(begin&nbsp;e1&nbsp;e2&nbsp;...)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[((k&nbsp;...)&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(if&nbsp;(memv&nbsp;t&nbsp;'(k&nbsp;...))&nbsp;(begin&nbsp;e1&nbsp;e2&nbsp;...))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;c1&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[((k&nbsp;...)&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#`(if&nbsp;(memv&nbsp;t&nbsp;'(k&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#,(f&nbsp;(car&nbsp;cmore)&nbsp;(cdr&nbsp;cmore)))]))))])))</tt>
+Формы </p><p><tt>unsyntax</tt> и <tt>unsyntax-splicing</tt> которые содержат
+ноль или больше чем одну подформу, действительны только
+в соединяемом контексте (список или вектор).
+<tt>(unsyntax&nbsp;<i>template</i>&nbsp;...)</tt> эквивалентен
+<tt>(unsyntax&nbsp;<i>template</i>)&nbsp;...</tt>, и
+<tt>(unsyntax-splicing&nbsp;<i>template</i>&nbsp;...)</tt> является эквивалентным
+<tt>(unsyntax-splicing&nbsp;<i>template</i>)&nbsp;...</tt>.
+Эти формы в первую очередь полезны в качестве промежуточных форм 
+в выходе расширителя <tt>quasisyntax</tt>.
+Они поддерживают вложенные идиомы квазицитирование(quasiquotation (<tt>quasisyntax</tt>))
+&nbsp;[<a class="citation" href="bibliography.html#g221">3</a>], такие как <tt>#,@#,@</tt>, 
+что приводит к двойному непрямому соединению, при использовании двойного
+вложения и двойного вычисления выражения <tt>quasisyntax</tt>, как и с
+вложением <tt>quasiquote</tt> в примерах показанных в Разделе
+&nbsp;<a href="objects.html#g107">6.1</a>.
+
+</p><p>
+<tt>unsyntax</tt> и <tt>unsyntax-splicing</tt> являются вспомогательными
+ключевыми словами для <tt>quasisyntax</tt>.
+Будет нарушением синтаксиса ссылаться на эти идентификаторы, за 
+исключением случаев, где они распознаются как вспомогательные ключевые слова.
+
+</p><p>
+<a name="./syntax:s42"></a><a name="desc:make-variable-transformer"></a>
+<span class="formdef"><b>procedure</b>: <tt>(make-variable-transformer&nbsp;<i>procedure</i>)</tt></span>
+<br>
+<b>returns: </b>преобразователь переменной
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Как описано в начале этого раздела, преобразователи могут просто быть
+процедурами, которые принимают один аргумент,
+синтаксический объект представляющий собой входную форму, и возвращают
+новый синтаксический объект, представляющий выходную форму.
+Форма, передаваемая преобразователю, обычно представляет собой
+форму в скобках, первая подформа которой является ключевым словом,
+связанным с преобразователем или просто ключевым словом.
+<tt>make-variable-transformer</tt> может использоваться для преобразования процедуры
+в специальный вид преобразователя, к которому расширитель также добавляет
+ключевое слово <tt>set!</tt>, в котором ключевое слово появляется сразу после
+<tt>set!</tt>, как если бы это было присваивание переменной.
+Это позволяет программисту контролировать, что происходит, когда ключевое слово
+появляется в таких контекстах.
+Аргумент, <tt><i>procedure</i></tt>, должен принимать один аргумент.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([ls&nbsp;(list&nbsp;0)])<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;a<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(make-variable-transformer<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[id&nbsp;(identifier?&nbsp;#'id)&nbsp;#'(car&nbsp;ls)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(set!&nbsp;_&nbsp;e)&nbsp;#'(set-car!&nbsp;ls&nbsp;e)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e&nbsp;...)&nbsp;#'((car&nbsp;ls)&nbsp;e&nbsp;...)]))))<br>
+
+&nbsp;&nbsp;(let&nbsp;([before&nbsp;a])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;a&nbsp;1)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;before&nbsp;a&nbsp;ls)))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(0&nbsp;1&nbsp;(1))</tt>
+</p><p><a name="./syntax:s43"></a>Эта синтаксическая абстракция может быть определена более
+кратко с использованием <tt>identifier-syntax</tt>, 
+как показано в разделе&nbsp;<a href="syntax.html#g135">8.2</a>,
+но <tt>make-variable-transformer</tt> может использоваться для создания
+преобразователей, которые выполняют произвольные вычисления, тогда 
+как <tt>identifier-syntax</tt> ограничивается простым переписыванием
+терминов, подобно  <tt>syntax-rules</tt>.
+<tt>identifier-syntax</tt> может быть определен в терминах
+ <tt>make-variable-transformer</tt>, как показано ниже.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;identifier-syntax<a name="defn:identifier-syntax"></a><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;(set!)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[id&nbsp;(identifier?&nbsp;#'id)&nbsp;#'e]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;x&nbsp;(...&nbsp;...))&nbsp;#'(e&nbsp;x&nbsp;(...&nbsp;...))]))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(id&nbsp;exp1)&nbsp;((set!&nbsp;var&nbsp;val)&nbsp;exp2))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(identifier?&nbsp;#'id)&nbsp;(identifier?&nbsp;#'var))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(make-variable-transformer<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;(set!)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(set!&nbsp;var&nbsp;val)&nbsp;#'exp2]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(id&nbsp;x&nbsp;(...&nbsp;...))&nbsp;#'(exp1&nbsp;x&nbsp;(...&nbsp;...))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[id&nbsp;(identifier?&nbsp;#'id)&nbsp;#'exp1])))])))</tt>
+</p><p><a name="./syntax:s44"></a><span class="formdef"><b>procedure</b>: <tt>(syntax-&gt;datum&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt><i>obj</i></tt> лишенный синтаксической информации
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Процедура <tt>syntax-&gt;datum</tt>
+удаляет всю синтаксическую информацию из синтаксического объекта
+и возвращает соответствующий объект("datum") Scheme. 
+Идентификаторы, разделенные таким образом, преобразуются в их
+символические имена, которые затем можно сравнивать  используя <tt>eq?</tt>.
+Таким образом, предикат <tt>symbolic-identifier=?</tt> может быть определен
+следующим образом.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;symbolic-identifier=?<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(eq?&nbsp;(syntax-&gt;datum&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-&gt;datum&nbsp;y))))</tt>
+</p><p>Двум идентификаторам, которые являются <tt>free-identifier=?</tt> необязательно
+быть <tt>symbolic-identifier=?</tt>: два идентификатора которые ссылаются на одну
+и туже привязку, обычно имеют одно и тоже имя, но субформы <tt>rename</tt> и
+<tt>prefix</tt> библиотечной формы <tt>import</tt>
+(страница&nbsp;<a href="libraries.html#desc:import">345</a>) могут
+приводить к двум идентификаторам с разными именами.
+
+</p><p>
+<a name="./syntax:s45"></a><span class="formdef"><b>procedure</b>: <tt>(datum-&gt;syntax&nbsp;<i>template-identifier</i>&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b>синтаксический объект
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>datum-&gt;syntax</tt> создает синтаксический объект из <tt><i>obj</i></tt>,
+который содержит ту же контекстную информацию, что и
+<tt><i>template-identifier</i></tt>, с тем эффектом что
+синтаксический объект ведет себя так, как если бы он был введен
+в код при вводе
+<tt><i>template-identifier</i></tt>.
+Идентификатор шаблона(template identifier) часто является ключевым словом
+входной формы, извлекаемый из формы, и объект часто является символом,
+именующиий(обозначающий) идентификатор, который должен быть сконструирован.
+
+</p><p>
+<tt>datum-&gt;syntax</tt> позволяет преобразователю "изгибать"("bend") 
+лексический охват правил, создавая  неявные идентификаторы(<i>implicit identifiers</i>),
+которые ведут себя так, как если бы они присутствовали во входной форме,
+что позволяет определять синтаксические расширения, которые
+вносят видимые привязки или ссылки на идентификаторы,
+которые не появляются явно в входной форме.
+Например, мы можем определить выражение<a name="./syntax:s46"></a><tt>loop</tt> которое
+связывает переменную <a name="./syntax:s47"></a><tt>break</tt> с процедурой побега(escape)
+из тела цикла.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;loop<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(k&nbsp;e&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(with-syntax&nbsp;([break&nbsp;(datum-&gt;syntax&nbsp;#'k&nbsp;'break)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(break)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;()&nbsp;e&nbsp;...&nbsp;(f)))))])))
+<br>
+<br>
+(let&nbsp;([n&nbsp;3]&nbsp;[ls&nbsp;'()])<br>
+
+&nbsp;&nbsp;(loop<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;n&nbsp;0)&nbsp;(break&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;ls&nbsp;(cons&nbsp;'a&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;n&nbsp;(-&nbsp;n&nbsp;1))))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;a&nbsp;a)</tt>
+</p><p>Где мы определяем  <tt>loop</tt> как
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;loop<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(break)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;()&nbsp;e&nbsp;...&nbsp;(f))))])))</tt>
+</p><p>переменная  <tt>break</tt> не будет видна в <tt>e&nbsp;...</tt>.
+
+</p><p>
+Так же полезно, чтобы <tt><i>obj</i></tt> представлял произвольную
+форму Scheme, как показано в следующем определении
+<a name="./syntax:s48"></a><tt>include</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;include<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;read-file<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(fn&nbsp;k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([p&nbsp;(open-input-file&nbsp;fn)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([x&nbsp;(read&nbsp;p)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(eof-object?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin&nbsp;(close-port&nbsp;p)&nbsp;'())<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(datum-&gt;syntax&nbsp;k&nbsp;x)&nbsp;(f&nbsp;(read&nbsp;p))))))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(k&nbsp;filename)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([fn&nbsp;(syntax-&gt;datum&nbsp;#'filename)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(with-syntax&nbsp;([(expr&nbsp;...)&nbsp;(read-file&nbsp;fn&nbsp;#'k)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(begin&nbsp;expr&nbsp;...)))])))</tt>
+</p><p><tt>(include&nbsp;"filename")</tt> расширяется в выражение <tt>begin</tt>
+содержащее формы найденые в файле с именем
+<tt>"filename"</tt>.
+Например, если файл <tt>f-def.ss</tt> содержит выражение
+<tt>(define&nbsp;f&nbsp;(lambda&nbsp;()&nbsp;x))</tt>, выражение
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;"okay"])<br>
+
+&nbsp;&nbsp;(include&nbsp;"f-def.ss")<br>
+
+&nbsp;&nbsp;(f))</tt>
+</p><p>вычисляется с результатом <tt>"okay"</tt>.
+
+</p><p>
+В определении <tt>include</tt> используется <tt>datum-&gt;syntax</tt> для
+преобразования объектов, считанных из файла, в синтаксические объекты в
+правильном лексическом контексте, так что ссылки и определения идентификаторов
+в этих выражениях имеют область видимости, где появляется форма <tt>include</tt>.
+
+</p><p>
+<a name="./syntax:s49"></a><span class="formdef"><b>procedure</b>: <tt>(generate-temporaries&nbsp;<i>list</i>)</tt></span>
+<br>
+<b>returns: </b>a список отдельных сгенерированных идентификаторов
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;syntax-case)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Преобразователи могут вводить фиксированное количество иденификаторов
+в свой вывод, именуя каждый идентификатор.
+Однако, в некторых случаях, количество вводимых идентификаторов зависит
+от некторой харастеристики входного выражения.
+Простое определение <tt>letrec</tt>, например,
+требует так много идентификаторов, сколько есть пар привязок
+во входном выражении.
+Процедура <tt>generate-temporaries</tt> используется для создания
+списка временных идентификаторов.
+
+</p><p>
+<tt><i>list</i></tt> может быть любым списком; его содержание не имеет значения.
+Количество созданных временных элементов равно количеству элеметов в  <tt><i>list</i></tt>.
+Каждый временный идентификатор гарантированно отличается от всех других
+идентификаторов.
+
+</p><p>
+Ниже приведено определение <a name="./syntax:s50"></a><tt>letrec</tt>, которое
+использует <tt>generate-temporaries</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;letrec<a name="defn:letrec"></a><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((i&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(with-syntax&nbsp;([(t&nbsp;...)&nbsp;(generate-temporaries&nbsp;#'(i&nbsp;...))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(let&nbsp;([i&nbsp;#f]&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([t&nbsp;e]&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;i&nbsp;t)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;()&nbsp;b1&nbsp;b2&nbsp;...))))])))</tt>
+</p><p>Любой преобразователь, который использует <tt>generate-temporaries</tt> таким образом, может быть
+переписан, чтобы избежать его использования, хотя и с потерей ясности.
+Хитрость заключается в использовании рекурсивно определенной промежуточной формы,
+которая генерирует один временный идентификатор на один шаг расширения и
+завершает расширение после создания достаточного количества временных идентификаторов.
+<a name="fullletvalues"></a>Вот определение <a name="./syntax:s51"></a><tt>let-values</tt>
+(page&nbsp;<a href="binding.html#desc:let-values">99</a>) которое использует этот метод
+для поддержки нескольких наборов привязок.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;let-values<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;()&nbsp;f1&nbsp;f2&nbsp;...)&nbsp;(let&nbsp;()&nbsp;f1&nbsp;f2&nbsp;...)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((fmls1&nbsp;expr1)&nbsp;(fmls2&nbsp;expr2)&nbsp;...)&nbsp;f1&nbsp;f2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lvhelp&nbsp;fmls1&nbsp;()&nbsp;()&nbsp;expr1&nbsp;((fmls2&nbsp;expr2)&nbsp;...)&nbsp;(f1&nbsp;f2&nbsp;...))]))
+<br>
+<br>
+(define-syntax&nbsp;lvhelp<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(x1&nbsp;.&nbsp;fmls)&nbsp;(x&nbsp;...)&nbsp;(t&nbsp;...)&nbsp;e&nbsp;m&nbsp;b)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lvhelp&nbsp;fmls&nbsp;(x&nbsp;...&nbsp;x1)&nbsp;(t&nbsp;...&nbsp;tmp)&nbsp;e&nbsp;m&nbsp;b)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;()&nbsp;(x&nbsp;...)&nbsp;(t&nbsp;...)&nbsp;e&nbsp;m&nbsp;b)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(call-with-values<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;e)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(t&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let-values&nbsp;m&nbsp;(let&nbsp;([x&nbsp;t]&nbsp;...)&nbsp;.&nbsp;b))))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;xr&nbsp;(x&nbsp;...)&nbsp;(t&nbsp;...)&nbsp;e&nbsp;m&nbsp;b)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(call-with-values<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;e)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(t&nbsp;...&nbsp;.&nbsp;tmpr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let-values&nbsp;m&nbsp;(let&nbsp;([x&nbsp;t]&nbsp;...&nbsp;[xr&nbsp;tmpr])&nbsp;.&nbsp;b))))]))</tt>
+</p><p>Реализация <tt>lvhelp</tt> осложняется необходимостью
+вычисления всех правых выражений перед созданием каких-либо
+привязок и необходимостью поддержки списков неправильных форматов.
+
+</p><p>
+
+</p><h3><a name="g137"></a><a name="./syntax:h4"></a>Section 8.4. Примеры<a name="SECTSYNTAXEXAMPLES"></a></h3>
+
+<p>
+В этом разделе представлена серия илюстративных синтаксических расширений
+определенных  как <tt>syntax-rules</tt> или <tt>syntax-case</tt>, начиная с
+нескольких простых, но полезных синтаксических расширений и заканчивая
+довольно сложным механизмом для определения структур с автоматически
+генерируемыми конструктрорами, предикатами, процедурами доступа и установки
+для полей.
+
+</p><p>
+Простейшим примером в этом разделе является следующее определение
+<a name="./syntax:s52"></a><tt>rec</tt>.
+<tt>rec</tt> это синтаксическое расширение, которое позволяет с минимальными
+усилиями создавать внутренне рекурсивные анонимные (не имеющие внешнего имени)
+процедуры.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;rec<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;x&nbsp;e)&nbsp;(letrec&nbsp;([x&nbsp;e])&nbsp;x)]))
+<br>
+<br>
+(map&nbsp;(rec&nbsp;sum<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;x&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;(sum&nbsp;(-&nbsp;x&nbsp;1))))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(0&nbsp;1&nbsp;2&nbsp;3&nbsp;4&nbsp;5))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(0&nbsp;1&nbsp;3&nbsp;6&nbsp;10&nbsp;15)</tt>
+</p><p>Используя <tt>rec</tt>, мы можем определить полный <tt>let</tt> (как
+неименованный так и именованный) следующим образом.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;let<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((x&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)&nbsp;e&nbsp;...)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;f&nbsp;((x&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((rec&nbsp;f&nbsp;(lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...))&nbsp;e&nbsp;...)]))</tt>
+</p><p>Мы также можем определить <tt>let</tt> непосредственно в 
+терминах <tt>letrec</tt>, хотя это определение немного менее понятно.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;let<a name="defn:let"></a><br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((x&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)&nbsp;e&nbsp;...)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;f&nbsp;((x&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((letrec&nbsp;([f&nbsp;(lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)])&nbsp;f)&nbsp;e&nbsp;...)]))</tt>
+</p><p>Эти определения основаны на том факте, что первый образец не может
+соответствовать именованному <tt>let</tt>, поскольку первая подформа в именованном
+<tt>let</tt> должна быть идентификатором, а не списком привязок.
+В следующем определении используется дополнительное условие(fender), чтобы сделать
+эту проверку более надежной.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;let<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((x&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'((lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)&nbsp;e&nbsp;...)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;f&nbsp;((x&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(identifier?&nbsp;#'f)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'((rec&nbsp;f&nbsp;(lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...))&nbsp;e&nbsp;...)])))</tt>
+</p><p>С дополнительным условием(fender), мы можем даже поставить предложения
+в обратном порядке.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;let<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;f&nbsp;((x&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(identifier?&nbsp;#'f)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'((rec&nbsp;f&nbsp;(lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...))&nbsp;e&nbsp;...)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((x&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'((lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)&nbsp;e&nbsp;...)])))</tt>
+</p><p>Чтобы быть полностью надежным, проверки <tt>ids?</tt> и <tt>unique-ids?</tt> 
+применяемые в определении неименованного <tt>let</tt> в Разделе&nbsp;<a href="syntax.html#g136">8.3</a>
+должны использоваться и здесь.
+
+</p><p>
+</p><p>Оба варианта <tt>let</tt> легко описываются простыми однострочными образцами, но <tt>do</tt> 
+требует большей работы.
+Точный синтаксис <a name="./syntax:s53"></a><tt>do</tt> не может быть выражен напрямую
+с помощью одного образца, потому что некоторые привязки в списке привязок в  выражении <tt>do</tt>
+могут принимать форму <tt>(var&nbsp;val)</tt>, в то время как другие
+принимают форму <tt>(var&nbsp;val&nbsp;update)</tt>.
+Следующее определение <tt>do</tt> использует <tt>syntax-case</tt>
+для внутреннего разбора привязок отдельно от общей формы.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;do<a name="defn:do"></a><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(binding&nbsp;...)&nbsp;(test&nbsp;res&nbsp;...)&nbsp;expr&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(with-syntax&nbsp;([((var&nbsp;val&nbsp;update)&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;(lambda&nbsp;(b)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;b&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(var&nbsp;val)&nbsp;#'(var&nbsp;val&nbsp;var)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(var&nbsp;val&nbsp;update)&nbsp;#'(var&nbsp;val&nbsp;update)]))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(binding&nbsp;...))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(let&nbsp;doloop&nbsp;([var&nbsp;val]&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;test<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin&nbsp;(if&nbsp;#f&nbsp;#f)&nbsp;res&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin&nbsp;expr&nbsp;...&nbsp;(doloop&nbsp;update&nbsp;...)))))])))</tt>
+</p><p>Нечетное выражение <tt>(if&nbsp;#f&nbsp;#f)</tt> вставлено до
+результирующего выражения <tt>res&nbsp;...</tt>, на случай отсутствия результирующего
+выражения, так как для <tt>begin</tt> требуется хотя бы одно подвыражение.
+Значение <tt>(if&nbsp;#f&nbsp;#f)</tt> неопределено, и это то что мы хотим, 
+поскольк значение <tt>do</tt> непоределено, если не указано результирующее выражение.
+За счет немного большего количества кода, мы могли бы использовать <tt>syntax-case</tt>,
+чтобы определить, предоставляются ли какие-либо результирующие выражения, и создать
+цикл с одно или двух сторонними <tt>if</tt>, если это необходимо.
+Полученное расширение будет более ясным, но семантически эквивалентным.
+
+</p><p>
+</p><p>Как упоминалось в Разделе&nbsp;<a href="syntax.html#g135">8.2</a>,
+многоточия теряют свое особое значение в шаблонах вида <tt>(...&nbsp;<i>template</i>)</tt>.
+Этот факт позволяет синтаксическим расширениям расширяться в синтаксические
+определения содержащие многоточия.
+Его использование демонстрируется нижеследующим определением 
+<a name="./syntax:s54"></a><tt>be-like-begin</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;be-like-begin<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;name)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define-syntax&nbsp;name<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e0&nbsp;e1&nbsp;(...&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin&nbsp;e0&nbsp;e1&nbsp;(...&nbsp;...))]))]))</tt>
+</p><p>С <tt>be-like-begin</tt> определенным таким образом,
+<tt>(be-like-begin&nbsp;sequence)</tt> имеет тот же эффект, что и следующее
+определение <a name="./syntax:s55"></a><tt>sequence</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;sequence<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e0&nbsp;e1&nbsp;...)&nbsp;(begin&nbsp;e0&nbsp;e1&nbsp;...)]))</tt>
+</p><p>То есть, форма <tt>sequence</tt> становиться эквивалентной форме <tt>begin</tt>,
+так что, например:
+
+</p><p>
+
+</p><p><tt>(sequence&nbsp;(display&nbsp;"Say&nbsp;what?")&nbsp;(newline))</tt>
+</p><p>печатает "Say what?" а затем новую строку.
+
+</p><p>
+</p><p>В следующем примере показано, как можно ограничить выражение
+<tt>if</tt>  в заданном выражении требующим подвыражения
+"else" (альтернатива) определением локального <tt>if</tt> 
+в терминах встроенного <tt>if</tt>.
+Внутри тела <tt>let-syntax</tt> связанный ниже,
+двух сторонний <tt>if</tt> работает как обычно:
+
+</p><p>
+
+</p><p><tt>(let-syntax&nbsp;([if&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e1&nbsp;e2&nbsp;e3)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(if&nbsp;e1&nbsp;e2&nbsp;e3)]))])<br>
+
+&nbsp;&nbsp;(if&nbsp;(&lt;&nbsp;1&nbsp;5)&nbsp;2&nbsp;3))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2</tt>
+</p><p>но односторонний if приводит к синтаксической ошибке.
+
+</p><p>
+
+</p><p><tt>(let-syntax&nbsp;([if&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e1&nbsp;e2&nbsp;e3)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(if&nbsp;e1&nbsp;e2&nbsp;e3)]))])<br>
+
+&nbsp;&nbsp;(if&nbsp;(&lt;&nbsp;1&nbsp;5)&nbsp;2))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>syntax&nbsp;violation</i></tt>
+</p><p>Хотя это локальное определение <tt>if</tt> выглядит достаточно простым,
+есть несколько тонких способов, в которых попытка написать его может пойти не так.
+Если <a name="./syntax:s56"></a><tt>letrec-syntax</tt> использовался вместо
+<a name="./syntax:s57"></a><tt>let-syntax</tt>,
+идентификатор <tt>if</tt> вставленный в выход, будет ссылаться на локальный <tt>if</tt>, 
+а не на встроенный <tt>if</tt>, а расширение будет работать бесконечно в цикле.
+
+</p><p>
+Аналогично, если знак подчеркивания был заменен идентификатором <tt>if</tt>, 
+расширение снова запустит бесконечный цикл.
+<tt>if</tt> появляющееся в шаблоне <tt>(if&nbsp;e1&nbsp;e2&nbsp;e3)</tt> будет
+рассматриваться как переменная образца, связанная с соответствующим
+идентификатором <tt>if</tt> из входной формы, которая обозначает
+локальную версию <tt>if</tt>.
+
+</p><p>
+Размещение <tt>if</tt> в списке литералов в попытке исправления
+последней версии не будет работать.
+В этом случаее <tt>syntax-case</tt> будет сравнивать литерал
+<tt>if</tt> в образце, который будет ограничен пределами
+выражения <tt>let-syntax</tt>, с <tt>if</tt> во входном выражении,
+который будет ограничен пределами <tt>let-syntax</tt>.
+Поскольку они не будут ссылаться на одну и туже привязку, они не
+будут <tt>free-identifier=?</tt>, и это приведет к нарушению
+синтаксиса.
+
+</p><p>
+Обычное использование
+<a name="./syntax:s58"></a><a name="./syntax:s59"></a>подчеркивания (&nbsp;<tt>_</tt>&nbsp;)
+помогает программисту избежать ситуаций, подобных тем, в которых неправильный
+идентификатор сопоставляется опять или вставлен случайно.
+
+</p><p>
+</p><p>Нарушение синтаксиса создает ссылку на идентификатор, который отсутствует
+в контексте входной формы, что может произойти, если
+"ближайшая охватывающая лексическая привязка" для идентификатора вставленного в
+вывод преобразователя, также не охватывает входную форму.
+Например,
+
+</p><p>
+
+</p><p><tt>(let-syntax&nbsp;([divide&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([/&nbsp;+])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e1&nbsp;e2)&nbsp;#'(/&nbsp;e1&nbsp;e2)])))])<br>
+
+&nbsp;&nbsp;(let&nbsp;([/&nbsp;*])&nbsp;(divide&nbsp;2&nbsp;1)))</tt>
+</p><p>должно привести к нарушению синтаксиса с сообщением о том, что
+&nbsp;<tt>/</tt>&nbsp;ссылается в недопустимом контексте, так как вхождение&nbsp;<tt>/</tt>&nbsp;в вывод
+<tt>divide</tt> является ссылкой на переменную&nbsp;<tt>/</tt>&nbsp; связанную выражением <tt>let</tt>
+внутри перобразователя.
+
+</p><p>
+<a name="./syntax:s60"></a>Следующий пример определяет форму
+<a name="./syntax:s61"></a><tt>define-integrable</tt>,
+которая аналогична <tt>define</tt> 
+для определения процедур, за исключением того, что она заставляет
+код для процедуры быть встроенным(<i>integrated</i>), или вставленным, где
+бы ни был найден прямой вызов процедуры.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;define-integrable<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;(lambda)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;name&nbsp;(lambda&nbsp;formals&nbsp;form1&nbsp;form2&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;xname&nbsp;(lambda&nbsp;formals&nbsp;form1&nbsp;form2&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define-syntax&nbsp;name<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[_&nbsp;(identifier?&nbsp;x)&nbsp;#'xname]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;arg&nbsp;(...&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'((lambda&nbsp;formals&nbsp;form1&nbsp;form2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arg<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(...&nbsp;...))]))))]))</tt>
+</p><p>Форма <tt>(define-integrable&nbsp;<i>name</i>&nbsp;<i>lambda-expression</i>)</tt>
+расширяется в пару определений:  синтаксическое определение <tt><i>name</i></tt> и
+определение переменной <tt>xname</tt>.
+Преобразователь для <tt><i>name</i></tt> преобразует кажущиеся вызовы 
+<tt><i>name</i></tt> в прямые вызовы <tt><i>lambda-expression</i></tt>.
+Поскольку полученные формы являются просто прямым применением <tt>lambda</tt> 
+(эквивалентными выражениям <tt>let</tt>),
+фактические параметры вычисляются ровно один раз до вычисления
+тела процедуры, если это необходимо)
+Все остальные ссылки на <tt><i>name</i></tt> заменяются ссылками на
+<tt>xname</tt>.
+Определение <tt>xname</tt> связываетего со значением 
+<tt><i>lambda-expression</i></tt>.
+Это позволяет использовать эту процедуру в качестве значения первого класса.
+Преобразователь <tt>define-integrable</tt> не делает ничего особенного для
+поддержания лексического охвата в пределах <tt>lambda</tt> выражения или места вызова,
+поскольку область лексического охвата автоматически поддерживаетс расширителем.
+Кроме того, поскольку <tt>xname</tt> вводиться преобразователем, привязка для
+ <tt>xname</tt> не видна нигде, кроме случаев, когда ссылки на нее вводяться
+преобразователем для <tt><i>name</i></tt>.
+
+</p><p>
+Вышеприведенное определение <tt>define-integrable</tt> не работает для
+рекурсивных процедур, поскольку рекурсивный вызов вызовет неопределенное
+количество шагов расширения, что вероятно, приведет к исчерпанию памяти
+во время расширения.
+Решение этой проблемы для непосредственно рекурсивных процедур заключается
+в том, чтобы обернуть каждое вхождение <tt>lambda</tt> выражения связыванием
+с <tt>let-syntax</tt> которое безоговорочно расширяет <tt><i>name</i></tt> 
+в <tt>xname</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;define-integrable<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;(lambda)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;name&nbsp;(lambda&nbsp;formals&nbsp;form1&nbsp;form2&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;xname<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let-syntax&nbsp;([name&nbsp;(identifier-syntax&nbsp;xname)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;formals&nbsp;form1&nbsp;form2&nbsp;...)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define-syntax&nbsp;name<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[_&nbsp;(identifier?&nbsp;x)&nbsp;#'xname]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;arg&nbsp;(...&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'((let-syntax&nbsp;([name&nbsp;(identifier-syntax&nbsp;xname)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;formals&nbsp;form1&nbsp;form2&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arg&nbsp;(...&nbsp;...))]))))]))</tt>
+</p><p>Эта проблема может быть решена для взаимнорекурсивных процедур путем замены
+форм <tt>let-syntax</tt> на нестандартную форму <tt>fluid-let-syntax</tt>,
+которая описана в <i>Руководстве пользователя Chez Scheme 
+</i>&nbsp;[<a class="citation" href="bibliography.html#g227">9</a>].
+
+</p><p>
+</p><p>Оба определения <tt>define-integrable</tt> относятся
+к случаю, когда идентификатор появляется в первой позиции
+структурированного выражения отличающегося от
+случая когда он появляется в другом месте, как в примере <tt>pcar</tt>
+приведенном в описании для <tt>identifier?</tt>.
+В других ситуациях, оба случая должны рассматриваться одинаково.
+Форма <a name="./syntax:s62"></a><tt>identifier-syntax</tt>
+может сделать это более удобным.
+<a name="./syntax:s63"></a>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;0])<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;x++<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(identifier-syntax<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([t&nbsp;x])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;x&nbsp;(+&nbsp;t&nbsp;1))&nbsp;t)))<br>
+
+&nbsp;&nbsp;(let&nbsp;([a&nbsp;x++])&nbsp;(list&nbsp;a&nbsp;x)))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(0&nbsp;1)</tt>
+</p><p></p><p>В следующем примере используются
+<a name="./syntax:s64"></a><tt>identifier-syntax</tt>,
+<a name="./syntax:s65"></a><tt>datum-&gt;syntax</tt>,
+и локальные синтаксические определения для опредления формы <i>method</i>, одной
+из основных строительных блоков систем
+<a name="./syntax:s66"></a>объектно-ориентированного программирования(ООП)
+Выражение <a name="./syntax:s67"></a><tt>method</tt> аналогично выражению
+<tt>lambda</tt>, за исключением того, что помимо формальных параметров и
+тела выражения, выражение <tt>method</tt> содержит список переменных экземпляра
+<tt>(ivar&nbsp;...)</tt>.
+Когда метод вызывается, он всегда передается объекту-<i>object</i>
+(<i>instance</i>-экземпляру),
+представленному как вектор полей <i>fields</i> соответствующих переменных
+экземпляра, и нулю или более дополнительных аргументов.
+Внури тела метода объект привязан к неявному идентификатору <tt>self</tt> 
+и в дополнительные параметры связаны с формальными параметрами.
+Поля объекта могут быть доступны или изменены внутри тела метода
+посредством ссылок или присвоений переменным экземпляра.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;method<a name="defn:method"></a><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(k&nbsp;(ivar&nbsp;...)&nbsp;formals&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(with-syntax&nbsp;([(index&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([i&nbsp;0]&nbsp;[ls&nbsp;#'(ivar&nbsp;...)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;i&nbsp;(f&nbsp;(+&nbsp;i&nbsp;1)&nbsp;(cdr&nbsp;ls)))))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[self&nbsp;(datum-&gt;syntax&nbsp;#'k&nbsp;'self)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[set!&nbsp;(datum-&gt;syntax&nbsp;#'k&nbsp;'set!)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(lambda&nbsp;(self&nbsp;.&nbsp;formals)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let-syntax&nbsp;([ivar&nbsp;(identifier-syntax<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector-ref&nbsp;self&nbsp;index))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let-syntax&nbsp;([set!<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;(ivar&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;ivar&nbsp;e)&nbsp;(vector-set!&nbsp;self&nbsp;index&nbsp;e)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;x&nbsp;e)&nbsp;(set!&nbsp;x&nbsp;e)])])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b1&nbsp;b2&nbsp;...))))])))</tt>
+</p><p>Локальные привязки для <tt>ivar&nbsp;...</tt> и для <tt>set!</tt> делают поля
+объекта кажущимися обычными переменными,  сслыки и присваивания которым
+преобразуются в вызовы <tt>vector-ref</tt> и <tt>vector-set!</tt>.
+<tt>datum-&gt;syntax</tt> используется для создания видимыми введенных 
+привязок <tt>self</tt> и <tt>set!</tt> в теле метода.
+Вложенные выражения <tt>let-syntax</tt> необходимы, чтобы идентификаторы
+<tt>ivar&nbsp;...</tt> служили вспомогательными ключевыми словами для локальной
+версии <tt>set!</tt> должным образом.
+
+</p><p>
+<a name="./syntax:s68"></a>Используя общую форму <tt>identifier-syntax</tt> для обработки форм <tt>set!</tt>
+напрямую, мы можем упростить определение <tt>method</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;method<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(k&nbsp;(ivar&nbsp;...)&nbsp;formals&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(with-syntax&nbsp;([(index&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([i&nbsp;0]&nbsp;[ls&nbsp;#'(ivar&nbsp;...)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;i&nbsp;(f&nbsp;(+&nbsp;i&nbsp;1)&nbsp;(cdr&nbsp;ls)))))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[self&nbsp;(datum-&gt;syntax&nbsp;#'k&nbsp;'self)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(lambda&nbsp;(self&nbsp;.&nbsp;formals)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let-syntax&nbsp;([ivar&nbsp;(identifier-syntax<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[_&nbsp;(vector-ref&nbsp;self&nbsp;index)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(set!&nbsp;_&nbsp;e)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector-set!&nbsp;self&nbsp;index&nbsp;e)])]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b1&nbsp;b2&nbsp;...)))])))</tt>
+</p><p>Примеры ниже демонстрируют простое использование <tt>method</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([m&nbsp;(method&nbsp;(a)&nbsp;(x)&nbsp;(list&nbsp;a&nbsp;x&nbsp;self))])<br>
+
+&nbsp;&nbsp;(m&nbsp;#(1)&nbsp;2))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;#(1))
+<br>
+<br>
+(let&nbsp;([m&nbsp;(method&nbsp;(a)&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;a&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;x&nbsp;(+&nbsp;a&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;a&nbsp;x&nbsp;self))])<br>
+
+&nbsp;&nbsp;(m&nbsp;#(1)&nbsp;2))&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(2&nbsp;4&nbsp;#(2))</tt>
+</p><p>В полной ООП системе, основанной на <tt>method</tt>, переменные экземпляра
+<tt>ivar&nbsp;...</tt> вероятно, будут сфрмированы из объявлений классов, не указанных
+явно, в формах  <tt>method</tt>, хотя те же методы будут использоваться, чтобы 
+переменные экземпляра отображались как обычные переменные в телах методов.
+
+</p><p>
+</p><p><a name="./syntax:s69"></a>Последний пример этого раздела определяет средство
+определения простой структуры, которая представляет структуру типа вектора с
+именованными полями.
+Структуры определяются с помощью
+<a name="./syntax:s70"></a><tt>define-structure</tt>, которая принимает форму
+
+</p><p>
+
+</p><p><tt>(define-structure&nbsp;<i>name</i>&nbsp;<i>field</i>&nbsp;...)</tt>
+</p><p>где <tt><i>name</i></tt> именуют структуру и <tt><i>field</i>&nbsp;...</tt> именуют ее
+поля.
+<tt>define-structure</tt> расширяется в ряд сгенерированных определений:
+конструктор <tt>make-<i>name</i></tt>, предикат типа <tt><i>name</i>?</tt>,
+и по одной процедуре доступа к полю(accessor) <tt><i>name</i>-<i>field</i></tt> и одному
+установщику поля(setter)  <tt>set-<i>name</i>-<i>field</i>!</tt> для каждого
+имени поля.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;define-structure<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;gen-id<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(template-id&nbsp;.&nbsp;args)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(datum-&gt;syntax&nbsp;template-id<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(string-&gt;symbol<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;string-append<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(string?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(symbol-&gt;string&nbsp;(syntax-&gt;datum&nbsp;x))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;args))))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;name&nbsp;field&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(with-syntax&nbsp;([constructor&nbsp;(gen-id&nbsp;#'name&nbsp;"make-"&nbsp;#'name)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[predicate&nbsp;(gen-id&nbsp;#'name&nbsp;#'name&nbsp;"?")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(access&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;(lambda&nbsp;(x)&nbsp;(gen-id&nbsp;x&nbsp;#'name&nbsp;"-"&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(field&nbsp;...))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(assign&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(gen-id&nbsp;x&nbsp;"set-"&nbsp;#'name&nbsp;"-"&nbsp;x&nbsp;"!"))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(field&nbsp;...))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[structure-length&nbsp;(+&nbsp;(length&nbsp;#'(field&nbsp;...))&nbsp;1)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(index&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([i&nbsp;1]&nbsp;[ids&nbsp;#'(field&nbsp;...)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ids)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;i&nbsp;(f&nbsp;(+&nbsp;i&nbsp;1)&nbsp;(cdr&nbsp;ids)))))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#'(begin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;constructor<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(field&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector&nbsp;'name&nbsp;field&nbsp;...)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;predicate<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(vector?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(=&nbsp;(vector-length&nbsp;x)&nbsp;structure-length)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(eq?&nbsp;(vector-ref&nbsp;x&nbsp;0)&nbsp;'name))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;access<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector-ref&nbsp;x&nbsp;index)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;assign<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;update)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector-set!&nbsp;x&nbsp;index&nbsp;update)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...))])))</tt>
+</p><p>
+</p><p>Конструктор принимает столько аргументов, сколько полей в структуре, и создает вектор,
+первым элементом которого является символ
+<tt><i>name</i></tt>(имя структуры), а остальные элементы значения аргументов.
+Предикат типа возвращает истину если его аргумент представляет собой вектор ожидаемой длины,
+первым элементом которого является <tt><i>name</i></tt>.
+
+</p><p>
+Поскольку форма <tt>define-structure</tt> расширяется в <tt>begin</tt> содержащее
+определения, она сама по себе является определением и может использоваться везде,
+где определения допустимы.
+
+</p><p>
+Сгенерированные идентификаторы создаются с помощью синтаксиса
+<a name="./syntax:s71"></a><tt>datum-&gt;syntax</tt>, чтобы позволить идентификаторам быть
+видимыми, везде где появляется форма <tt>define-structure</tt>.
+
+</p><p>
+Приведенные ниже примеры демонстрируют испольование <tt>define-structure</tt>.
+
+</p><p>
+
+</p><p><tt>(define-structure&nbsp;tree&nbsp;left&nbsp;right)<br>
+
+(define&nbsp;t<br>
+
+&nbsp;&nbsp;(make-tree<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(make-tree&nbsp;0&nbsp;1)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(make-tree&nbsp;2&nbsp;3)))
+<br>
+<br>
+t&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(tree&nbsp;#(tree&nbsp;0&nbsp;1)&nbsp;#(tree&nbsp;2&nbsp;3))<br>
+
+(tree?&nbsp;t)&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(tree-left&nbsp;t)&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(tree&nbsp;0&nbsp;1)<br>
+
+(tree-right&nbsp;t)&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(tree&nbsp;2&nbsp;3)<br>
+
+(set-tree-left!&nbsp;t&nbsp;0)<br>
+
+t&nbsp;<img src="./syntax_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(tree&nbsp;0&nbsp;#(tree&nbsp;2&nbsp;3))</tt>
+</p><p>
+
+</p><hr class="copyright" align="left">
+<p>
+R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</it><br>
+Copyright © 2009 <a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">The MIT Press</a>.  Electronically reproduced by permission.<br>
+Illustrations © 2009 <a class="plain" href="http://hebert.kitp.ucsb.edu/">Jean-Pierre Hébert</a><br>
+ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>
+<a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">to order this book</a> / <a class="plain" href="canned/about.html">about this book</a>
+</p>
+<p><a class="plain" href="http://www.scheme.com/">http://www.scheme.com</a></p>
+
+</body></html>

@@ -1,0 +1,102 @@
+body {
+	background-color: rgb(255, 255, 255);
+}
+a:link {
+	color: rgb(57, 116, 179); text-decoration: underline;
+}
+a:active {
+	color: rgb(57, 116, 179); text-decoration: underline;
+}
+a:visited {
+	color: rgb(57, 116, 179); text-decoration: underline;
+}
+a:hover {
+	background: rgb(57, 116, 179); color: black; text-decoration: underline;
+}
+a.plain:link {
+	color: rgb(57, 116, 179); text-decoration: none;
+}
+a.plain:active {
+	color: rgb(57, 116, 179); text-decoration: none;
+}
+a.plain:visited {
+	color: rgb(57, 116, 179); text-decoration: none;
+}
+a.plain:hover {
+	background: rgb(57, 116, 179); color: black; text-decoration: none;
+}
+a.toc:link {
+	color: rgb(57, 116, 179); font-family: sans-serif; text-decoration: none;
+}
+a.toc:active {
+	color: rgb(57, 116, 179); font-family: sans-serif; text-decoration: none;
+}
+a.toc:visited {
+	color: rgb(57, 116, 179); font-family: sans-serif; text-decoration: none;
+}
+a.toc:hover {
+	background: rgb(57, 116, 179); color: black; font-family: sans-serif; text-decoration: none;
+}
+ul.tocchapter {
+	list-style: none;
+}
+ul.tocsection {
+	list-style: circle; color: rgb(45, 68, 140);
+}
+hr.copyright {
+	width: 50%;
+}
+input.default {
+	background: rgb(255, 255, 255); color: rgb(0, 0, 0); vertical-align: middle;
+}
+h1 {
+	color: rgb(45, 68, 140); font-family: sans-serif;
+}
+h2 {
+	color: rgb(45, 68, 140); font-family: sans-serif;
+}
+h3 {
+	color: rgb(45, 68, 140); font-family: sans-serif;
+}
+h4 {
+	color: rgb(45, 68, 140); font-family: sans-serif;
+}
+h1 {
+	font-size: 2em;
+}
+h2 {
+	font-size: 1.5em; margin-top: 30px;
+}
+h3 {
+	font-size: 1.17em; margin-top: 30px;
+}
+h1 {
+	font-weight: bold;
+}
+h2 {
+	font-weight: bold;
+}
+h3 {
+	font-weight: bold;
+}
+h4 {
+	font-weight: bold;
+}
+.title {
+	color: rgb(45, 68, 140); font-family: sans-serif; font-size: 2.5em; font-weight: bold; white-space: nowrap;
+}
+.author {
+	color: rgb(45, 68, 140); font-family: sans-serif; font-size: 2em; font-weight: bold; white-space: nowrap;
+}
+.edition {
+	color: rgb(57, 116, 179); font-family: sans-serif; font-size: 1.5em; font-weight: bold; white-space: nowrap;
+}
+.artist {
+	color: rgb(57, 116, 179); font-family: sans-serif; font-size: 1.25em; font-weight: bold; white-space: nowrap;
+}
+.formdef {
+	color: rgb(57, 116, 179);
+}
+table.indent {
+	margin-left: 20px;
+}

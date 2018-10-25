@@ -1,0 +1,3632 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0052)examples.html#./examples:h0 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<title>Расширенные Примеры</title>
+<link href="./examples_files/tspl.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a name="g151"></a>
+<a name="./examples:h0"></a>
+
+<div>
+<img src="./examples_files/ch12.png">
+</div>
+<h1>Chapter 12. Расширенные Примеры<a name="CHPTEXAMPLES"></a></h1>
+
+<p>
+<a name="./examples:s0"></a>В этой главе представлена серия программ, которые
+выполняют более сложные задачи, чем большинство примеров, встречающихся в
+предыдущих главах книги.
+Они иллюстрируют различные методы программирования и демонстрируют определенный
+стиль программирования.
+
+</p><p>
+В каждом разделе этой главы подробно описывается одна программа и приводятся
+примеры ее использования.
+За этим следует листинг кода. В конце каждого раздела приводятся упражнения,
+призванные стимулировать размышления о программе и предложить возможные расширения.
+Эти упражнения, как правило, сложнее, чем в главах &nbsp;<a href="start.html#g4">2</a> и 
+&nbsp;<a href="further.html#g49">3</a>, а некоторые из них являются крупными проектами.
+
+</p><p>
+В разделе <a href="examples.html#g152">12.1</a> представлен простой пакет умножения
+матриц.
+Он демонстрирует набор процедур, которые могут быть написаны практически на любом
+языке.
+Его наиболее интересные функции заключаются в том, что все операции умножения
+выполняются путем вызова одной общей <i>generic</i> процедуры,
+<tt>mul</tt>, которая вызывает соответствующую вспомогательную процедуру в зависимости
+от размерности своих аргументов и динамически распределяет результаты соответствующего
+размера.
+В разделе <a href="examples.html#g158">12.2</a> представлен алгоритм сортировки слиянием
+для упорядочения списков в соответствии с произвольными предикатами.
+Раздел <a href="examples.html#g162">12.3</a> описывает синтаксическую форму, которая используется
+для построения множеств.
+Он демонстрирует простое, но эффективное синтаксическое преобразование из обозначений множества в
+код Scheme.
+В разделе <a href="examples.html#g169">12.4</a> представлена программа подсчета слов, заимствованная
+из <i>The C Programming Language</i>&nbsp;[<a class="citation" href="bibliography.html#g237">19</a>], 
+переведенная из Си в  Scheme.
+Он показывает манипуляции символьными знаками и строками, создание структур данных и работу с ними,
+основы фаайлового ввода и вывода.
+В разделе <a href="examples.html#g176">12.5</a> представлен печатчик Scheme, который реализует базову
+версию <tt>put-datum</tt>, <tt>write</tt>, и
+<tt>display</tt>.
+В разделе <a href="examples.html#g180">12.6</a> представлено простое средство форматирования вывода,
+аналогичное тому, которое существует во многих системах Scheme и в других языках.
+В разделе <a href="examples.html#g187">12.7</a> представлен простой интерпретатор Scheme, который
+представляет Scheme как средство реализации языков, предоставляющий неформальную оперативную
+семантику для Scheme, а также основу для исследования расширений Scheme.
+В разделе <a href="examples.html#g193">12.8</a> представлен небольшой расширяемый абстрактрый объект, 
+который может служить основой для создания объектно ориентированной подсистемы.
+В разделе <a href="examples.html#g198">12.9</a> представлен рекурсивный алгоритм вычисления преобразования
+Фурье последовательности входных значений. В нем подчеркивается использование комплексной арифметики Scheme.
+В разделе <a href="examples.html#g204">12.10</a> представлен краткий алгоритм унификации, который показывает,
+как процедуры могут использоваться как продолжения и как подстановки(замены, унификации) в Scheme.
+В разделе <a href="examples.html#g208">12.11</a> описан механизм многозадачности и его реализация в терминах
+продолжений.
+
+</p><p>
+
+</p><h3><a name="g152"></a><a name="./examples:h1"></a>Section 12.1. Умножение Матриц и Векторов<a name="SECTEXMATMUL"></a></h3>
+
+<p>
+<a name="./examples:s1"></a>Этот пример программы включает самые основные
+приемы программирования.
+Он демонстрирует простые арифметические и векторные операции, циклы с синтаксической
+формой <tt>do</tt>, диспетчеризацию сообщений основанную на типе объекта,
+и выбрасывание исключений.
+
+</p><p>
+Умножение скаляра на скаляр, скаляра на матрицу, или матрицы на 
+матрицу выполняется одной общей(<i>generic</i>) процедурой,
+называемой <a name="./examples:s2"></a><tt>mul</tt>.
+<tt>mul</tt> вызывается с двумя аргументами, и он решает основываясь
+на типе своих аргументов, какую операцию выполнять.
+Поскольку скалярные операции используют процедуру уножения Scheme
+<tt>*</tt>, <tt>mul</tt> для скаляров может выполняться для любых
+встроенных числовых типов (точных или не точных, комплексных,
+вещественных, рациональных или целых)(exact or inexact
+complex, real, rational, or integer).
+
+</p><p>
+Произведение матрицы <i>A</i> размерности <i>m</i> × <i>n</i>  и матрицы  <i>B</i> размерности <i>n</i> × <i>p</i> 
+явлется матрица  <i>C</i> размерности <i>m</i> × <i>p</i>, элмемнты которой определяются формулой
+
+</p><p>
+</p><p>
+<img src="./examples_files/26.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+Произведением скаляра <i>x</i> и матрицы <i>A</i> размености <i>m</i> × <i>n</i>  будет
+матица <i>C</i> размерности <i>m</i> × <i>n</i> , элементы которой определяются уравнением
+
+</p><p>
+</p><p>
+<i>C</i><sub><i>ij</i></sub> = <i>xA</i><sub><i>ij</i></sub>.</p><p>
+
+</p><p>
+То есть каждый элемент <i>C</i> является произведением <i>x</i> и соответствующего
+элемента <i>A</i>.
+умножение вектор-вектор, вектор-матрица и матрица-вектор можно рассматривать как частные
+случаи умножения матрица-матрица, где вектор представлен как матрица размерностью 1 × <i>n</i> 
+или <i>n</i> × 1.
+
+</p><p>
+Вот несколько примеров, каждому из которых предшествует эквивалент операции
+в стандартной математической нотации.
+
+</p><p>
+</p><ul>
+<li>скаляр умножаем на скаляр:
+
+<p>
+</p><p>
+3 × 4 = 12</p><p>
+
+</p><p>
+
+</p><p><tt>(mul&nbsp;3&nbsp;4)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;12</tt>
+</p><p></p></li><li>скаляр умножаем на вектор (матрицу размерностью 1 × 3):
+
+<p>
+</p><p>
+<img src="./examples_files/27.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+
+</p><p><tt>(mul&nbsp;1/2&nbsp;'#(#(1&nbsp;2&nbsp;3)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(#(1/2&nbsp;1&nbsp;3/2))</tt>
+</p><p></p></li><li>скаляр умножаем на матрицу:
+
+<p>
+</p><p>
+<img src="./examples_files/28.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+
+</p><p><tt>(mul&nbsp;-2<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'#(#(3&nbsp;-2&nbsp;-1)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#(-3&nbsp;0&nbsp;-5)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#(7&nbsp;-1&nbsp;-1)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(#(-6&nbsp;4&nbsp;2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./examples_files/ghostRightarrow.gif">&nbsp;&nbsp;&nbsp;#(6&nbsp;0&nbsp;10)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./examples_files/ghostRightarrow.gif">&nbsp;&nbsp;&nbsp;#(-14&nbsp;2&nbsp;2))</tt>
+</p><p></p></li><li>Вектор умножаем на матрицу:
+
+<p>
+</p><p>
+<img src="./examples_files/29.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+
+</p><p><tt>(mul&nbsp;'#(#(1&nbsp;2&nbsp;3))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'#(#(2&nbsp;3)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#(3&nbsp;4)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#(4&nbsp;5)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(#(20&nbsp;26))</tt>
+</p><p></p></li><li>Матрицу умножаем на вектор:
+
+<p>
+</p><p>
+<img src="./examples_files/30.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+
+</p><p><tt>(mul&nbsp;'#(#(2&nbsp;3&nbsp;4)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#(3&nbsp;4&nbsp;5))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'#(#(1)&nbsp;#(2)&nbsp;#(3)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(#(20)&nbsp;#(26))</tt>
+</p><p></p></li><li>Матрицу умножаем на матрицу:
+
+<p>
+</p><p>
+<img src="./examples_files/31.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+
+</p><p><tt>(mul&nbsp;'#(#(1&nbsp;2&nbsp;3)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#(4&nbsp;5&nbsp;6))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'#(#(1&nbsp;2&nbsp;3&nbsp;4)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#(2&nbsp;3&nbsp;4&nbsp;5)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#(3&nbsp;4&nbsp;5&nbsp;6)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(#(14&nbsp;20&nbsp;26&nbsp;32)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./examples_files/ghostRightarrow.gif">&nbsp;&nbsp;&nbsp;#(32&nbsp;47&nbsp;62&nbsp;77))</tt>
+</p><p></p></li></ul>
+<p>
+
+</p><p>
+Ниже приведен код для <tt>mul</tt> и его помощников, который структурирован
+как библиотека. Первые несколько определений устанавливают набор процедур,
+поддерживающий матричный тип данных.
+Матрицей является вектор <a name="./examples:s3"></a>векторов.
+Включена процедура создания матриц, процедура доступа и установки
+элментов матрицы и предикат матрицы.
+За этими определениями следует определение самого умножения <tt>mul</tt>.
+Внутри <tt>lambda</tt> выражения для <tt>mul</tt> есть набор определений
+вспомогательных процедур поддерживающих выполнение <tt>mul</tt>.
+
+</p><p>
+<tt>mul</tt> проверяет типы своих аргументов и выбирает
+соответствующую вспомогательную процедуру для выполнения работы.
+Каждая вспомогательная процедура работает с аргументами определенных типов.
+Например, <tt>mat-sca-mul</tt> умножает матрицу на скаляр.
+Если тип любого аргумента недействителен или аргументы не совместимы, например
+строки или столбцы не совпадают, <tt>mul</tt> или одна из его вспомогательных
+процедур выбрасывают исключение.
+
+</p><p>
+
+</p><p><tt>
+(library&nbsp;(tspl&nbsp;matrix)<br>
+
+&nbsp;&nbsp;(export&nbsp;make-matrix&nbsp;matrix?&nbsp;matrix-rows&nbsp;matrix-columns<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;matrix-ref&nbsp;matrix-set!&nbsp;mul)<br>
+
+&nbsp;&nbsp;(import&nbsp;(rnrs))
+<br>
+<br>
+&nbsp;;&nbsp;make-matrix&nbsp;creates&nbsp;a&nbsp;matrix&nbsp;(a&nbsp;vector&nbsp;of&nbsp;vectors).<br>
+
+&nbsp;&nbsp;(define&nbsp;make-matrix<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(rows&nbsp;columns)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([m&nbsp;(make-vector&nbsp;rows)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[i&nbsp;0&nbsp;(+&nbsp;i&nbsp;1)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((=&nbsp;i&nbsp;rows)&nbsp;m)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector-set!&nbsp;m&nbsp;i&nbsp;(make-vector&nbsp;columns)))))
+<br>
+<br>
+&nbsp;;&nbsp;matrix?&nbsp;checks&nbsp;to&nbsp;see&nbsp;if&nbsp;its&nbsp;argument&nbsp;is&nbsp;a&nbsp;matrix.<br>
+
+&nbsp;;&nbsp;It&nbsp;isn't&nbsp;foolproof,&nbsp;but&nbsp;it's&nbsp;generally&nbsp;good&nbsp;enough.<br>
+
+&nbsp;&nbsp;(define&nbsp;matrix?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(vector?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(&gt;&nbsp;(vector-length&nbsp;x)&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector?&nbsp;(vector-ref&nbsp;x&nbsp;0)))))
+<br>
+<br>
+&nbsp;;&nbsp;matrix-rows&nbsp;returns&nbsp;the&nbsp;number&nbsp;of&nbsp;rows&nbsp;in&nbsp;a&nbsp;matrix.<br>
+
+&nbsp;&nbsp;(define&nbsp;matrix-rows<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector-length&nbsp;x)))
+<br>
+<br>
+&nbsp;;&nbsp;matrix-columns&nbsp;returns&nbsp;the&nbsp;number&nbsp;of&nbsp;columns&nbsp;in&nbsp;a&nbsp;matrix.<br>
+
+&nbsp;&nbsp;(define&nbsp;matrix-columns<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector-length&nbsp;(vector-ref&nbsp;x&nbsp;0))))
+<br>
+<br>
+&nbsp;;&nbsp;matrix-ref&nbsp;returns&nbsp;the&nbsp;jth&nbsp;element&nbsp;of&nbsp;the&nbsp;ith&nbsp;row.<br>
+
+&nbsp;&nbsp;(define&nbsp;matrix-ref<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(m&nbsp;i&nbsp;j)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector-ref&nbsp;(vector-ref&nbsp;m&nbsp;i)&nbsp;j)))
+<br>
+<br>
+&nbsp;;&nbsp;matrix-set!&nbsp;changes&nbsp;the&nbsp;jth&nbsp;element&nbsp;of&nbsp;the&nbsp;ith&nbsp;row.<br>
+
+&nbsp;&nbsp;(define&nbsp;matrix-set!<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(m&nbsp;i&nbsp;j&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector-set!&nbsp;(vector-ref&nbsp;m&nbsp;i)&nbsp;j&nbsp;x)))
+<br>
+<br>
+&nbsp;;&nbsp;mat-sca-mul&nbsp;multiplies&nbsp;a&nbsp;matrix&nbsp;by&nbsp;a&nbsp;scalar.<br>
+
+&nbsp;&nbsp;(define&nbsp;mat-sca-mul<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(m&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let*&nbsp;([nr&nbsp;(matrix-rows&nbsp;m)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[nc&nbsp;(matrix-columns&nbsp;m)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[r&nbsp;(make-matrix&nbsp;nr&nbsp;nc)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([i&nbsp;0&nbsp;(+&nbsp;i&nbsp;1)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((=&nbsp;i&nbsp;nr)&nbsp;r)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([j&nbsp;0&nbsp;(+&nbsp;j&nbsp;1)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((=&nbsp;j&nbsp;nc))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(matrix-set!&nbsp;r&nbsp;i&nbsp;j&nbsp;(*&nbsp;x&nbsp;(matrix-ref&nbsp;m&nbsp;i&nbsp;j))))))))
+<br>
+<br>
+&nbsp;;&nbsp;mat-mat-mul&nbsp;multiplies&nbsp;one&nbsp;matrix&nbsp;by&nbsp;another,&nbsp;after&nbsp;verifying<br>
+
+&nbsp;;&nbsp;that&nbsp;the&nbsp;first&nbsp;matrix&nbsp;has&nbsp;as&nbsp;many&nbsp;columns&nbsp;as&nbsp;the&nbsp;second<br>
+
+&nbsp;;&nbsp;matrix&nbsp;has&nbsp;rows.<br>
+
+&nbsp;&nbsp;(define&nbsp;mat-mat-mul<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(m1&nbsp;m2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let*&nbsp;([nr1&nbsp;(matrix-rows&nbsp;m1)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[nr2&nbsp;(matrix-rows&nbsp;m2)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[nc2&nbsp;(matrix-columns&nbsp;m2)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[r&nbsp;(make-matrix&nbsp;nr1&nbsp;nc2)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;(=&nbsp;(matrix-columns&nbsp;m1)&nbsp;nr2)&nbsp;(match-error&nbsp;m1&nbsp;m2))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([i&nbsp;0&nbsp;(+&nbsp;i&nbsp;1)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((=&nbsp;i&nbsp;nr1)&nbsp;r)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([j&nbsp;0&nbsp;(+&nbsp;j&nbsp;1)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((=&nbsp;j&nbsp;nc2))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([k&nbsp;0&nbsp;(+&nbsp;k&nbsp;1)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[a&nbsp;0&nbsp;(+&nbsp;a<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;(matrix-ref&nbsp;m1&nbsp;i&nbsp;k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(matrix-ref&nbsp;m2&nbsp;k&nbsp;j)))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((=&nbsp;k&nbsp;nr2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(matrix-set!&nbsp;r&nbsp;i&nbsp;j&nbsp;a))))))))
+<br>
+<br>
+&nbsp;;&nbsp;type-error&nbsp;is&nbsp;called&nbsp;to&nbsp;complain&nbsp;when&nbsp;mul&nbsp;receives&nbsp;an&nbsp;invalid<br>
+
+&nbsp;;&nbsp;type&nbsp;of&nbsp;argument.<br>
+
+&nbsp;&nbsp;(define&nbsp;type-error<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(what)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assertion-violation&nbsp;'mul<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"not&nbsp;a&nbsp;number&nbsp;or&nbsp;matrix"<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what)))
+<br>
+<br>
+&nbsp;;&nbsp;match-error&nbsp;is&nbsp;called&nbsp;to&nbsp;complain&nbsp;when&nbsp;mul&nbsp;receives&nbsp;a&nbsp;pair&nbsp;of<br>
+
+&nbsp;;&nbsp;incompatible&nbsp;arguments.<br>
+
+&nbsp;&nbsp;(define&nbsp;match-error<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(what1&nbsp;what2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assertion-violation&nbsp;'mul<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"incompatible&nbsp;operands"&nbsp;what1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;what2)))
+<br>
+<br>
+&nbsp;;&nbsp;mul&nbsp;is&nbsp;the&nbsp;generic&nbsp;matrix/scalar&nbsp;multiplication&nbsp;procedure<br>
+
+&nbsp;&nbsp;(define&nbsp;mul<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(number?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(number?&nbsp;y)&nbsp;(*&nbsp;x&nbsp;y)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(matrix?&nbsp;y)&nbsp;(mat-sca-mul&nbsp;y&nbsp;x)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(type-error&nbsp;y)])]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(matrix?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(number?&nbsp;y)&nbsp;(mat-sca-mul&nbsp;x&nbsp;y)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(matrix?&nbsp;y)&nbsp;(mat-mat-mul&nbsp;x&nbsp;y)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(type-error&nbsp;y)])]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(type-error&nbsp;x)]))))</tt>
+</p><p>
+</p><h4>Exercise <a name="g153"></a>12.1.1</h4>
+<a name="./examples:s4"></a>Внесите необходимые изменения чтобы переименовать <tt>mul</tt> в <tt>*</tt>.
+
+<p>
+
+</p><h4>Exercise <a name="g154"></a>12.1.2</h4>
+<a name="./examples:s5"></a><a name="exercise:reliable"></a>
+Предиката <tt>matrix?</tt> обычно достаточно, но он не полностью надежен, так
+как он может возвращать значение <tt>#t</tt> для объкетов, которые
+не являются матрицами.
+В частности, он не проверяет, что все стороки матрицы являются векторами, каждая ли
+строка имеет одинаковое количество элементов или являются ли сами элементы числами.
+Измените <tt>matrix?</tt> для выполнения каждой из этих дополнительных проверок.
+
+<p>
+
+</p><h4>Exercise <a name="g155"></a>12.1.3</h4>
+<a name="./examples:s6"></a>Другим решением упражнения&nbsp;<a href="examples.html#g154">12.1.2</a>
+является определение типа записи матрица, инкапсулирующего векторы матрицы.
+Если процедура создания матрицы никогда не позволяет создать запись с неправильными
+матрицами, проверка является ли замись матрицей является единственной проверкой,
+необходимой для обеспечения уверенности что ввходые данные являются правильными.
+Определите тип записи матрица и перекодируйте библиотеку, чтобы использовать его.
+
+<p>
+
+</p><h4>Exercise <a name="g156"></a>12.1.4</h4>
+<a name="./examples:s7"></a>Напишите подобные общие процедуры для сложения и вычитания.
+Придумайте общую процедуру <tt>dispatch</tt> или синтаксическую форму, чтобы код
+диспетчеризации не нужно было переписывать для каждой новой операции.
+
+<p>
+
+</p><h4>Exercise <a name="g157"></a>12.1.5</h4>
+<a name="./examples:s8"></a>Эта версия <tt>mul</tt> использует векторы
+векторов для представления матриц.
+Перепишите систему, используя вложенные списки для представления матриц.
+Какая эффективность достигается или теряется в результате этого изменения?
+
+<p>
+
+</p><h3><a name="g158"></a><a name="./examples:h2"></a>Section 12.2. Сортировка<a name="SECTEXSORTMERGE"></a></h3>
+
+<p>
+<a name="./examples:s9"></a>В этом разделе показан алгоритм сортировки списка,
+основанный на простой технике, известной как сортировка слиянием.
+Определенная здесь процедура <a name="./examples:s10"></a><tt>sort</tt> 
+принимает два аргумента: предикат и список, как и встроенная процедура
+<tt>list-sort</tt>.
+Она возвращает список, содержащий элементы старого списка, отсортированые в 
+соответствии с предикатом.
+Как и при <tt>list-sort</tt>,
+предикат должен быть процедурой которая ожидает два аргумента и возвращает
+ <tt>#t</tt> если первый аргнумент должен предшествовать второму в отсортированном
+списке и  false в противном случае.
+То есть, если предикат применяется к двум элементам <tt><i>x</i></tt> и
+<tt><i>y</i></tt>, где <tt><i>x</i></tt> появляется после <tt><i>y</i></tt> во входном
+списке, он должен вернуть истину(true) только если <tt><i>x</i></tt> должен появиться
+перед <tt><i>y</i></tt> в выходном списке.
+Если это ограничение выполнено, <tt>sort</tt> будет выполнять <i>стабильную сортировку(stable sort)</i>;
+со стабильной сортировкой, два элемента, которые уже отсортированы относительно
+друг друга, появляются на выходе в том же порядке, в котором они находились на входе.
+Таким образом, сортировка списка, который уже отсортирован, не приведет к переупорядочению,
+даже если есть эквивалентные элементы.
+
+</p><p>
+
+</p><p><tt>(sort&nbsp;&lt;&nbsp;'(3&nbsp;4&nbsp;2&nbsp;1&nbsp;2&nbsp;5))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;2&nbsp;3&nbsp;4&nbsp;5)<br>
+
+(sort&nbsp;&gt;&nbsp;'(0.5&nbsp;1/2))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(0.5&nbsp;1/2)<br>
+
+(sort&nbsp;&gt;&nbsp;'(1/2&nbsp;0.5))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1/2&nbsp;0.5)<br>
+
+(list-&gt;string<br>
+
+&nbsp;&nbsp;(sort&nbsp;char&gt;?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(string-&gt;list&nbsp;"coins")))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"sonic"</tt>
+</p><p>Сопутствующие процедуры, <a name="./examples:s11"></a><tt>merge</tt>,
+также определяются кодом.
+<tt>merge</tt> принимает предикат и два отсортированных списка и возвращает объединенный список
+в отсортированном порядке элементов из двух списков.
+С правильно определенным предикатом, <tt>merge</tt> также стабильно в том смысле,
+что элемент из первого списка будет отображаться перед элементом из второго списка,
+если только не требуется, чтобы элемент из второго списка был первым.
+
+</p><p>
+
+</p><p><tt>(merge&nbsp;char&lt;?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(#\a&nbsp;#\c)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(#\b&nbsp;#\c&nbsp;#\d))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#\a&nbsp;#\b&nbsp;#\c&nbsp;#\c&nbsp;#\d)<br>
+
+(merge&nbsp;&lt;<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(1/2&nbsp;2/3&nbsp;3/4)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(0.5&nbsp;0.6&nbsp;0.7))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1/2&nbsp;0.5&nbsp;0.6&nbsp;2/3&nbsp;0.7&nbsp;3/4)<br>
+
+(list-&gt;string<br>
+
+&nbsp;&nbsp;(merge&nbsp;char&gt;?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(string-&gt;list&nbsp;"old")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(string-&gt;list&nbsp;"toe")))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"tooled"</tt>
+</p><p>Алгоритм сортировки слиянием прост и элегантен.
+Входной список разделяется на два приблизительно равных подсписка.
+Эти подсписки сортируются рекурсивно, что дает два отсортированных списка.
+Затем отсортированные списки объединяются, чтобы сформировать один отсортированный
+список. Базовый случай для рекурсии это список из одного элемента,
+который уже отсортирован.
+
+</p><p>
+Чтобы уменьшить накладные расходы, реализация вычисляет длину входного списка
+один раз,в <tt>sort</tt>,  а не на каждом этапе рекурсии в <tt>dosort</tt>.
+Это также позволяет <tt>dosort</tt> изолировать первую половину списка,
+просто сокращая вдвое длину, экономя затраты на выделение нового списка,
+содержащего половину элементов.
+В результате, <tt>ls</tt> может содержать более чем <tt>n</tt> элементов,
+но только первые <tt>n</tt> элементов считаются частью списка.
+
+</p><p>
+
+</p><p><tt>
+(library&nbsp;(tspl&nbsp;sort)<br>
+
+&nbsp;&nbsp;(export&nbsp;sort&nbsp;merge)<br>
+
+&nbsp;&nbsp;(import&nbsp;(rnrs))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;dosort<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(pred?&nbsp;ls&nbsp;n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;n&nbsp;1)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;(car&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([i&nbsp;(div&nbsp;n&nbsp;2)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(domerge&nbsp;pred?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(dosort&nbsp;pred?&nbsp;ls&nbsp;i)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(dosort&nbsp;pred?&nbsp;(list-tail&nbsp;ls&nbsp;i)&nbsp;(-&nbsp;n&nbsp;i)))))))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;domerge<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(pred?&nbsp;l1&nbsp;l2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;l1)&nbsp;l2]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;l2)&nbsp;l1]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(pred?&nbsp;(car&nbsp;l2)&nbsp;(car&nbsp;l1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(car&nbsp;l2)&nbsp;(domerge&nbsp;pred?&nbsp;l1&nbsp;(cdr&nbsp;l2)))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(cons&nbsp;(car&nbsp;l1)&nbsp;(domerge&nbsp;pred?&nbsp;(cdr&nbsp;l1)&nbsp;l2))])))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;sort<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(pred?&nbsp;l)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;l)&nbsp;l&nbsp;(dosort&nbsp;pred?&nbsp;l&nbsp;(length&nbsp;l)))))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;merge<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(pred?&nbsp;l1&nbsp;l2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(domerge&nbsp;pred?&nbsp;l1&nbsp;l2))))</tt>
+</p><p>
+</p><h4>Exercise <a name="g159"></a>12.2.1</h4>
+<a name="./examples:s12"></a>В <tt>dosort</tt>, когда <tt>n</tt> равно 1, почему
+возвращает <tt>(list&nbsp;(car&nbsp;ls))</tt> вместо просто <tt>ls</tt>?
+Сколько будет распределений, заменив
+<tt>(list&nbsp;(car&nbsp;ls))</tt> на
+<tt>(if&nbsp;(null?&nbsp;(cdr&nbsp;ls))&nbsp;ls&nbsp;(list&nbsp;(car&nbsp;ls)))</tt>?
+
+<p>
+
+</p><h4>Exercise <a name="g160"></a>12.2.2</h4>
+<a name="./examples:s13"></a>Сколько работы фактически сохраняется,
+не копируя первую часть списка входных данных при расщеплении
+в <tt>dosort</tt>?
+
+<p>
+
+</p><h4>Exercise <a name="g161"></a>12.2.3</h4>
+<a name="./examples:s14"></a>Все или почти все размещения могут быть сохранены если алгоритм будет
+работать деструктивно(изменяя исходный список), используя <tt>set-cdr!</tt> для разделения и
+объединения списков.
+Напишите разрушающую(деструктивную) версию <tt>sort!</tt> и <tt>merge!</tt> для <tt>sort</tt> и
+<tt>merge</tt>.
+Определите разницу между двумя наборами процедур в терминах распределения и времени выполнения
+для различных входных данных.
+
+<p>
+
+</p><h3><a name="g162"></a><a name="./examples:h3"></a>Section 12.3. Конструктор Множеств<a name="SECTEXSETS"></a></h3>
+
+<p>
+В этом примере описывается синтаксическое расширение, <a name="./examples:s15"></a><tt>set-of</tt>, которое
+позволяет создавать <a name="./examples:s16"></a>множества представленные в виде списков без
+повторяющихся элементов &nbsp;[<a class="citation" href="bibliography.html#g240">22</a>].
+Оно использует <a name="./examples:s17"></a><tt>define-syntax</tt> и
+<a name="./examples:s18"></a><tt>syntax-rules</tt>
+для составления выражений множеств в рекурсивные выражения.
+Расширенный код часто эффективен, как тот, который может быть создан вручную
+
+</p><p>
+Выражение <tt>set-of</tt> принимает следующую форму.
+
+</p><p>
+
+</p><p><tt>(set-of&nbsp;<i>expr</i>&nbsp;<i>clause</i>&nbsp;...)</tt>
+</p><p><tt><i>expr</i></tt> описывает элементы множества в терминах привязко
+устанавливаемых в <tt>set-of</tt> предложениями <tt><i>clause</i>&nbsp;...</tt>.
+Каждое предложение <tt><i>clause</i></tt> может принимать одну из трех форм:
+
+</p><p>
+</p><ol>
+<a name="g163"></a><li>Предложение формы <tt>(<i>x</i>&nbsp;in&nbsp;<i>s</i>)</tt> устанавливает
+привязку для <tt><i>x</i></tt> к каждому элементу множества <tt><i>s</i></tt> по очереди.
+Эта привязка видна в остальных предложениях и выражении <tt><i>expr</i></tt>.
+
+<p>
+<a name="g164"></a></p></li><li>Предложение формы <tt>(<i>x</i>&nbsp;is&nbsp;<i>e</i>)</tt> устанавливает привязку
+для <tt><i>x</i></tt> к <tt><i>e</i></tt>.
+Эта привязка видна в остальных предложениях и выражении <tt><i>expr</i></tt>.
+Эта форма по существу является аббревиатурой для <tt>(<i>x</i>&nbsp;in&nbsp;(list&nbsp;<i>e</i>))</tt>.
+
+<p>
+<a name="g165"></a></p></li><li>Предложение, принимающее любую другую форму, рассматривается как предикат; 
+это используется для принудительного отказа некторых элементов, как во втором из приведенных
+ниже примеров.
+</li></ol>
+<p>
+
+</p><p>
+
+</p><p><tt>(set-of&nbsp;x<br>
+
+&nbsp;&nbsp;(x&nbsp;in&nbsp;'(a&nbsp;b&nbsp;c)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)
+<br>
+<br>
+(set-of&nbsp;x<br>
+
+&nbsp;&nbsp;(x&nbsp;in&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4))<br>
+
+&nbsp;&nbsp;(even?&nbsp;x))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(2&nbsp;4)
+<br>
+<br>
+(set-of&nbsp;(cons&nbsp;x&nbsp;y)<br>
+
+&nbsp;&nbsp;(x&nbsp;in&nbsp;'(1&nbsp;2&nbsp;3))<br>
+
+&nbsp;&nbsp;(y&nbsp;is&nbsp;(*&nbsp;x&nbsp;x)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((1&nbsp;.&nbsp;1)&nbsp;(2&nbsp;.&nbsp;4)&nbsp;(3&nbsp;.&nbsp;9))</tt>
+</p><p>
+</p><p><tt>(set-of&nbsp;(cons&nbsp;x&nbsp;y)<br>
+
+&nbsp;&nbsp;(x&nbsp;in&nbsp;'(a&nbsp;b))<br>
+
+&nbsp;&nbsp;(y&nbsp;in&nbsp;'(1&nbsp;2)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((a&nbsp;.&nbsp;1)&nbsp;(a&nbsp;.&nbsp;2)&nbsp;(b&nbsp;.&nbsp;1)&nbsp;(b&nbsp;.&nbsp;2))</tt>
+</p><p>Выражение <tt>set-of</tt> преобразуется в вложенные выражения <tt>let</tt>, именованный <tt>let</tt>,
+и <tt>if</tt>, соответственно для каждого подвыражения <tt>is</tt>, <tt>in</tt>, или предиката.
+Например, простое выражение
+
+</p><p>
+
+</p><p><tt>(set-of&nbsp;x&nbsp;(x&nbsp;in&nbsp;'(a&nbsp;b&nbsp;c)))</tt>
+</p><p>преобразуется в
+
+</p><p>
+
+</p><p><tt>(let&nbsp;loop&nbsp;([set&nbsp;'(a&nbsp;b&nbsp;c)])<br>
+
+&nbsp;&nbsp;(if&nbsp;(null?&nbsp;set)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;(car&nbsp;set)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-cons&nbsp;x&nbsp;(loop&nbsp;(cdr&nbsp;set))))))</tt>
+</p><p>Выражение
+
+</p><p>
+
+</p><p><tt>(set-of&nbsp;x&nbsp;(x&nbsp;in&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4))&nbsp;(even?&nbsp;x))</tt>
+</p><p>преобразуется в
+
+</p><p>
+
+</p><p><tt>(let&nbsp;loop&nbsp;([set&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4)])<br>
+
+&nbsp;&nbsp;(if&nbsp;(null?&nbsp;set)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;(car&nbsp;set)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(even?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-cons&nbsp;x&nbsp;(loop&nbsp;(cdr&nbsp;set)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;(cdr&nbsp;set))))))</tt>
+</p><p>Более сложное выражение
+
+</p><p>
+
+</p><p><tt>(set-of&nbsp;(cons&nbsp;x&nbsp;y)&nbsp;(x&nbsp;in&nbsp;'(1&nbsp;2&nbsp;3))&nbsp;(y&nbsp;is&nbsp;(*&nbsp;x&nbsp;x)))</tt>
+</p><p>преобразуется в
+
+</p><p>
+
+</p><p><tt>(let&nbsp;loop&nbsp;([set&nbsp;'(1&nbsp;2&nbsp;3)])<br>
+
+&nbsp;&nbsp;(if&nbsp;(null?&nbsp;set)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;(car&nbsp;set)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([y&nbsp;(*&nbsp;x&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-cons&nbsp;(cons&nbsp;x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;(cdr&nbsp;set)))))))</tt>
+</p><p>Наконец, выражение
+
+</p><p>
+
+</p><p><tt>(set-of&nbsp;(cons&nbsp;x&nbsp;y)&nbsp;(x&nbsp;in&nbsp;'(a&nbsp;b))&nbsp;(y&nbsp;in&nbsp;'(1&nbsp;2)))</tt>
+</p><p>преобразуется во вложенное именованное <tt>let</tt> выражение:
+
+</p><p>
+
+</p><p><tt>(let&nbsp;loop1&nbsp;([set1&nbsp;'(a&nbsp;b)])<br>
+
+&nbsp;&nbsp;(if&nbsp;(null?&nbsp;set1)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;(car&nbsp;set1)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;loop2&nbsp;([set2&nbsp;'(1&nbsp;2)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;set2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop1&nbsp;(cdr&nbsp;set1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([y&nbsp;(car&nbsp;set2)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-cons&nbsp;(cons&nbsp;x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop2&nbsp;(cdr&nbsp;set2)))))))))</tt>
+</p><p>Это довольно простые преобразования, за исключением базового
+случая для рекусривного вложенного выражения именованного <tt>let</tt> 
+варьируемого в зависимости от уровня.
+Базовым случаем для самого удаленного именованного <tt>let</tt> является всегда
+пустой список <tt>()</tt>, а базовый случай для внутреннего именованного <tt>let</tt>
+является шагом рекурсии для следующего внешнего именованного <tt>let</tt>.
+Чтобы с правиться с этим, в определении <tt>set-of</tt> используется вспомогательное
+синтаксическое расширение <tt>set-of-help</tt>.
+<tt>set-of-help</tt> принимает дополнительное выражение, <tt>base</tt>, которое
+является базовым случаем для рекурсии на текущем уровне.
+
+</p><p>
+
+</p><p><tt>
+(library&nbsp;(tspl&nbsp;sets)<br>
+
+&nbsp;&nbsp;(export&nbsp;set-of&nbsp;set-cons&nbsp;in&nbsp;is)<br>
+
+&nbsp;&nbsp;(import&nbsp;(rnrs))
+<br>
+<br>
+&nbsp;;&nbsp;set-of&nbsp;uses&nbsp;helper&nbsp;syntactic&nbsp;extension&nbsp;set-of-help,&nbsp;passing&nbsp;it<br>
+
+&nbsp;;&nbsp;an&nbsp;initial&nbsp;base&nbsp;expression&nbsp;of&nbsp;'()<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;set-of<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e&nbsp;m&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-of-help&nbsp;e&nbsp;'()&nbsp;m&nbsp;...)]))
+<br>
+<br>
+&nbsp;;&nbsp;set-of-help&nbsp;recognizes&nbsp;in,&nbsp;is,&nbsp;and&nbsp;predicate&nbsp;expressions&nbsp;and<br>
+
+&nbsp;;&nbsp;changes&nbsp;them&nbsp;into&nbsp;nested&nbsp;named&nbsp;let,&nbsp;let,&nbsp;and&nbsp;if&nbsp;expressions.<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;set-of-help<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;(in&nbsp;is)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e&nbsp;base)&nbsp;(set-cons&nbsp;e&nbsp;base)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e&nbsp;base&nbsp;(x&nbsp;in&nbsp;s)&nbsp;m&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;loop&nbsp;([set&nbsp;s])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;set)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;base<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;(car&nbsp;set)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-of-help&nbsp;e&nbsp;(loop&nbsp;(cdr&nbsp;set))&nbsp;m&nbsp;...))))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e&nbsp;base&nbsp;(x&nbsp;is&nbsp;y)&nbsp;m&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;y])&nbsp;(set-of-help&nbsp;e&nbsp;base&nbsp;m&nbsp;...))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e&nbsp;base&nbsp;p&nbsp;m&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;p&nbsp;(set-of-help&nbsp;e&nbsp;base&nbsp;m&nbsp;...)&nbsp;base)]))
+<br>
+<br>
+&nbsp;;&nbsp;since&nbsp;in&nbsp;and&nbsp;is&nbsp;are&nbsp;used&nbsp;as&nbsp;auxiliary&nbsp;keywords&nbsp;by&nbsp;set-of,&nbsp;the<br>
+
+&nbsp;;&nbsp;library&nbsp;must&nbsp;export&nbsp;definitions&nbsp;for&nbsp;them&nbsp;as&nbsp;well<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;in<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-violation&nbsp;'in&nbsp;"misplaced&nbsp;auxiliary&nbsp;keyword"&nbsp;x)))
+<br>
+<br>
+&nbsp;&nbsp;(define-syntax&nbsp;is<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-violation&nbsp;'is&nbsp;"misplaced&nbsp;auxiliary&nbsp;keyword"&nbsp;x)))
+<br>
+<br>
+&nbsp;;&nbsp;set-cons&nbsp;returns&nbsp;the&nbsp;original&nbsp;set&nbsp;y&nbsp;if&nbsp;x&nbsp;is&nbsp;already&nbsp;in&nbsp;y.<br>
+
+&nbsp;&nbsp;(define&nbsp;set-cons<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(memv&nbsp;x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;x&nbsp;y)))))</tt>
+</p><p>
+</p><h4>Exercise <a name="g166"></a>12.3.1</h4>
+<a name="./examples:s19"></a>Напишите процедуру объединения <tt>union</tt>, которая принимает
+произвольное количество множеств (списков) в качестве аргументов и возвращает объединенное 
+множество, используюя только синтаксическую форму <tt>set-of</tt>.
+Например:
+
+<p>
+
+</p><p><tt>(union)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;()<br>
+
+(union&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)<br>
+
+(union&nbsp;'(2&nbsp;5&nbsp;4)&nbsp;'(9&nbsp;4&nbsp;3))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(2&nbsp;5&nbsp;9&nbsp;4&nbsp;3)<br>
+
+(union&nbsp;'(1&nbsp;2)&nbsp;'(2&nbsp;4)&nbsp;'(4&nbsp;8))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;4&nbsp;8)</tt>
+</p><p>
+</p><h4>Exercise <a name="g167"></a>12.3.2</h4>
+<a name="./examples:s20"></a>Версию единичного списка <a name="./examples:s21"></a><tt>map</tt> можно(почти) определить
+следующим образом.
+
+<p>
+
+</p><p><tt>(define&nbsp;map1<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(f&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set-of&nbsp;(f&nbsp;x)&nbsp;(x&nbsp;in&nbsp;ls))))
+<br>
+<br>
+(map1&nbsp;-&nbsp;'(1&nbsp;2&nbsp;3&nbsp;2))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(-1&nbsp;-3&nbsp;-2)</tt>
+</p><p>Почему это не работает?
+Что нужно изменить, чтобы заставить его работать?
+
+</p><p>
+
+</p><h4>Exercise <a name="g168"></a>12.3.3</h4>
+<a name="./examples:s22"></a>Разработайте другое определение <tt>set-cons</tt> которое поддерживает 
+множества в некотором упорядоченном виде, делая проверку установления членства в множестве,
+и следовательно саму форму <tt>set-cons</tt>, потенциально более эффективными.
+
+<p>
+
+</p><h3><a name="g169"></a><a name="./examples:h4"></a>Section 12.4. Подсчет частоты слов<a name="SECTEXWORDFREQ"></a></h3>
+
+<p>
+Эта программа демонстрирует несколько базовых методов программирования,
+включая манипуляции строками и символьными знаками, файловый ввод/вывод,
+манипуляция структурами данных и рекурсию.
+Программа адаптирована из Главы &nbsp;6 of <i>The C Programming Language</i>&nbsp;[<a class="citation" href="bibliography.html#g237">19</a>].
+Одна из причин использования конкретного примера - показать, как программа
+<a name="./examples:s23"></a>Си может выглядеть, когда конвертируется почти буквально
+в Scheme.
+
+</p><p>
+Следует отметить несколько отличий между программой Scheme и исходной
+программой на Си.
+Во-первых, версия Scheme использует другой протокол для ввода и вывода
+из файла.
+Вместо того, чтобы неявно использовать стандартные порты ввода и вывода,
+она требует чтобы ей переданы, чтобы продемонстрировать открытие и закрытие
+файлов.
+Во-вторых, процедура <tt>get-word</tt> возвращает одно из трех значений:
+строку(слово), не литеральный знак, или значение конца файла(eof).
+Исходная Си версия возвращала флаг для буквы (чтобы сказать что
+прочитано слово) или неалфавитный символьный знак.
+Кроме того, Си версии передавалась строка для заполнения и ограничение
+количества символьных знаков в строке; версия Scheme создает новую 
+строку любой длины (символьные знаки в слове храняться в списке, пока не
+найден конец слова, а затем преобразуются в строку с помощью <tt>list-&gt;string</tt>).
+Наконец, <tt>char-type</tt> использует примитивные предикаты для символьных знаков Scheme
+<tt>char-alphabetic?</tt> и <tt>char-numeric?</tt> для определения, является ли
+знак буквой или цифрой.
+
+</p><p>
+Основная программа <a name="./examples:s24"></a><tt>frequency</tt>,
+принимает имя входного файла и имя выходного файла в качестве аргументов,
+например <tt>(frequency&nbsp;"pickle"&nbsp;"freq.out")</tt>
+и печатает частоту для каждого слова в файле "pickle" в файл
+"freq.out."
+Поскольку <tt>frequency</tt> читает слова из входного файла, он вставляет
+их в структуру бинарного дерева( используя алгоритм бинарной сортировки).
+Дублирующие записи записываются путем увеличения количества, связанного
+с каждым словом.
+Как только конец файла будет достигнут, программа проходит по дереву,
+печатая каждое слово и его количество(счетчик).
+
+</p><p>
+Предположим, что файл "pickle" содержит следующий текст.
+
+</p><p>
+
+</p><p><tt>Peter&nbsp;Piper&nbsp;picked&nbsp;a&nbsp;peck&nbsp;of&nbsp;pickled&nbsp;peppers;<br>
+
+A&nbsp;peck&nbsp;of&nbsp;pickled&nbsp;peppers&nbsp;Peter&nbsp;Piper&nbsp;picked.<br>
+
+If&nbsp;Peter&nbsp;Piper&nbsp;picked&nbsp;a&nbsp;peck&nbsp;of&nbsp;pickled&nbsp;peppers,<br>
+
+Where's&nbsp;the&nbsp;peck&nbsp;of&nbsp;pickled&nbsp;peppers&nbsp;Peter&nbsp;Piper&nbsp;picked?</tt>
+</p><p>Тогда, после ввода <tt>(frequency&nbsp;"pickle"&nbsp;"freq.out")</tt>, файл
+"freq.out" должен содержать следующее.
+
+</p><p>
+
+</p><p><tt>1&nbsp;A<br>
+
+1&nbsp;If<br>
+
+4&nbsp;Peter<br>
+
+4&nbsp;Piper<br>
+
+1&nbsp;Where<br>
+
+2&nbsp;a<br>
+
+4&nbsp;of<br>
+
+4&nbsp;peck<br>
+
+4&nbsp;peppers<br>
+
+4&nbsp;picked<br>
+
+4&nbsp;pickled<br>
+
+1&nbsp;s<br>
+
+1&nbsp;the</tt>
+</p><p>Код для программы подсчета слов структурирован как программа верхнего уровня,
+с заколовком сценария рекомендованным в главе сценариев ненормативных приложений в
+ Revised<sup>6</sup> Report&nbsp;[<a class="citation" href="bibliography.html#g243">25</a>].
+Он принимает имена входного и выходного файлов из командной строки.
+
+</p><p>
+
+</p><p><tt>
+#!&nbsp;/usr/bin/env&nbsp;scheme-script<br>
+
+(import&nbsp;(rnrs))
+<br>
+<br>
+;;;&nbsp;If&nbsp;the&nbsp;next&nbsp;character&nbsp;on&nbsp;p&nbsp;is&nbsp;a&nbsp;letter,&nbsp;get-word&nbsp;reads&nbsp;a&nbsp;word<br>
+
+;;;&nbsp;from&nbsp;p&nbsp;and&nbsp;returns&nbsp;it&nbsp;in&nbsp;a&nbsp;string.&nbsp;&nbsp;If&nbsp;the&nbsp;character&nbsp;is&nbsp;not&nbsp;a<br>
+
+;;;&nbsp;letter,&nbsp;get-word&nbsp;returns&nbsp;the&nbsp;character&nbsp;(on&nbsp;eof,&nbsp;the&nbsp;eof-object).<br>
+
+(define&nbsp;get-word<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([c&nbsp;(get-char&nbsp;p)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(eq?&nbsp;(char-type&nbsp;c)&nbsp;'letter)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list-&gt;string<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;loop&nbsp;([c&nbsp;c])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(memq&nbsp;(char-type&nbsp;(lookahead-char&nbsp;p))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(letter&nbsp;digit))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;(get-char&nbsp;p))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c))))
+<br>
+<br>
+;;;&nbsp;char-type&nbsp;tests&nbsp;for&nbsp;the&nbsp;eof-object&nbsp;first,&nbsp;since&nbsp;the&nbsp;eof-object<br>
+
+;;;&nbsp;may&nbsp;not&nbsp;be&nbsp;a&nbsp;valid&nbsp;argument&nbsp;to&nbsp;char-alphabetic?&nbsp;or&nbsp;char-numeric?<br>
+
+;;;&nbsp;It&nbsp;returns&nbsp;the&nbsp;eof-object,&nbsp;the&nbsp;symbol&nbsp;letter,&nbsp;the&nbsp;symbol&nbsp;digit,<br>
+
+;;;&nbsp;or&nbsp;the&nbsp;argument&nbsp;itself&nbsp;if&nbsp;it&nbsp;is&nbsp;not&nbsp;a&nbsp;letter&nbsp;or&nbsp;digit.<br>
+
+(define&nbsp;char-type<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(c)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(eof-object?&nbsp;c)&nbsp;c]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(char-alphabetic?&nbsp;c)&nbsp;'letter]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(char-numeric?&nbsp;c)&nbsp;'digit]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;c])))
+<br>
+<br>
+;;;&nbsp;Tree&nbsp;nodes&nbsp;are&nbsp;represented&nbsp;as&nbsp;a&nbsp;record&nbsp;type&nbsp;with&nbsp;four&nbsp;fields:&nbsp;word,<br>
+
+;;;&nbsp;left,&nbsp;right,&nbsp;and&nbsp;count.&nbsp;&nbsp;Only&nbsp;one&nbsp;field,&nbsp;word,&nbsp;is&nbsp;initialized&nbsp;by&nbsp;an<br>
+
+;;;&nbsp;argument&nbsp;to&nbsp;the&nbsp;constructor&nbsp;procedure&nbsp;make-tnode.&nbsp;&nbsp;The&nbsp;remaining<br>
+
+;;;&nbsp;fields&nbsp;are&nbsp;initialized&nbsp;by&nbsp;the&nbsp;constructor&nbsp;and&nbsp;changed&nbsp;by&nbsp;subsequent<br>
+
+;;;&nbsp;operations.<br>
+
+(define-record-type&nbsp;tnode<br>
+
+&nbsp;&nbsp;(fields&nbsp;(immutable&nbsp;word)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(mutable&nbsp;left)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(mutable&nbsp;right)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(mutable&nbsp;count))<br>
+
+&nbsp;&nbsp;(protocol<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(new)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(word)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(new&nbsp;word&nbsp;'()&nbsp;'()&nbsp;1)))))
+<br>
+<br>
+;;;&nbsp;If&nbsp;the&nbsp;word&nbsp;already&nbsp;exists&nbsp;in&nbsp;the&nbsp;tree,&nbsp;tree&nbsp;increments&nbsp;its<br>
+
+;;;&nbsp;count.&nbsp;&nbsp;Otherwise,&nbsp;a&nbsp;new&nbsp;tree&nbsp;node&nbsp;is&nbsp;created&nbsp;and&nbsp;put&nbsp;into&nbsp;the<br>
+
+;;;&nbsp;tree.&nbsp;&nbsp;In&nbsp;any&nbsp;case,&nbsp;the&nbsp;new&nbsp;or&nbsp;modified&nbsp;tree&nbsp;is&nbsp;returned.<br>
+
+(define&nbsp;tree<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(node&nbsp;word)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;node)&nbsp;(make-tnode&nbsp;word)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(string=?&nbsp;word&nbsp;(tnode-word&nbsp;node))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(tnode-count-set!&nbsp;node&nbsp;(+&nbsp;(tnode-count&nbsp;node)&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(string&lt;?&nbsp;word&nbsp;(tnode-word&nbsp;node))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(tnode-left-set!&nbsp;node&nbsp;(tree&nbsp;(tnode-left&nbsp;node)&nbsp;word))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(tnode-right-set!&nbsp;node&nbsp;(tree&nbsp;(tnode-right&nbsp;node)&nbsp;word))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node])))
+<br>
+<br>
+;;;&nbsp;tree-print&nbsp;prints&nbsp;the&nbsp;tree&nbsp;in&nbsp;"in-order,"&nbsp;i.e.,&nbsp;left&nbsp;subtree,<br>
+
+;;;&nbsp;then&nbsp;node,&nbsp;then&nbsp;right&nbsp;subtree.&nbsp;&nbsp;For&nbsp;each&nbsp;word,&nbsp;the&nbsp;count&nbsp;and&nbsp;the<br>
+
+;;;&nbsp;word&nbsp;are&nbsp;printed&nbsp;on&nbsp;a&nbsp;single&nbsp;line.<br>
+
+(define&nbsp;tree-print<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(node&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;(null?&nbsp;node)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(tree-print&nbsp;(tnode-left&nbsp;node)&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-datum&nbsp;p&nbsp;(tnode-count&nbsp;node))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;#\space)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-string&nbsp;p&nbsp;(tnode-word&nbsp;node))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(newline&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(tree-print&nbsp;(tnode-right&nbsp;node)&nbsp;p))))
+<br>
+<br>
+;;;&nbsp;frequency&nbsp;is&nbsp;the&nbsp;driver&nbsp;routine.&nbsp;&nbsp;It&nbsp;opens&nbsp;the&nbsp;files,&nbsp;reads&nbsp;the<br>
+
+;;;&nbsp;words,&nbsp;and&nbsp;enters&nbsp;them&nbsp;into&nbsp;the&nbsp;tree.&nbsp;&nbsp;When&nbsp;the&nbsp;input&nbsp;port<br>
+
+;;;&nbsp;reaches&nbsp;end-of-file,&nbsp;it&nbsp;prints&nbsp;the&nbsp;tree&nbsp;and&nbsp;closes&nbsp;the&nbsp;ports.<br>
+
+(define&nbsp;frequency<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(infn&nbsp;outfn)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([ip&nbsp;(open-file-input-port&nbsp;infn&nbsp;(file-options)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(buffer-mode&nbsp;block)&nbsp;(native-transcoder))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[op&nbsp;(open-file-output-port&nbsp;outfn&nbsp;(file-options)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(buffer-mode&nbsp;block)&nbsp;(native-transcoder))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;loop&nbsp;([root&nbsp;'()])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([w&nbsp;(get-word&nbsp;ip)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(eof-object?&nbsp;w)&nbsp;(tree-print&nbsp;root&nbsp;op)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(string?&nbsp;w)&nbsp;(loop&nbsp;(tree&nbsp;root&nbsp;w))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(loop&nbsp;root)])))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(close-port&nbsp;ip)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(close-port&nbsp;op))))
+<br>
+<br>
+(unless&nbsp;(=&nbsp;(length&nbsp;(command-line))&nbsp;3)<br>
+
+&nbsp;&nbsp;(put-string&nbsp;(current-error-port)&nbsp;"usage:&nbsp;")<br>
+
+&nbsp;&nbsp;(put-string&nbsp;(current-error-port)&nbsp;(car&nbsp;(command-line)))<br>
+
+&nbsp;&nbsp;(put-string&nbsp;(current-error-port)&nbsp;"&nbsp;input-filename&nbsp;output-filename\n")<br>
+
+&nbsp;&nbsp;(exit&nbsp;#f))
+<br>
+<br>
+(frequency&nbsp;(cadr&nbsp;(command-line))&nbsp;(caddr&nbsp;(command-line)))</tt>
+</p><p>
+</p><h4>Exercise <a name="g170"></a>12.4.1</h4>
+<a name="./examples:s25"></a>В выходном файле, показанном ранее, заглавные слова появляются перед
+остальными, и заглавная <tt>A</tt> не распознается как то же самое слово в нижнем регистре <tt>a</tt>.
+Измените дерево <tt>tree</tt> чтобы использовать нечувствительные к регистру версии сравнения
+строк, чтобы этого не происходило.
+
+<p>
+
+</p><h4>Exercise <a name="g171"></a>12.4.2</h4>
+<a name="./examples:s26"></a>слово "word" <tt>s</tt> появляется в файле "freq.out," хотя в действительности
+это просто часть сокращения <tt>Where's</tt>.
+Откорректируйте <tt>get-word</tt> для включения встроенной метки  одиночной кавычки.
+
+<p>
+
+</p><h4>Exercise <a name="g172"></a>12.4.3</h4>
+<a name="./examples:s27"></a>Измените эту программу, чтобы  "отсеять" некоторые общие слова, такие 
+как <tt>a</tt>, <tt>an</tt>, <tt>the</tt>, <tt>is</tt>, <tt>of</tt>, и т.д., чтобы уменьшить
+объем вывода для длинных входных файлов.
+Попытайтесь разработать другие способы сокращения бесполезного вывода.
+
+<p>
+
+</p><h4>Exercise <a name="g173"></a>12.4.4</h4>
+<a name="./examples:s28"></a><tt>get-word</tt> буферизирует символьные знаки в списке, выделяя
+новую пару (с <tt>cons</tt>) для каждого знака.
+Сделаете его более эффективным, ипользуя строку для буферизации символьных знаков.
+Создайте способ, чтобы строка при необходимости увеличивалась.
+[<i>подсказка</i>: Используйте <tt>string-append</tt> или порт строкового вывода.]
+
+<p>
+
+</p><h4>Exercise <a name="g174"></a>12.4.5</h4>
+<a name="./examples:s29"></a>Реализация <tt>tree</tt> работает создавая деревья, а затем заполняя их
+левое(<tt>left</tt>) и правое(<tt>right</tt>) поля.
+Это требует множества ненужный присваиваний.
+Перепишите процедуру <tt>tree</tt> чтобы избежать полностью <tt>tree-left-set!</tt> и
+<tt>tree-right-set!</tt>.
+
+<p>
+
+</p><h4>Exercise <a name="g175"></a>12.4.6</h4>
+<a name="./examples:s30"></a>Перекодируйте программу используя хеш-таблицу (Раздел&nbsp;<a href="objects.html#g119">6.13</a>)
+вместо двоичного дерева, и сравните время работы новой и старой программ с большими входными файлами.
+Всегда ли быстрее хеш-таблицы или всегда медленне?
+Есть ли переходная точка?
+Переходная точка зависит от размера или какой либо другой характеристики файла?
+
+<p>
+
+</p><h3><a name="g176"></a><a name="./examples:h5"></a>Section 12.5. Печатчик Scheme<a name="SECTEXPRINTER"></a></h3>
+
+<p>
+Печать объектов Scheme objects может показаться сложным процессом, но на самом деле
+рудиментарный печатчик прост, как демонстрирует этот пример.
+<a name="./examples:s31"></a><tt>put-datum</tt>,
+<a name="./examples:s32"></a><tt>write</tt>,
+и <a name="./examples:s33"></a><tt>display</tt> реализованы одним и тем же кодом.
+Сложные печатчики часто поддерживают различные элементы управления печатью и
+обрабатывают циклические объекты, но тот, который приведен здесь, является
+самым базовым.
+
+</p><p>
+Основным двигателем для программы является процедура <tt>wr</tt>, которая берет объект
+для печати <tt>x</tt>, флаг <tt>d?</tt>, и порт <tt>p</tt>.
+Флаг <tt>d?</tt> (для отображения) является <tt>#t</tt> если код предназанчен для
+отображения(<i>display</i>) объекта,  <tt>#f</tt> в противном случае.
+Флаг <tt>d?</tt> важен только для символьных знаков и строк.
+Напомним из раздела&nbsp;<a href="io.html#g129">7.8</a> в котором  <tt>display</tt> печатал
+строки без заключения в кавычки и символьные знаки без синтаксиса<tt>#\</tt>.
+
+</p><p>
+Точки входа для <tt>write</tt> и <tt>display</tt> обрабатывают необязательный 
+второй аргумент (port), передавая значение
+<tt>current-output-port</tt> когда аргумент port не предоставляется.
+
+</p><p>
+Процедуры, порты(ports), и объект конец файла(end-of-file) печатаются как
+<tt>#&lt;procedure&gt;</tt>, <tt>#&lt;port&gt;</tt>, и <tt>#&lt;eof&gt;</tt>.
+Неопознанные типы печатаются как <tt>#&lt;unknown&gt;</tt>.
+Так, например хеш-таблицы(hashtable), (множества)enumeration set, и объекты(object)
+зависимые от реализации будут распечатываться как <tt>#&lt;unknown&gt;</tt>.
+
+</p><p>
+
+</p><p><tt>
+(library&nbsp;(tspl&nbsp;printer)<br>
+
+&nbsp;&nbsp;(export&nbsp;put-datum&nbsp;write&nbsp;display)<br>
+
+&nbsp;&nbsp;(import&nbsp;(except&nbsp;(rnrs)&nbsp;put-datum&nbsp;write&nbsp;display))
+<br>
+<br>
+&nbsp;;&nbsp;define&nbsp;these&nbsp;here&nbsp;to&nbsp;avoid&nbsp;confusing&nbsp;paren-balancers<br>
+
+&nbsp;&nbsp;(define&nbsp;lparen&nbsp;#\()<br>
+
+&nbsp;&nbsp;(define&nbsp;rparen&nbsp;#\))
+<br>
+<br>
+&nbsp;;&nbsp;wr&nbsp;is&nbsp;the&nbsp;driver,&nbsp;dispatching&nbsp;on&nbsp;the&nbsp;type&nbsp;of&nbsp;x<br>
+
+&nbsp;&nbsp;(define&nbsp;wr<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;d?&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(symbol?&nbsp;x)&nbsp;(put-string&nbsp;p&nbsp;(symbol-&gt;string&nbsp;x))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(pair?&nbsp;x)&nbsp;(wrpair&nbsp;x&nbsp;d?&nbsp;p)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(number?&nbsp;x)&nbsp;(put-string&nbsp;p&nbsp;(number-&gt;string&nbsp;x))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;x)&nbsp;(put-string&nbsp;p&nbsp;"()")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(boolean?&nbsp;x)&nbsp;(put-string&nbsp;p&nbsp;(if&nbsp;x&nbsp;"#t"&nbsp;"#f"))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(char?&nbsp;x)&nbsp;(if&nbsp;d?&nbsp;(put-char&nbsp;p&nbsp;x)&nbsp;(wrchar&nbsp;x&nbsp;p))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(string?&nbsp;x)&nbsp;(if&nbsp;d?&nbsp;(put-string&nbsp;p&nbsp;x)&nbsp;(wrstring&nbsp;x&nbsp;p))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(vector?&nbsp;x)&nbsp;(wrvector&nbsp;x&nbsp;d?&nbsp;p)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(bytevector?&nbsp;x)&nbsp;(wrbytevector&nbsp;x&nbsp;d?&nbsp;p)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(eof-object?&nbsp;x)&nbsp;(put-string&nbsp;p&nbsp;"#&lt;eof&gt;")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(port?&nbsp;x)&nbsp;(put-string&nbsp;p&nbsp;"#&lt;port&gt;")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(procedure?&nbsp;x)&nbsp;(put-string&nbsp;p&nbsp;"#&lt;procedure&gt;")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(put-string&nbsp;p&nbsp;"#&lt;unknown&gt;")])))
+<br>
+<br>
+&nbsp;;&nbsp;wrpair&nbsp;handles&nbsp;pairs&nbsp;and&nbsp;nonempty&nbsp;lists<br>
+
+&nbsp;&nbsp;(define&nbsp;wrpair<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;d?&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;lparen)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;loop&nbsp;([x&nbsp;x])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(wr&nbsp;(car&nbsp;x)&nbsp;d?&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(pair?&nbsp;(cdr&nbsp;x))&nbsp;(put-char&nbsp;p&nbsp;#\space)&nbsp;(loop&nbsp;(cdr&nbsp;x))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;(cdr&nbsp;x))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(put-string&nbsp;p&nbsp;"&nbsp;.&nbsp;")&nbsp;(wr&nbsp;(cdr&nbsp;x)&nbsp;d?&nbsp;p)]))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;rparen)))
+<br>
+<br>
+&nbsp;;&nbsp;wrchar&nbsp;handles&nbsp;characters.&nbsp;&nbsp;Used&nbsp;only&nbsp;when&nbsp;d?&nbsp;is&nbsp;#f.<br>
+
+&nbsp;&nbsp;(define&nbsp;wrchar<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-string&nbsp;p&nbsp;"#\\")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(assq&nbsp;x&nbsp;'((#\alarm&nbsp;.&nbsp;"alarm")&nbsp;(#\backspace&nbsp;.&nbsp;"backspace")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(#\delete&nbsp;.&nbsp;"delete")&nbsp;(#\esc&nbsp;.&nbsp;"esc")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(#\newline&nbsp;.&nbsp;"newline")&nbsp;(#\nul&nbsp;.&nbsp;"nul")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(#\page&nbsp;.&nbsp;"page")&nbsp;(#\return&nbsp;.&nbsp;"return")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(#\space&nbsp;.&nbsp;"space")&nbsp;(#\tab&nbsp;.&nbsp;"tab")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(#\vtab&nbsp;.&nbsp;"vtab")))&nbsp;=&gt;<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(a)&nbsp;(put-string&nbsp;p&nbsp;(cdr&nbsp;a)))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(put-char&nbsp;p&nbsp;x)])))
+<br>
+<br>
+&nbsp;;&nbsp;wrstring&nbsp;handles&nbsp;strings.&nbsp;&nbsp;Used&nbsp;only&nbsp;when&nbsp;d?&nbsp;is&nbsp;#f.<br>
+
+&nbsp;&nbsp;(define&nbsp;wrstring<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;#\")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([n&nbsp;(string-length&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([i&nbsp;0&nbsp;(+&nbsp;i&nbsp;1)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((=&nbsp;i&nbsp;n))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([c&nbsp;(string-ref&nbsp;x&nbsp;i)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(case&nbsp;c<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\alarm)&nbsp;(put-string&nbsp;p&nbsp;"\\a")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\backspace)&nbsp;(put-string&nbsp;p&nbsp;"\\b")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\newline)&nbsp;(put-string&nbsp;p&nbsp;"\\n")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\page)&nbsp;(put-string&nbsp;p&nbsp;"\\f")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\return)&nbsp;(put-string&nbsp;p&nbsp;"\\r")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\tab)&nbsp;(put-string&nbsp;p&nbsp;"\\t")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\vtab)&nbsp;(put-string&nbsp;p&nbsp;"\\v")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\")&nbsp;(put-string&nbsp;p&nbsp;"\\\"")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\\)&nbsp;(put-string&nbsp;p&nbsp;"\\\\")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(put-char&nbsp;p&nbsp;c)]))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;#\")))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;wrvector<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;d?&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;#\#)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([n&nbsp;(vector-length&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([i&nbsp;0&nbsp;(+&nbsp;i&nbsp;1)]&nbsp;[sep&nbsp;lparen&nbsp;#\space])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((=&nbsp;i&nbsp;n))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;sep)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(wr&nbsp;(vector-ref&nbsp;x&nbsp;i)&nbsp;d?&nbsp;p)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;rparen)))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;wrbytevector<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;d?&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-string&nbsp;p&nbsp;"#vu8")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([n&nbsp;(bytevector-length&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([i&nbsp;0&nbsp;(+&nbsp;i&nbsp;1)]&nbsp;[sep&nbsp;lparen&nbsp;#\space])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((=&nbsp;i&nbsp;n))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;sep)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(wr&nbsp;(bytevector-u8-ref&nbsp;x&nbsp;i)&nbsp;d?&nbsp;p)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;rparen)))
+<br>
+<br>
+&nbsp;;&nbsp;check-and-wr&nbsp;is&nbsp;called&nbsp;when&nbsp;the&nbsp;port&nbsp;is&nbsp;supplied<br>
+
+&nbsp;&nbsp;(define&nbsp;check-and-wr<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(who&nbsp;x&nbsp;d?&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;(and&nbsp;(output-port?&nbsp;p)&nbsp;(textual-port?&nbsp;p))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assertion-violation&nbsp;who&nbsp;"invalid&nbsp;argument"&nbsp;p))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(wr&nbsp;x&nbsp;d?&nbsp;p)))
+<br>
+<br>
+&nbsp;;&nbsp;put-datum&nbsp;calls&nbsp;wr&nbsp;with&nbsp;d?&nbsp;set&nbsp;to&nbsp;#f<br>
+
+&nbsp;&nbsp;(define&nbsp;put-datum<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(p&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(check-and-wr&nbsp;'put-datum&nbsp;x&nbsp;#f&nbsp;p)))
+<br>
+<br>
+&nbsp;;&nbsp;write&nbsp;calls&nbsp;wr&nbsp;with&nbsp;d?&nbsp;set&nbsp;to&nbsp;#f<br>
+
+&nbsp;&nbsp;(define&nbsp;write<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(case-lambda<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(x)&nbsp;(wr&nbsp;x&nbsp;#f&nbsp;(current-output-port))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(x&nbsp;p)&nbsp;(check-and-wr&nbsp;'write&nbsp;x&nbsp;#f&nbsp;p)]))
+<br>
+<br>
+&nbsp;;&nbsp;display&nbsp;calls&nbsp;wr&nbsp;with&nbsp;d?&nbsp;set&nbsp;to&nbsp;#t<br>
+
+&nbsp;&nbsp;(define&nbsp;display<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(case-lambda<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(x)&nbsp;(wr&nbsp;x&nbsp;#t&nbsp;(current-output-port))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(x&nbsp;p)&nbsp;(check-and-wr&nbsp;'display&nbsp;x&nbsp;#t&nbsp;p)])))</tt>
+</p><p>
+</p><h4>Exercise <a name="g177"></a>12.5.1</h4>
+<a name="./examples:s34"></a> Числа печатаются с помощью <tt>number-&gt;string</tt>.
+Правильная печать всех числовых типов Scheme, особенно неточных чисел,
+является сложной задачей.
+Тем не менее, обработка точных целых чисел и соотношений довольно
+просты.
+Измените код, чтобы печатать точные целы числа и соотношения чисел напрямую
+(без <tt>number-&gt;string</tt>), но продолжайте использовать <tt>number-&gt;string</tt>
+для неточных и комплексных чисел.
+
+<p>
+
+</p><h4>Exercise <a name="g178"></a>12.5.2</h4>
+<a name="./examples:s35"></a><a name="EXOBJTOSTR"></a>Измените <tt>wr</tt> и его помощников,
+чтобы направлять их вывод во внутренний буфер, а не в порт.
+Используйте измененную версию для реализации процедуры <tt>object-&gt;string</tt>
+которая, подобно <tt>number-&gt;string</tt>, возвращает строку содержащую напечатанное 
+представление его ввода.
+Например:
+
+<p>
+
+</p><p><tt>(object-&gt;string&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"(a&nbsp;b&nbsp;c)"<br>
+
+(object-&gt;string&nbsp;"hello")&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"\"hello\""</tt>
+</p><p>Вы можете быть удивлены, насколько легко это изменение сделать.
+
+</p><p>
+
+</p><h4>Exercise <a name="g179"></a>12.5.3</h4>
+<a name="./examples:s36"></a>Некоторые символьные знаки не печатаются <tt>wr</tt> должным образом,
+включая те, которые начинаются с цифр или содержат пробелы.
+Измените <tt>wr</tt>, чтобы вызвать помощник <tt>wrsymbol</tt> который использует шестнадцатеричные
+скалярные escape-последовательности, необходимые для обработки таких знаков.
+Шестнадцатеричный скалярный  escape принимает вид <tt>#\x<i>n</i>;</tt>, где <tt><i>n</i></tt>
+это Unicode значение знака выраженное в шестнадцеричной системе обозначений.
+Проконсультируйтесь с граматикой для знаков на странице&nbsp;<a href="grammar.html#grammar:symbols">458</a> 
+чтобы определить, когда нужны шестнадцатеричные  скалярные escape.
+
+<p>
+
+</p><h3><a name="g180"></a><a name="./examples:h6"></a>Section 12.6. Отформатированный Вывод<a name="SECTEXPRINTF"></a></h3>
+
+<p>
+Часто бывает необходимо печатать строки, содержащие печатные представления
+объектов Scheme, особенно чисел.
+Это можно сделать с помощью стандартных процедур Scheme, вызов которых может быть утомительным.
+Например, процедура <tt>tree-print</tt> в разделе&nbsp;<a href="examples.html#g169">12.4</a>
+требует последовательности из четырех вызовов процедур вывода для печать простого однострочного
+сообщения:
+
+</p><p>
+
+</p><p><tt>(put-datum&nbsp;p&nbsp;(tnode-count&nbsp;node))<br>
+
+(put-char&nbsp;p&nbsp;#\space)<br>
+
+(put-string&nbsp;p&nbsp;(tnode-word&nbsp;node))<br>
+
+(newline&nbsp;p)</tt>
+</p><p>Форматирующее средство <a name="./examples:s37"></a> вывода, определенное в этом разделе,
+позволяет заменить эти четыре вызова одним вызовом <tt>fprintf</tt>, ниже.
+
+</p><p>
+
+</p><p><tt>(fprintf&nbsp;p&nbsp;"~s&nbsp;~a~%"&nbsp;(tnode-count&nbsp;node)&nbsp;(tnode-word&nbsp;node))</tt>
+</p><p><a name="./examples:s38"></a><tt>fprintf</tt> ожидает аргумент port, управляющую строку - <i>control string</i>,
+и неопределенное количество аргументов, котоыре вставляются в вывод, как
+указано в управляющей строке.
+В этом примере, сначала записывается значение <tt>(tnode-count&nbsp;node)</tt> вместо
+<tt>~s</tt>. За ним следует пробел и отображается значение <tt>(tnode-word&nbsp;node)</tt>
+вместо <tt>~a</tt>.
+ <tt>~%</tt> заменяется на выходе знаком новой строки.
+
+</p><p>
+Процедура <a name="./examples:s39"></a><tt>printf</tt>, также определенная в этом разделе, похожа на
+<tt>fprintf</tt> за исключением того, что аргумент port не требуется и вывод
+отправляется на текущий порт вывода.
+
+</p><p>
+<tt>~s</tt>, <tt>~a</tt>, и <tt>~%</tt> являются директивами форматирования(<i>format directives</i>);
+<tt>~s</tt> вызывает печать первого неиспользованного аргумента после контрольной строки на вывод
+через вызов <tt>write</tt>,
+<tt>~a</tt> вызывает печать первого неиспользованного аргумента после контрольной строки на вывод
+через вызов <tt>display</tt>,
+и <tt>~%</tt> простов вызывает печать знака новой строки.
+Простая реализация <tt>fprintf</tt>, ниже, распознает еще одну директиву форматирования
+ <tt>~~</tt>, которая вставляет тильду в вывод.
+Например,
+
+</p><p>
+
+</p><p><tt>(printf&nbsp;"The&nbsp;string&nbsp;~s&nbsp;displays&nbsp;as&nbsp;~~.~%"&nbsp;"~")</tt>
+</p><p>печатает
+
+</p><p>
+
+</p><p><tt>&nbsp;строка&nbsp;"~"&nbsp;отображается&nbsp;как&nbsp;~.</tt>
+</p><p>
+</p><p><tt>
+(library&nbsp;(tspl&nbsp;formatted-output)<br>
+
+&nbsp;&nbsp;(export&nbsp;printf&nbsp;fprintf)<br>
+
+&nbsp;&nbsp;(import&nbsp;(rnrs))
+<br>
+<br>
+&nbsp;;&nbsp;dofmt&nbsp;does&nbsp;all&nbsp;of&nbsp;the&nbsp;work.&nbsp;&nbsp;It&nbsp;loops&nbsp;through&nbsp;the&nbsp;control&nbsp;string<br>
+
+&nbsp;;&nbsp;recognizing&nbsp;format&nbsp;directives&nbsp;and&nbsp;printing&nbsp;all&nbsp;other&nbsp;characters<br>
+
+&nbsp;;&nbsp;without&nbsp;interpretation.&nbsp;&nbsp;A&nbsp;tilde&nbsp;at&nbsp;the&nbsp;end&nbsp;of&nbsp;a&nbsp;control&nbsp;string&nbsp;is<br>
+
+&nbsp;;&nbsp;treated&nbsp;as&nbsp;an&nbsp;ordinary&nbsp;character.&nbsp;&nbsp;No&nbsp;checks&nbsp;are&nbsp;made&nbsp;for&nbsp;proper<br>
+
+&nbsp;;&nbsp;inputs.&nbsp;&nbsp;Directives&nbsp;may&nbsp;be&nbsp;given&nbsp;in&nbsp;either&nbsp;lower&nbsp;or&nbsp;upper&nbsp;case.<br>
+
+&nbsp;&nbsp;(define&nbsp;dofmt<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(p&nbsp;cntl&nbsp;args)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([nmax&nbsp;(-&nbsp;(string-length&nbsp;cntl)&nbsp;1)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;loop&nbsp;([n&nbsp;0]&nbsp;[a&nbsp;args])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(&lt;=&nbsp;n&nbsp;nmax)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([c&nbsp;(string-ref&nbsp;cntl&nbsp;n)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(and&nbsp;(char=?&nbsp;c&nbsp;#\~)&nbsp;(&lt;&nbsp;n&nbsp;nmax))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(case&nbsp;(string-ref&nbsp;cntl&nbsp;(+&nbsp;n&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\a&nbsp;#\A)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(display&nbsp;(car&nbsp;a)&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;(+&nbsp;n&nbsp;2)&nbsp;(cdr&nbsp;a))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\s&nbsp;#\S)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(write&nbsp;(car&nbsp;a)&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;(+&nbsp;n&nbsp;2)&nbsp;(cdr&nbsp;a))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\%)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(newline&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;(+&nbsp;n&nbsp;2)&nbsp;a)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(#\~)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;#\~)&nbsp;(loop&nbsp;(+&nbsp;n&nbsp;2)&nbsp;a)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;c)&nbsp;(loop&nbsp;(+&nbsp;n&nbsp;1)&nbsp;a)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(put-char&nbsp;p&nbsp;c)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;(+&nbsp;n&nbsp;1)&nbsp;a)))))))))
+<br>
+<br>
+&nbsp;;&nbsp;printf&nbsp;and&nbsp;fprintf&nbsp;differ&nbsp;only&nbsp;in&nbsp;that&nbsp;fprintf&nbsp;passes&nbsp;its<br>
+
+&nbsp;;&nbsp;port&nbsp;argument&nbsp;to&nbsp;dofmt&nbsp;while&nbsp;printf&nbsp;passes&nbsp;the&nbsp;current&nbsp;output<br>
+
+&nbsp;;&nbsp;port.<br>
+
+&nbsp;&nbsp;(define&nbsp;printf<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(control&nbsp;.&nbsp;args)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(dofmt&nbsp;(current-output-port)&nbsp;control&nbsp;args)))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;fprintf<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(p&nbsp;control&nbsp;.&nbsp;args)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(dofmt&nbsp;p&nbsp;control&nbsp;args))))</tt>
+</p><p>
+</p><h4>Exercise <a name="g181"></a>12.6.1</h4>
+<a name="./examples:s40"></a>Добавьте проверку ошибок в код для недопустимых аргументов порта (<tt>fprintf</tt>),
+недопустимых escapes последовательностей тильды, и отсутствующих аргументов.
+
+<p>
+
+</p><h4>Exercise <a name="g182"></a>12.6.2</h4>
+<a name="./examples:s41"></a>Используя необязательный аргумент radix для <tt>number-&gt;string</tt>,
+добавьте в <tt>printf</tt> и <tt>fprintf</tt> поддержку следующих директив нового форматирования:
+
+<p>
+
+ </p><table>
+<tbody><tr valign="top"><td><i>&nbsp;&nbsp;a</i>.</td><td><tt>~b</tt> или <tt>~B</tt>: печать следующего неиспользуемого аргумента,
+который должен быть числом, в бинарном виде;
+
+<p>
+</p></td></tr><tr valign="top"><td><i>&nbsp;&nbsp;b</i>.</td><td><tt>~o</tt> или <tt>~O</tt>: печать следующего неиспользуемого
+аргумента, который должен быть числом, в восмеричном формате; и
+
+<p>
+</p></td></tr><tr valign="top"><td><i>&nbsp;&nbsp;c</i>.</td><td><tt>~x</tt> or <tt>~X</tt>: печать следующего неиспользуемого
+аргумента, который должен быть числом, в шестнадцатеричном формате.
+</td></tr></tbody></table>
+
+<p>
+Например:
+
+</p><p>
+
+</p><p><tt>(printf&nbsp;"#x~x&nbsp;#o~o&nbsp;#b~b~%"&nbsp;16&nbsp;8&nbsp;2)</tt>
+</p><p>будет печатать
+
+</p><p>
+
+</p><p><tt>#x10&nbsp;#o10&nbsp;#b10</tt>
+</p><p>
+</p><h4>Exercise <a name="g183"></a>12.6.3</h4>
+<a name="./examples:s42"></a>Добавить директиву косвенного("indirect") форматирования, <tt>~@</tt>, которая обрабатывает
+следующий неиспользованный аргумент, который должен быть строкой, как если бы он был объединен с текущей строкой
+форматирования. Например:
+
+<p>
+
+</p><p><tt>(printf&nbsp;"---&nbsp;~@&nbsp;---"&nbsp;"&gt;&nbsp;~s&nbsp;&lt;"&nbsp;'(a&nbsp;b&nbsp;c))</tt>
+</p><p>будет печатать
+
+</p><p>
+
+</p><p><tt>---&gt;&nbsp;(a&nbsp;b&nbsp;c)&nbsp;&lt;---</tt>
+</p><p>
+</p><h4>Exercise <a name="g184"></a>12.6.4</h4>
+<a name="./examples:s43"></a>Реализуйте процедуру <tt>format</tt>, версия  <tt>fprintf</tt> которая помещает
+свой вывод в строку вместо записи в порт.
+Используте <tt>object-&gt;string</tt> из упражнения&nbsp;<a href="examples.html#g178">12.5.2</a>
+для поддержки директив <tt>~s</tt> и <tt>~a</tt>.
+
+<p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;3]&nbsp;[y&nbsp;4])<br>
+
+&nbsp;&nbsp;(format&nbsp;"~s&nbsp;+&nbsp;~s&nbsp;=&nbsp;~s"&nbsp;x&nbsp;y&nbsp;(+&nbsp;x&nbsp;y)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"3&nbsp;+&nbsp;4&nbsp;=&nbsp;7"</tt>
+</p><p>
+</p><h4>Exercise <a name="g185"></a>12.6.5</h4>
+<a name="./examples:s44"></a>Вместо использования <tt>object-&gt;string</tt>, определите процедуру <tt>format</tt>
+использующую строку как порт вывода.
+
+<p>
+
+</p><h4>Exercise <a name="g186"></a>12.6.6</h4>
+<a name="./examples:s45"></a>Измените <tt>format</tt>, <tt>fprintf</tt>, и <tt>printf</tt>, чтобы
+указывать размер поля после тильды в директивах форматирования <tt>~a</tt> и <tt>~s</tt>.
+Например, директива <tt>~10s</tt> приведет к тому, что следующий неиспользуемый аргумент будет
+вставлен в выходной результат, выравниваемый по левому краю в поле размера
+size&nbsp;10.
+Если для объекта требуется больше места, чем указанно, позвольте ему выйти за пределы поля.
+
+<p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;'abc]&nbsp;[y&nbsp;'(def)])<br>
+
+&nbsp;&nbsp;(format&nbsp;"(cons&nbsp;'~5s&nbsp;'~5s)&nbsp;=&nbsp;~5s"<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;y&nbsp;(cons&nbsp;x&nbsp;y)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"(cons&nbsp;'abc&nbsp;&nbsp;&nbsp;'(def))&nbsp;=&nbsp;(abc&nbsp;def)"</tt>
+</p><p>[<i>Подсказка</i>: Используйте <tt>format</tt> рекурсивно.]
+
+</p><p>
+
+</p><h3><a name="g187"></a><a name="./examples:h7"></a>Section 12.7. Мета-Циркулярный(Meta-Circular) интерпретатор для Scheme<a name="SECTEXINTERPRET"></a></h3>
+
+<p>
+Программа, описанная в этом разделе, представляет собой
+<a name="./examples:s46"></a><a name="./examples:s47"></a>мета-циркулярный(<i>meta-circular</i>)
+<a name="./examples:s48"></a>интерпретатор для Scheme, т.е.,
+он является интерпретатором <i>для</i> Scheme написанный <i>на</i> Scheme.
+Интерпретатор показывает, насколько мала Scheme, когда основная структура
+рассматривается независимо от ее синтаксических расширений и примитивов.
+Он также иллюстрирует методы интерпретации, которые могут быть одинаково хорошо
+применены к языкам отличным от Scheme.
+
+</p><p>
+Относительная простота интерпретатора несколько вводит в заблуждение.
+Интерпретатор для Scheme написанный на Scheme может быть немного проще,
+чем написанный на большинстве других языков.
+Вот несколько причин, почему это проще.
+
+</p><p>
+</p><ul>
+<li>Хвостовые вызовы обрабатываются должным образом только потому, что хвостовые
+вызовы в интерпретаторе обрабатываются должным образом реализацией базовой Scheme.
+Все что требуется, это то, что сам интерпретатор являлся рекурсивным для хвостовых
+вызовов.
+
+<p>
+</p></li><li>Процедуры первого класса в интерпретируемом коде реализуются
+процедурами первого класса в интерпретаторе, которые в свою очередь поддерживаются
+реализацией.
+
+<p>
+</p></li><li>Продолжения первого класса созданные  с помощью <tt>call/cc</tt> предоставляются
+реализацией на базовой Scheme <tt>call/cc</tt>.
+
+<p>
+</p></li><li>Примитивные процедуры, такие как <tt>cons</tt> и <tt>assq</tt> и такие сервисы как
+управление хранилищем, обеспечиваются реализацией хоста(базовой Scheme).
+</li></ul>
+<p>
+
+</p><p>
+Преобразование интерпретатора для работы на языке отличном от
+Scheme, может потребовать явной поддержки некоторых или всех этих
+элементов.
+
+</p><p>
+Интерпретатор хранит лексические привязки в <a name="./examples:s49"></a><i>environment</i>, которая
+является просто ассоциативным списком(<a name="./examples:s50"></a><i>association list</i>)
+(см. страницу&nbsp;<a href="objects.html#page:assq">165</a>).
+Вычисление <tt>lambda</tt> выражений приводит к созданию процедуры с областью переменных,
+содержащую среду(environment) и тело <tt>lambda</tt> выражения.
+Последующее применение процедуры объединяет новые привязки(
+актуальные параметры) с сохраненной средой(environment).
+
+</p><p>
+Интерпретатор обрабатывает только <a name="./examples:s51"></a>основные синтаксические формы, описанные
+в разделе&nbsp;<a href="further.html#g50">3.1</a>, и распознает привязки тоько для нескольких примитивных
+процедур. Он не выполняет проверку ошибок.
+
+</p><p>
+
+</p><p><tt>(interpret&nbsp;3)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3
+<br>
+<br>
+(interpret&nbsp;'(cons&nbsp;3&nbsp;4))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(3&nbsp;.&nbsp;4)
+<br>
+<br>
+(interpret<br>
+
+&nbsp;&nbsp;'((lambda&nbsp;(x&nbsp;.&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;x&nbsp;y))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;'a&nbsp;'b&nbsp;'c&nbsp;'d))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;(b&nbsp;c&nbsp;d))
+<br>
+<br>
+(interpret<br>
+
+&nbsp;&nbsp;'(((call/cc&nbsp;(lambda&nbsp;(k)&nbsp;k))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;"HEY!"))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"HEY!"
+<br>
+<br>
+(interpret<br>
+
+&nbsp;&nbsp;'((lambda&nbsp;(memq)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(memq&nbsp;memq&nbsp;'a&nbsp;'(b&nbsp;c&nbsp;a&nbsp;d&nbsp;e)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(memq&nbsp;x&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)&nbsp;#f<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(eq?&nbsp;(car&nbsp;ls)&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ls<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(memq&nbsp;memq&nbsp;x&nbsp;(cdr&nbsp;ls)))))))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;d&nbsp;e)
+<br>
+<br>
+(interpret<br>
+
+&nbsp;&nbsp;'((lambda&nbsp;(reverse)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;reverse<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ls&nbsp;new)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(reverse&nbsp;(cdr&nbsp;ls)&nbsp;(cons&nbsp;(car&nbsp;ls)&nbsp;new)))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(reverse&nbsp;'(a&nbsp;b&nbsp;c&nbsp;d&nbsp;e)&nbsp;'()))<br>
+
+&nbsp;#f))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(e&nbsp;d&nbsp;c&nbsp;b&nbsp;a)</tt>
+</p><p>
+</p><p><tt>
+(library&nbsp;(tspl&nbsp;interpreter)<br>
+
+&nbsp;&nbsp;(export&nbsp;interpret)<br>
+
+&nbsp;&nbsp;(import&nbsp;(rnrs)&nbsp;(rnrs&nbsp;mutable-pairs))
+<br>
+<br>
+&nbsp;;&nbsp;primitive-environment&nbsp;contains&nbsp;a&nbsp;small&nbsp;number&nbsp;of&nbsp;primitive<br>
+
+&nbsp;;&nbsp;procedures;&nbsp;it&nbsp;can&nbsp;be&nbsp;extended&nbsp;easily&nbsp;with&nbsp;additional&nbsp;primitives.<br>
+
+&nbsp;&nbsp;(define&nbsp;primitive-environment<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;`((apply&nbsp;.&nbsp;,apply)&nbsp;(assq&nbsp;.&nbsp;,assq)&nbsp;(call/cc&nbsp;.&nbsp;,call/cc)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;.&nbsp;,car)&nbsp;(cadr&nbsp;.&nbsp;,cadr)&nbsp;(caddr&nbsp;.&nbsp;,caddr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cadddr&nbsp;.&nbsp;,cadddr)&nbsp;(cddr&nbsp;.&nbsp;,cddr)&nbsp;(cdr&nbsp;.&nbsp;,cdr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;.&nbsp;,cons)&nbsp;(eq?&nbsp;.&nbsp;,eq?)&nbsp;(list&nbsp;.&nbsp;,list)&nbsp;(map&nbsp;.&nbsp;,map)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(memv&nbsp;.&nbsp;,memv)&nbsp;(null?&nbsp;.&nbsp;,null?)&nbsp;(pair?&nbsp;.&nbsp;,pair?)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(read&nbsp;.&nbsp;,read)&nbsp;(set-car!&nbsp;.&nbsp;,set-car!)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-cdr!&nbsp;.&nbsp;,set-cdr!)&nbsp;(symbol?&nbsp;.&nbsp;,symbol?)))
+<br>
+<br>
+&nbsp;;&nbsp;new-env&nbsp;returns&nbsp;a&nbsp;new&nbsp;environment&nbsp;from&nbsp;a&nbsp;formal&nbsp;parameter<br>
+
+&nbsp;;&nbsp;specification,&nbsp;a&nbsp;list&nbsp;of&nbsp;actual&nbsp;parameters,&nbsp;and&nbsp;an&nbsp;outer<br>
+
+&nbsp;;&nbsp;environment.&nbsp;&nbsp;The&nbsp;symbol?&nbsp;test&nbsp;identifies&nbsp;"improper"<br>
+
+&nbsp;;&nbsp;argument&nbsp;lists.&nbsp;&nbsp;Environments&nbsp;are&nbsp;association&nbsp;lists,<br>
+
+&nbsp;;&nbsp;associating&nbsp;variables&nbsp;with&nbsp;values.<br>
+
+&nbsp;&nbsp;(define&nbsp;new-env<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(formals&nbsp;actuals&nbsp;env)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;formals)&nbsp;env]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(symbol?&nbsp;formals)&nbsp;(cons&nbsp;(cons&nbsp;formals&nbsp;actuals)&nbsp;env)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(car&nbsp;formals)&nbsp;(car&nbsp;actuals))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(new-env&nbsp;(cdr&nbsp;formals)&nbsp;(cdr&nbsp;actuals)&nbsp;env))])))
+<br>
+<br>
+&nbsp;;&nbsp;lookup&nbsp;finds&nbsp;the&nbsp;value&nbsp;of&nbsp;the&nbsp;variable&nbsp;var&nbsp;in&nbsp;the&nbsp;environment<br>
+
+&nbsp;;&nbsp;env,&nbsp;using&nbsp;assq.&nbsp;&nbsp;Assumes&nbsp;var&nbsp;is&nbsp;bound&nbsp;in&nbsp;env.<br>
+
+&nbsp;&nbsp;(define&nbsp;lookup<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(var&nbsp;env)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cdr&nbsp;(assq&nbsp;var&nbsp;env))))
+<br>
+<br>
+&nbsp;;&nbsp;assign&nbsp;is&nbsp;similar&nbsp;to&nbsp;lookup&nbsp;but&nbsp;alters&nbsp;the&nbsp;binding&nbsp;of&nbsp;the<br>
+
+&nbsp;;&nbsp;variable&nbsp;var&nbsp;by&nbsp;changing&nbsp;the&nbsp;cdr&nbsp;of&nbsp;the&nbsp;association&nbsp;pair<br>
+
+&nbsp;&nbsp;(define&nbsp;assign<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(var&nbsp;val&nbsp;env)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-cdr!&nbsp;(assq&nbsp;var&nbsp;env)&nbsp;val)))
+<br>
+<br>
+&nbsp;;&nbsp;exec&nbsp;evaluates&nbsp;the&nbsp;expression,&nbsp;recognizing&nbsp;a&nbsp;small&nbsp;set&nbsp;of&nbsp;core&nbsp;forms.<br>
+
+&nbsp;&nbsp;(define&nbsp;exec<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(expr&nbsp;env)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(symbol?&nbsp;expr)&nbsp;(lookup&nbsp;expr&nbsp;env)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(pair?&nbsp;expr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(case&nbsp;(car&nbsp;expr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(quote)&nbsp;(cadr&nbsp;expr)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(lambda)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;vals<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([env&nbsp;(new-env&nbsp;(cadr&nbsp;expr)&nbsp;vals&nbsp;env)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;loop&nbsp;([exprs&nbsp;(cddr&nbsp;expr)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;(cdr&nbsp;exprs))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(exec&nbsp;(car&nbsp;exprs)&nbsp;env)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(exec&nbsp;(car&nbsp;exprs)&nbsp;env)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;(cdr&nbsp;exprs)))))))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(if)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(exec&nbsp;(cadr&nbsp;expr)&nbsp;env)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(exec&nbsp;(caddr&nbsp;expr)&nbsp;env)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(exec&nbsp;(cadddr&nbsp;expr)&nbsp;env))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(set!)&nbsp;(assign&nbsp;(cadr&nbsp;expr)&nbsp;(exec&nbsp;(caddr&nbsp;expr)&nbsp;env)&nbsp;env)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(exec&nbsp;(car&nbsp;expr)&nbsp;env)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;(lambda&nbsp;(x)&nbsp;(exec&nbsp;x&nbsp;env))&nbsp;(cdr&nbsp;expr)))])]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;expr])))
+<br>
+<br>
+&nbsp;;&nbsp;interpret&nbsp;starts&nbsp;execution&nbsp;with&nbsp;the&nbsp;primitive&nbsp;environment.<br>
+
+&nbsp;&nbsp;(define&nbsp;interpret<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(expr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(exec&nbsp;expr&nbsp;&nbsp;primitive-environment))))</tt>
+</p><p>
+</p><h4>Exercise <a name="g188"></a>12.7.1</h4>
+<a name="./examples:s52"></a>Как написано, интерпретатор не может интерпретировать сам себя, потому
+что он не поддерживает несколько синтаксических форм используемых в его реализации:
+<tt>let</tt> (именованный и не именованный), внутренние <tt>define</tt>, <tt>case</tt>, <tt>cond</tt>, и
+<tt>begin</tt>.
+Перепишите код интерпретатора, исопльзуя только синтаксические формы поддерживаемые им.
+
+<p>
+
+</p><h4>Exercise <a name="g189"></a>12.7.2</h4>
+<a name="./examples:s53"></a>По завершению предыдущего упражнения используйте
+интерпретатор для запуска копии интерпретатора и используйте копию для запуска
+другой копии интерпретатора.
+Повторяйте этот процесс, чтобы узнать скольких уровней вложенности он достигнет,
+до того как система остановиться.
+
+<p>
+
+</p><h4>Exercise <a name="g190"></a>12.7.3</h4>
+<a name="./examples:s54"></a>На первый взгляд кажеться, что вариант <tt>lambda</tt> можно написать более просто
+следующим образом.
+
+<p>
+
+</p><p><tt>[(lambda)<br>
+
+&nbsp;(lambda&nbsp;vals<br>
+
+&nbsp;&nbsp;&nbsp;(let&nbsp;([env&nbsp;(new-env&nbsp;(cadr&nbsp;expr)&nbsp;vals&nbsp;env)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;loop&nbsp;([exprs&nbsp;(cddr&nbsp;expr)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([val&nbsp;(exec&nbsp;(car&nbsp;exprs)&nbsp;env)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;(cdr&nbsp;exprs))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;val<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;(cdr&nbsp;exprs)))))))]</tt>
+</p><p>Почему это не правильно?
+[<i>подсказка</i>: какое свойство Scheme будет нарушено?]
+
+</p><p>
+
+</p><h4>Exercise <a name="g191"></a>12.7.4</h4>
+<a name="./examples:s55"></a>Постарайтесь сделать интерпретатор более эффективным, ища
+способы задавать меньше вопросов или выделять меньше места для хранения.
+[<i>подсказка</i>: перед выполнением, преобразуйте ссылки лексической переменной в
+<tt>(access&nbsp;<i>n</i>)</tt>, где <tt><i>n</i></tt> представляет количество значений в
+среде(environment) - ассоциативном списке от начала перед значением, о котором идет речь.]
+
+<p>
+
+</p><h4>Exercise <a name="g192"></a>12.7.5</h4>
+<a name="./examples:s56"></a>Scheme вычисляет аргументы процедуры перед применением процедуры
+и применяет процедуру к значениям этих аргументов
+(<a name="./examples:s57"></a><i>call-by-value</i>).
+Измените интерпретатор, чтобы передать аргументы без вычисления и организовать их
+вычисление по ссылке (<a name="./examples:s58"></a><i>call-by-name</i>).
+[<i>подсказка</i>: Используйте <tt>lambda</tt> для <a name="./examples:s59"></a>отложенного вычилсения(delay evaluation).]
+Вам нужно будет создать версии примитивных процедур(<tt>car</tt>,
+<tt>null?</tt>, и т.д.) которые будут принимать свои аргументы не вычисленными.
+
+<p>
+
+</p><h3><a name="g193"></a><a name="./examples:h8"></a>Section 12.8. Определение Абстрактных Объектов<a name="SECTEXOBJECTS"></a></h3>
+
+<p>
+Этот пример демонстрирует синтаксическое расширение, которое облегчает определение
+простых <a name="./examples:s60"></a>абстрактных объектов(abstract objects) (см. раздел&nbsp;<a href="start.html#g40">2.9</a>).
+Эта возможность имеет неограниченный потенциал в качестве основы для полной 
+<a name="./examples:s61"></a>объектно-ориентированной подсистемы на Scheme.
+
+</p><p>
+Абстрактные объекты аналогичны базовым структурам данных, таким как
+пары и вектора.
+Однако, вместо того, чтобы манипулировать операторами доступа и присваивания,
+абстрактные объекты реагируют на сообщения(<a name="./examples:s62"></a><i>messages</i>).
+Действительные сообщения(valid messages) и действия, которые необходимо предпринять
+для каждого сообщения, определяются кодом внутри самого объекта, а не кодом вне объекта,
+что приводит к более модульным и потенциально более безопасным системам программирования.
+Данные, локальные для абстрактного объекта, доступны только через действия, выполняемые
+объектом в ответ на сообщения.
+
+</p><p>
+Отдельный тип абстрактного объекта определяется с помощью <a name="./examples:s63"></a><tt>define-object</tt>,
+который имеет общий вид
+
+</p><p>
+
+</p><p><tt>(define-object&nbsp;(<i>name</i>&nbsp;<i>var<sub>1</sub></i>&nbsp;...)<br>
+
+&nbsp;&nbsp;((<i>var<sub>2</sub></i>&nbsp;<i>expr</i>)&nbsp;...)<br>
+
+&nbsp;&nbsp;((<i>msg</i>&nbsp;<i>action</i>)&nbsp;...))</tt>
+</p><p>Первый набор привязок <tt>((<i>var<sub>2</sub></i>&nbsp;<i>expr</i>)&nbsp;...)</tt> может быть
+пропущен.
+<tt>define-object</tt> определяет процедуру, которая вызывается для создания новых
+абстрактных объектов данного типа.
+Эта процедура называется <tt><i>name</i></tt>, и аргументы  этой процедуры
+становятся значениями локальных переменных
+<tt><i>var<sub>1</sub></i>&nbsp;...</tt>.
+После вызова процедуры переменные <tt><i>var<sub>2</sub></i>&nbsp;...</tt> привязаны
+к значениям <tt><i>expr</i>&nbsp;...</tt> в последовательности (как в случае с <tt>let*</tt>)
+а сообщения <tt><i>msg</i>&nbsp;...</tt> привязаны к процедурным значениям
+<tt><i>action</i>&nbsp;...</tt> взаимно рекурсивным образом (как в  <tt>letrec</tt>).
+В рамках этих привязок, создается новый абстрактный объект; этот объект является значением
+созданной процедуры.
+
+</p><p>
+Синтаксическая форма <tt>send-message</tt> используется для отправки сообщений абстрактным
+объектам.
+<tt>(send-message&nbsp;<i>object</i>&nbsp;<i>msg</i>&nbsp;<i>arg</i>&nbsp;...)</tt> посылает объекту
+<tt><i>object</i></tt> сообщение <tt><i>msg</i></tt> с аргументами <tt><i>arg</i>&nbsp;...</tt>.
+Когда объект получает сообщение, аргументы <tt><i>arg</i>&nbsp;...</tt> становятся параметрами
+процедуры действия(action) связанной с сообщением, а значение возвращаемое этой процедурой,
+возвращается <tt>send-message</tt>.
+
+</p><p>
+Следующие примеры должны помочь выяснить, как абстрактные объекты определяются
+и используются.
+Первый пример это простой объект <tt>kons</tt> который похож на встроенный тип
+объекта Scheme пару(pair), за исключением того, что для доступа или присваивания
+его полей требуется отправить ему сообщение.
+
+</p><p>
+
+</p><p><tt>(define-object&nbsp;(kons&nbsp;kar&nbsp;kdr)<br>
+
+&nbsp;&nbsp;((get-car&nbsp;(lambda&nbsp;()&nbsp;kar))<br>
+
+&nbsp;&nbsp;&nbsp;(get-cdr&nbsp;(lambda&nbsp;()&nbsp;kdr))<br>
+
+&nbsp;&nbsp;&nbsp;(set-car!&nbsp;(lambda&nbsp;(x)&nbsp;(set!&nbsp;kar&nbsp;x)))<br>
+
+&nbsp;&nbsp;&nbsp;(set-cdr!&nbsp;(lambda&nbsp;(x)&nbsp;(set!&nbsp;kdr&nbsp;x)))))
+<br>
+<br>
+(define&nbsp;p&nbsp;(kons&nbsp;'a&nbsp;'b))<br>
+
+(send-message&nbsp;p&nbsp;get-car)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a<br>
+
+(send-message&nbsp;p&nbsp;get-cdr)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;b<br>
+
+(send-message&nbsp;p&nbsp;set-cdr!&nbsp;'c)<br>
+
+(send-message&nbsp;p&nbsp;get-cdr)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;c</tt>
+</p><p>Простой объект <tt>kons</tt> ничего не делает, кроме как возврата или присваивания
+одного из полей в соотвтствии с запросом.
+Интересно то, что абстрактные объекты могут использоваться для ограничения доступа или выполнения
+дополнительных сервисов.
+Следующая версия <tt>kons</tt> требует указания пароля с любым запросом на присваивание одного из
+полей.
+Этот пароль является параметром процедуры <tt>kons</tt>.
+
+</p><p>
+
+</p><p><tt>(define-object&nbsp;(kons&nbsp;kar&nbsp;kdr&nbsp;pwd)<br>
+
+&nbsp;&nbsp;((get-car&nbsp;(lambda&nbsp;()&nbsp;kar))<br>
+
+&nbsp;&nbsp;&nbsp;(get-cdr&nbsp;(lambda&nbsp;()&nbsp;kar))<br>
+
+&nbsp;&nbsp;&nbsp;(set-car!<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(string=?&nbsp;p&nbsp;pwd)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;kar&nbsp;x))))<br>
+
+&nbsp;&nbsp;&nbsp;(set-cdr!<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(string=?&nbsp;p&nbsp;pwd)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;kar&nbsp;x))))))
+<br>
+<br>
+(define&nbsp;p1&nbsp;(kons&nbsp;'a&nbsp;'b&nbsp;"magnificent"))<br>
+
+(send-message&nbsp;p1&nbsp;set-car!&nbsp;'c&nbsp;"magnificent")<br>
+
+(send-message&nbsp;p1&nbsp;get-car)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;c<br>
+
+(send-message&nbsp;p1&nbsp;set-car!&nbsp;'d&nbsp;"please")<br>
+
+(send-message&nbsp;p1&nbsp;get-car)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;c
+<br>
+<br>
+(define&nbsp;p2&nbsp;(kons&nbsp;'x&nbsp;'y&nbsp;"please"))<br>
+
+(send-message&nbsp;p2&nbsp;set-car!&nbsp;'z&nbsp;"please")<br>
+
+(send-message&nbsp;p2&nbsp;get-car)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;z</tt>
+</p><p>Одной из важных возможностей абстрактного объекта является то, что
+он может сохранять статистику отправленных сообщений.
+Следующая версия <tt>kons</tt> подстчитывает количество доступов к двум полям.
+Эта версия демонстрирует использование явной инициализации локальных привязок.
+
+</p><p>
+
+</p><p><tt>(define-object&nbsp;(kons&nbsp;kar&nbsp;kdr)<br>
+
+&nbsp;&nbsp;((count&nbsp;0))<br>
+
+&nbsp;&nbsp;((get-car<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;count&nbsp;(+&nbsp;count&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kar))<br>
+
+&nbsp;&nbsp;&nbsp;(get-cdr<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;count&nbsp;(+&nbsp;count&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kdr))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(accesses<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;count))))
+<br>
+<br>
+(define&nbsp;p&nbsp;(kons&nbsp;'a&nbsp;'b))<br>
+
+(send-message&nbsp;p&nbsp;get-car)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a<br>
+
+(send-message&nbsp;p&nbsp;get-cdr)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;b<br>
+
+(send-message&nbsp;p&nbsp;accesses)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2<br>
+
+(send-message&nbsp;p&nbsp;get-cdr)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;b<br>
+
+(send-message&nbsp;p&nbsp;accesses)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3</tt>
+</p><p>Реализация <tt>define-object</tt> проста.
+Определение объекта преобразуется в определение процедуры создания объекта.
+Эта процедура представляет собой значение <tt>lambda</tt> выражения,
+аргументы которого указаны в определении.
+Тело <tt>lambda</tt> содержит <tt>let*</tt> для привязки локальных переменных
+и выражения <tt>letrec</tt> для привязки имен сообщений и процедур действий
+(action procedures).
+Тело <tt>letrec</tt> это другое <tt>lambda</tt> выражение, значение которого
+представляет новый объект.
+Тело этого <tt>lambda</tt> выражения сравнивает переданные сообщения с ожидаемыми
+сообщениями используя выражение <tt>case</tt> и применяет соответствующую
+процедуру действия(action procedure) к оставшимся аргументам.
+
+</p><p>
+Например, определение
+
+</p><p><tt>(define-object&nbsp;(kons&nbsp;kar&nbsp;kdr)<br>
+
+&nbsp;&nbsp;((count&nbsp;0))<br>
+
+&nbsp;&nbsp;((get-car<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;count&nbsp;(+&nbsp;count&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kar))<br>
+
+&nbsp;&nbsp;&nbsp;(get-cdr<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;count&nbsp;(+&nbsp;count&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kdr))<br>
+
+&nbsp;&nbsp;&nbsp;(accesses<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;count))))</tt>
+</p><p>превращается в
+
+</p><p>
+
+</p><p><tt>(define&nbsp;kons<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(kar&nbsp;kdr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let*&nbsp;([count&nbsp;0])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(letrec&nbsp;([get-car<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;count&nbsp;(+&nbsp;count&nbsp;1))&nbsp;kar)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[get-cdr<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;count&nbsp;(+&nbsp;count&nbsp;1))&nbsp;kdr)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[accesses&nbsp;(lambda&nbsp;()&nbsp;count)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(msg&nbsp;.&nbsp;args)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(case&nbsp;msg<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(get-car)&nbsp;(apply&nbsp;get-car&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(get-cdr)&nbsp;(apply&nbsp;get-cdr&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(accesses)&nbsp;(apply&nbsp;accesses&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(assertion-violation&nbsp;'kons<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"invalid&nbsp;message"<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;msg&nbsp;args))]))))))</tt>
+</p><p>
+</p><p><tt>
+(library&nbsp;(tspl&nbsp;oop)<br>
+
+&nbsp;&nbsp;(export&nbsp;define-object&nbsp;send-message)<br>
+
+&nbsp;&nbsp;(import&nbsp;(rnrs))
+<br>
+<br>
+&nbsp;;&nbsp;define-object&nbsp;creates&nbsp;an&nbsp;object&nbsp;constructor&nbsp;that&nbsp;uses&nbsp;let*&nbsp;to&nbsp;bind<br>
+
+&nbsp;;&nbsp;local&nbsp;fields&nbsp;and&nbsp;letrec&nbsp;to&nbsp;define&nbsp;the&nbsp;exported&nbsp;procedures.&nbsp;&nbsp;An<br>
+
+&nbsp;;&nbsp;object&nbsp;is&nbsp;itself&nbsp;a&nbsp;procedure&nbsp;that&nbsp;accepts&nbsp;messages&nbsp;corresponding<br>
+
+&nbsp;;&nbsp;to&nbsp;the&nbsp;names&nbsp;of&nbsp;the&nbsp;exported&nbsp;procedures.&nbsp;&nbsp;The&nbsp;second&nbsp;pattern&nbsp;is<br>
+
+&nbsp;;&nbsp;used&nbsp;to&nbsp;allow&nbsp;the&nbsp;set&nbsp;of&nbsp;local&nbsp;fields&nbsp;to&nbsp;be&nbsp;omitted.<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;define-object<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(name&nbsp;.&nbsp;varlist)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((var1&nbsp;val1)&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((var2&nbsp;val2)&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;name<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;varlist<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let*&nbsp;([var1&nbsp;val1]&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(letrec&nbsp;([var2&nbsp;val2]&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(msg&nbsp;.&nbsp;args)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(case&nbsp;msg<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(var2)&nbsp;(apply&nbsp;var2&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assertion-violation&nbsp;'name<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"invalid&nbsp;message"<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;msg&nbsp;args))]))))))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(name&nbsp;.&nbsp;varlist)&nbsp;((var2&nbsp;val2)&nbsp;...))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define-object&nbsp;(name&nbsp;.&nbsp;varlist)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((var2&nbsp;val2)&nbsp;...))]))
+<br>
+<br>
+&nbsp;;&nbsp;send-message&nbsp;abstracts&nbsp;the&nbsp;act&nbsp;of&nbsp;sending&nbsp;a&nbsp;message&nbsp;from&nbsp;the&nbsp;act<br>
+
+&nbsp;;&nbsp;of&nbsp;applying&nbsp;a&nbsp;procedure&nbsp;and&nbsp;allows&nbsp;the&nbsp;message&nbsp;to&nbsp;be&nbsp;unquoted.<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;send-message<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;obj&nbsp;msg&nbsp;arg&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(obj&nbsp;'msg&nbsp;arg&nbsp;...)])))</tt>
+</p><p>
+</p><h4>Exercise <a name="g194"></a>12.8.1</h4>
+<a name="./examples:s64"></a>Используйте <tt>define-object</tt> для определения типа объекта <tt>stack</tt> из
+раздела &nbsp;<a href="start.html#g40">2.9</a>.
+
+<p>
+
+</p><h4>Exercise <a name="g195"></a>12.8.2</h4>
+<a name="./examples:s65"></a>Используйте <tt>define-object</tt> для определения тип объекта<tt>queue</tt> с 
+операциями, аналогичными описанным в разделе &nbsp;<a href="start.html#g40">2.9</a>.
+
+<p>
+
+</p><h4>Exercise <a name="g196"></a>12.8.3</h4>
+<a name="./examples:s66"></a>Часто полезно описывать один объект в терминах другого.
+Например, второй тип объекта <tt>kons</tt> может быть описан как тот же что и
+первый но с аргументом пароль(password) и различными действиями связанными
+с сообщениями <tt>set-car!</tt> и <tt>set-cdr!</tt>.
+Это называется наследованием(<a name="./examples:s67"></a><i>inheritance</i>); новый тип объекта 
+наследует(<i>inherit</i>) атрибуты от первого.
+Измените  <tt>define-object</tt> для поддержки наследования, разрешив необязательное объявление
+ <tt>(inherit&nbsp;object-name)</tt> после пары сообщение/действие (message/action).
+Это потребует сохранения некоторой информации об определении каждого объекта для возможного использования
+в последующих определениях объектов. Конфликтные имена аргументов должны быть разрешены с помощью
+инициалзации или действий указанных в определении нового объекта.
+
+<p>
+
+</p><h4>Exercise <a name="g197"></a>12.8.4</h4>
+<a name="./examples:s68"></a>Основываясь на определении <tt>method</tt> на стр. &nbsp;<a href="syntax.html#defn:method">317</a>,
+определите полную объектную систему, но используйте записи, а не вектоыр для представления экземпляров объекта.
+Если все сделано хорошо, результирующая объектная система должна быть более эффективной и простой в использовании,
+чем приведенная выше система.
+
+<p>
+
+</p><h3><a name="g198"></a><a name="./examples:h9"></a>Section 12.9. Быстрое Преобразование Фурье(БПФ)<a name="SECTEXFFT"></a></h3>
+
+<p>
+Процедура, описанная в этом разделе использует
+комплексную арифметику Scheme 
+<a name="./examples:s69"></a> для вычисления
+дискретного <a name="./examples:s70"></a><i>Преобразования Фурье</i>
+(ДПФ) последовательности значений&nbsp;[<a class="citation" href="bibliography.html#g222">4</a>].
+Дискретное преобразование Фурье используется для анализа и обработки выборочных сигнальных
+последовательностей в широком спектре приложений цифровой электроники, таких как распознавание
+образов, сжатие полосы пропускания, обнаружение цели на радаре и наблюдения за погодой.
+
+</p><p>
+ДПФ последовательности из <i>N</i> входных значений,
+</p><p>
+{<i>x</i>(<i>n</i>)}<sub><i>n</i>=0</sub><sup><i>N</i>-1</sup>,</p><p>
+
+это последовательность из <i>N</i> выходных значений,
+</p><p>
+{<i>X</i>(<i>m</i>)}<sub><i>m</i>=0</sub><sup><i>N</i>-1</sup>,</p><p>
+
+каждое из которых определяется уравнением
+</p><p>
+<img src="./examples_files/32.gif" alt="&lt;graphic&gt;"></p><p>
+
+Удобно абстрагировать постоянную сумму (для данного <i>N</i>)
+</p><p>
+<img src="./examples_files/33.gif" alt="&lt;graphic&gt;"></p><p>
+
+для получения более сжатого, но эквивалентного уравнения
+</p><p>
+<img src="./examples_files/34.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+Прямое вычисление <i>N</i> выходных значений, каждого в виде суммы
+из <i>N</i> промежуточных значений, требует порядка <i>N</i><sup>2</sup> операций.
+Быстрое(<i>fast</i>) преобразование Фурье (БПФ), применимое когда <i>N</i> является
+степенью 2, требует только порядка <i>N</i>log<sub>2</sub><i>N</i> операций.
+Несмотря на то, что он обычно представляется как довольно сложный итеративный алгоритм,
+быстрое преобразование Фурье наиболее кратко и элегантно выражается как рекурсивный
+алгоритм.
+
+</p><p>
+Рекурсивный алгоритм, который принадлежит Sam&nbsp;Daniel&nbsp;[<a class="citation" href="bibliography.html#g225">7</a>],
+можно получить, манипулируя предыдущим суммированием следующим образом.
+Сначала мы разделим суммирование на два суммирования и скомбинируем их
+в одно суммирование от 0 до <i>N</i>/2 - 1.
+</p><p>
+<img src="./examples_files/35.gif" alt="&lt;graphic&gt;"></p><p>
+
+Затем мы вытаскиваем общий коэффициэнт <img src="./examples_files/36.gif" alt="&lt;graphic&gt;">.
+</p><p>
+<img src="./examples_files/37.gif" alt="&lt;graphic&gt;"></p><p>
+
+Мы можем уменьшить <img src="./examples_files/38.gif" alt="&lt;graphic&gt;"> до 1 когда <i>m</i> четно и  -1 когда <i>m</i> 
+нечетно, поскольку
+</p><p>
+<img src="./examples_files/39.gif" alt="&lt;graphic&gt;"></p><p>
+
+Это позволяет нам сузить суммирование для четный и нечетных случаев
+<i>m</i> = 2<i>k</i> и <i>m</i> = 2<i>k</i> + 1, 0 &#8804; <i>k</i> &#8804; <i>N</i>/2 - 1.
+</p><p>
+<img src="./examples_files/40.gif" alt="&lt;graphic&gt;"></p><p>
+
+Результирующими суммами является ДПФ последовательность из 
+<i>N</i>/2-элементов
+</p><p>
+{<i>x</i>(<i>n</i>) + <i>x</i>(<i>n</i> + <i>N</i>/2)}<sub><i>n</i>=0</sub><sup><i>N</i>/2-1</sup></p><p>
+
+и
+</p><p>
+<img src="./examples_files/41.gif" alt="&lt;graphic&gt;"></p><p>
+
+Таким образом ДПФ последовательности из N-элементов может
+быть вычислено рекурсивно путем чередования
+ДПФ для двух последовательностей из <i>N</i>/2-элементов.
+Если мы выберем базовый случай двух элементов, мы можем
+описать алгоритм рекурсивного быстрого преобразования Фурье
+(РБПФ) следующим образом:
+Для <i>N</i> = 2,
+</p><p>
+<img src="./examples_files/42.gif" alt="&lt;graphic&gt;"></p><p>
+
+так как <img src="./examples_files/43.gif" alt="&lt;graphic&gt;">.
+При <i>N</i> &gt; 2,
+</p><p>
+<img src="./examples_files/44.gif" alt="&lt;graphic&gt;"></p><p>
+
+с сопутствующим чередованием четных и нечетных компонетов.
+
+</p><p>
+
+</p><p>
+<img src="./examples_files/45.gif" alt="&lt;graphic&gt;"></p><p>
+
+</p><p>
+Диаграмма приведенная выше, адаптирована к одной из них
+Sam&nbsp;Daniel&nbsp;[<a class="citation" href="bibliography.html#g225">7</a>]
+и показывает вычислительную структуру алгоритма РБПФ.
+Первый этап вычисляет попарные суммы и разности певрой и второй половин входа;
+этот этап обозначается как стадия бабочки(<i>butterfly</i>).
+Второй этап повторяется по поулченным подпоследовательностям.
+Третий этап чередует вывод двух рекурсивных вызовов на РБПФ, что дает 
+правильно упорядоченную последовательность {<i>X</i>(<i>m</i>)}<sub><i>m</i>=0</sub><sup><i>N</i>-1</sup>.
+
+</p><p>
+Процедура <tt>dft</tt> принимает последовательрность
+(список) значений <tt>x</tt>, длина которого считается
+степенью  2.
+<tt>dft</tt> предварительно вычисляет последовательность степеней
+<img src="./examples_files/46.gif" alt="&lt;graphic&gt;">, <img src="./examples_files/47.gif" alt="&lt;graphic&gt;">, и
+вызывает РБПФ - <tt>rfft</tt>, чтобы инициировать рекурсию
+<tt>rfft</tt> следуя алгоритму, описанному выше.
+
+</p><p>
+
+</p><p><tt>
+(define&nbsp;(dft&nbsp;x)<br>
+
+&nbsp;&nbsp;(define&nbsp;(w-powers&nbsp;n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([pi&nbsp;(*&nbsp;(acos&nbsp;0.0)&nbsp;2)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([delta&nbsp;(/&nbsp;(*&nbsp;-2.0i&nbsp;pi)&nbsp;n)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([n&nbsp;n]&nbsp;[x&nbsp;0.0])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;n&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(exp&nbsp;x)&nbsp;(f&nbsp;(-&nbsp;n&nbsp;2)&nbsp;(+&nbsp;x&nbsp;delta))))))))<br>
+
+&nbsp;&nbsp;(define&nbsp;(evens&nbsp;w)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;w)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(car&nbsp;w)&nbsp;(evens&nbsp;(cddr&nbsp;w)))))<br>
+
+&nbsp;&nbsp;(define&nbsp;(interlace&nbsp;x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(car&nbsp;x)&nbsp;(cons&nbsp;(car&nbsp;y)&nbsp;(interlace&nbsp;(cdr&nbsp;x)&nbsp;(cdr&nbsp;y))))))<br>
+
+&nbsp;&nbsp;(define&nbsp;(split&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;split&nbsp;([fast&nbsp;ls]&nbsp;[slow&nbsp;ls])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;fast)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(values&nbsp;'()&nbsp;slow)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let-values&nbsp;([(front&nbsp;back)&nbsp;(split&nbsp;(cddr&nbsp;fast)&nbsp;(cdr&nbsp;slow))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(values&nbsp;(cons&nbsp;(car&nbsp;slow)&nbsp;front)&nbsp;back)))))<br>
+
+&nbsp;&nbsp;(define&nbsp;(butterfly&nbsp;x&nbsp;w)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let-values&nbsp;([(front&nbsp;back)&nbsp;(split&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(values<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;+&nbsp;front&nbsp;back)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;*&nbsp;(map&nbsp;-&nbsp;front&nbsp;back)&nbsp;w))))<br>
+
+&nbsp;&nbsp;(define&nbsp;(rfft&nbsp;x&nbsp;w)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;(cddr&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x0&nbsp;(car&nbsp;x)]&nbsp;[x1&nbsp;(cadr&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;(+&nbsp;x0&nbsp;x1)&nbsp;(-&nbsp;x0&nbsp;x1)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let-values&nbsp;([(front&nbsp;back)&nbsp;(butterfly&nbsp;x&nbsp;w)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([w&nbsp;(evens&nbsp;w)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(interlace&nbsp;(rfft&nbsp;front&nbsp;w)&nbsp;(rfft&nbsp;back&nbsp;w))))))<br>
+
+&nbsp;&nbsp;(rfft&nbsp;x&nbsp;(w-powers&nbsp;(length&nbsp;x))))</tt>
+</p><p>
+</p><h4>Exercise <a name="g199"></a>12.9.1</h4>
+<a name="./examples:s71"></a>Измените алгоритм, чтобы использовать базовый случай
+из четырех точек. Какие упрощения можно сделать, чтобы избежать умножения каких-либо
+выходов базоваого случая на элементы <tt>w</tt>?
+
+<p>
+
+</p><h4>Exercise <a name="g200"></a>12.9.2</h4>
+<a name="./examples:s72"></a>Перекодируйте <tt>dft</tt>, чтобы принять вектор, а не список в
+качестве входного сигнала, и произвести его в качестве выхода.
+При необходимости используйте списки внутри, но не выполняйте простое конвертирование входных данных в
+список при вводе и вывод в вектор при выходе.
+
+<p>
+
+</p><h4>Exercise <a name="g201"></a>12.9.3</h4>
+<a name="./examples:s73"></a>Rather than recomputing the powers of <tt>w</tt> on each step for a new
+number of points, the code simply uses the even-numbered elements of
+the preceding list of powers.
+Show that doing so yields the proper list of powers.
+That is, show that <tt>(evens&nbsp;(w-powers&nbsp;n))</tt> is equal to
+<tt>(w-powers&nbsp;(/&nbsp;n&nbsp;2))</tt>.
+
+<p>
+
+</p><h4>Exercise <a name="g202"></a>12.9.4</h4>
+<a name="./examples:s74"></a>На этапе рекурсии создается несколько промежуточных списков, которые немедленно отбрасываются. Перекодируйте шаг рекурсии, чтобы избежать ненужного выделения памяти.
+
+<p>
+
+</p><h4>Exercise <a name="g203"></a>12.9.5</h4>
+<a name="./examples:s75"></a>Каждый элемент последовательности входных значений может быть востановлен из дискретного преобразования Фурье последовательности через уравнение
+<p>
+<img src="./examples_files/48.gif" alt="&lt;graphic&gt;"></p><p>
+
+Отмечая сходство между этим уравнением и исходным уравнением, определяющим <i>X</i>(<i>m</i>), создайте модифицированную версию <tt>dft</tt>, <tt>inverse-dft</tt>,
+которая выполняет обратное преобразование. 
+Убедитесь, что  <tt>(inverse-dft&nbsp;(dft&nbsp;<i>seq</i>))</tt> возвращает 
+<tt><i>seq</i></tt> для нескольких входных последовательностей  <tt><i>seq</i></tt>.
+
+</p><p>
+
+</p><h3><a name="g204"></a><a name="./examples:h10"></a>Section 12.10. Алгоритм унификации<a name="SECTEXUNIFY"></a></h3>
+
+<p>
+<i>Унификация</i>&nbsp;[<a class="citation" href="bibliography.html#g241">23</a>] 
+это метод сопоставления с образцом, используемый в автоматическом доказательстве
+теорем, системах ввода типа, компьютерной алгебре и логическом программировании, например,
+ Prolog&nbsp;[<a class="citation" href="bibliography.html#g224">6</a>].
+
+</p><p>
+<a name="./examples:s76"></a>Алгоритм Унификации пытается сделать два
+символических выражения равными, вычисляя унифицирующую подстановку
+для выражений.
+Подстановка(<i>substitution</i>) это функция которая заменяет переменные другими
+выражениями.
+Подстановка должна обрабатывать все вхождения переменной одинаково, например,
+если она заменяет одно вхожденение переменной <i>x</i> на <i>a</i>, она должна
+заменить все вхождения <i>x</i> на <i>a</i>.
+Унифицирующая подстановка, или унификатор(<i>unifier</i>), для двух выражений <i>e</i><sub>1</sub> и <i>e</i><sub>2</sub> представляет собой замену, <img src="./examples_files/22.gif" alt="&lt;graphic&gt;">, такую что <img src="./examples_files/49.gif" alt="&lt;graphic&gt;">.
+
+</p><p>
+Например, два выражения <i>f</i>(<i>x</i>) и <i>f</i>(<i>y</i>) могут быть унифицированы
+путем подстановки <i>x</i> для <i>y</i> (или <i>y</i> для <i>x</i>).
+В этом случае, унификатор <img src="./examples_files/22.gif" alt="&lt;graphic&gt;"> could be может быть описан как функция, которая заменяет <i>y</i> на <i>x</i> и оставляет
+другие переменные неизменными.
+С другой стороны, два выражения <i>x</i> + 1 и <i>y</i> + 2 не могут быть
+унифицированы.
+Может показаться, что подстановка 3 для <i>x</i> и 2 для <i>y</i> сделает
+оба выражения равными 4 и следовательно равными друг другу.
+Однако символические выражения 3 + 1 и 2 + 2, все еще различаются.
+
+</p><p>
+В двух выражениях может быть более одного унификатора.
+Например, выражения <i>f</i>(<i>x</i>,<i>y</i>)и <i>f</i>(1,<i>y</i>) могут быть
+унифицированы до
+<i>f</i>(1,<i>y</i>) с подстановкой 1 для <i>x</i>(заменой <i>x</i> на 1).
+Они также могут быть унифицированы до <i>f</i>(1,5) с подстановкой 1 для
+<i>x</i> и 5 для <i>y</i>.
+Первая подстановка предпочтительнее, поскольку она не фиксирует не нужную
+замену <i>y</i>.
+Алгоритмы унификации обычно создают <i>наиболее общий унификатор(most general unifier)</i>,
+или <i>mgu</i>, для двух выражений.
+ mgu для двух выражений не делает ненужных подстановок; все
+остальные унификации для выражений являются частными случаями mgu.
+В приведенном выше примере, первой подстановкой является mgu, а второй -
+частный случай.
+
+</p><p>
+Для целей этой программы, символическое выражение может быть переменной,
+константой или применением функции.
+Переменные представлены символами Scheme, например <tt>x</tt>;
+применение функции представлено списком с именем функции в первой позиции и
+ее аргументами в остальных позициях, например <tt>(f&nbsp;x)</tt>; и
+константы представлены функциями без аргументов, например <tt>(a)</tt>.
+
+</p><p>
+Представленый здесь алгоритм находит mgu для двух термов, если он существует,
+используя <a name="./examples:s77"></a>стиль передачи продолжений(continuation-passing style), или
+CPS (см Раздел&nbsp;<a href="further.html#g75">3.4</a>),
+приближаясь рекурсивно по субтермам.
+Процедура <a name="./examples:s78"></a><tt>unify</tt> принимает два терма и передает
+их во вспомогательную процедуру <tt>uni</tt>, а также начальную идетничтную(identity)
+подстановку, продолжение для случая успеха, и продолжение для случая отказа.
+Продолжение успеха возвращает результат применения его аргумента,
+подстановки, к одному из термов, т.е., унифицированный результат.
+Продолжение отказа просто возвращает свой аргумент, сообщение.
+Поскольку управление проходит через явные продолжения в предедах<tt>unify</tt>
+(всегда с хвостовым вызовами), возврат из продолжения успеха или оказа
+это возврат из самого <tt>unify</tt>.
+
+</p><p>
+Подстановки(замены) это процедуры.
+Всякий раз, когда переменная дожна быть заменена другим термом, новая
+подстановка формируется из переменной, терма и существующей подстановки.
+Учитывая терм как аргумент, новая подстановка заменяет вхождения его
+сохраненной переменной ее сохраненным термом в результате вызова
+сохраненной подстановки в выражение аргумента.
+Интуитивно, подстановка представляет собой цепочку процедур, по одной 
+для каждой переменной в подстановке.
+Цепочка заканчивается начальной, идентичной(identity) подстановкой.
+
+</p><p>
+
+</p><p><tt>(unify&nbsp;'x&nbsp;'y)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;y<br>
+
+(unify&nbsp;'(f&nbsp;x&nbsp;y)&nbsp;'(g&nbsp;x&nbsp;y))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"clash"<br>
+
+(unify&nbsp;'(f&nbsp;x&nbsp;(h))&nbsp;'(f&nbsp;(h)&nbsp;y))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(f&nbsp;(h)&nbsp;(h))<br>
+
+(unify&nbsp;'(f&nbsp;(g&nbsp;x)&nbsp;y)&nbsp;'(f&nbsp;y&nbsp;x))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"cycle"<br>
+
+(unify&nbsp;'(f&nbsp;(g&nbsp;x)&nbsp;y)&nbsp;'(f&nbsp;y&nbsp;(g&nbsp;x)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(f&nbsp;(g&nbsp;x)&nbsp;(g&nbsp;x))<br>
+
+(unify&nbsp;'(f&nbsp;(g&nbsp;x)&nbsp;y)&nbsp;'(f&nbsp;y&nbsp;z))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(f&nbsp;(g&nbsp;x)&nbsp;(g&nbsp;x))</tt>
+</p><p>
+</p><p><tt>
+(library&nbsp;(tspl&nbsp;unification)<br>
+
+&nbsp;&nbsp;(export&nbsp;unify)<br>
+
+&nbsp;&nbsp;(import&nbsp;(rnrs))
+<br>
+<br>
+&nbsp;;&nbsp;occurs?&nbsp;returns&nbsp;true&nbsp;if&nbsp;and&nbsp;only&nbsp;if&nbsp;u&nbsp;occurs&nbsp;in&nbsp;v<br>
+
+&nbsp;&nbsp;(define&nbsp;occurs?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(u&nbsp;v)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(pair?&nbsp;v)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([l&nbsp;(cdr&nbsp;v)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(pair?&nbsp;l)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(eq?&nbsp;u&nbsp;(car&nbsp;l))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(occurs?&nbsp;u&nbsp;(car&nbsp;l))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(f&nbsp;(cdr&nbsp;l))))))))
+<br>
+<br>
+&nbsp;;&nbsp;sigma&nbsp;returns&nbsp;a&nbsp;new&nbsp;substitution&nbsp;procedure&nbsp;extending&nbsp;s&nbsp;by<br>
+
+&nbsp;;&nbsp;the&nbsp;substitution&nbsp;of&nbsp;u&nbsp;with&nbsp;v<br>
+
+&nbsp;&nbsp;(define&nbsp;sigma<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(u&nbsp;v&nbsp;s)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([x&nbsp;(s&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(symbol?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(eq?&nbsp;x&nbsp;u)&nbsp;v&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(car&nbsp;x)&nbsp;(map&nbsp;f&nbsp;(cdr&nbsp;x))))))))
+<br>
+<br>
+&nbsp;;&nbsp;try-subst&nbsp;tries&nbsp;to&nbsp;substitute&nbsp;u&nbsp;for&nbsp;v&nbsp;but&nbsp;may&nbsp;require&nbsp;a<br>
+
+&nbsp;;&nbsp;full&nbsp;unification&nbsp;if&nbsp;(s&nbsp;u)&nbsp;is&nbsp;not&nbsp;a&nbsp;variable,&nbsp;and&nbsp;it&nbsp;may<br>
+
+&nbsp;;&nbsp;fail&nbsp;if&nbsp;it&nbsp;sees&nbsp;that&nbsp;u&nbsp;occurs&nbsp;in&nbsp;v.<br>
+
+&nbsp;&nbsp;(define&nbsp;try-subst<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(u&nbsp;v&nbsp;s&nbsp;ks&nbsp;kf)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([u&nbsp;(s&nbsp;u)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(not&nbsp;(symbol?&nbsp;u))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(uni&nbsp;u&nbsp;v&nbsp;s&nbsp;ks&nbsp;kf)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([v&nbsp;(s&nbsp;v)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(eq?&nbsp;u&nbsp;v)&nbsp;(ks&nbsp;s)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(occurs?&nbsp;u&nbsp;v)&nbsp;(kf&nbsp;"cycle")]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(ks&nbsp;(sigma&nbsp;u&nbsp;v&nbsp;s))]))))))
+<br>
+<br>
+&nbsp;;&nbsp;uni&nbsp;attempts&nbsp;to&nbsp;unify&nbsp;u&nbsp;and&nbsp;v&nbsp;with&nbsp;a&nbsp;continuation-passing<br>
+
+&nbsp;;&nbsp;style&nbsp;that&nbsp;returns&nbsp;a&nbsp;substitution&nbsp;to&nbsp;the&nbsp;success&nbsp;argument<br>
+
+&nbsp;;&nbsp;ks&nbsp;or&nbsp;an&nbsp;error&nbsp;message&nbsp;to&nbsp;the&nbsp;failure&nbsp;argument&nbsp;kf.&nbsp;&nbsp;The<br>
+
+&nbsp;;&nbsp;substitution&nbsp;itself&nbsp;is&nbsp;represented&nbsp;by&nbsp;a&nbsp;procedure&nbsp;from<br>
+
+&nbsp;;&nbsp;variables&nbsp;to&nbsp;terms.<br>
+
+&nbsp;&nbsp;(define&nbsp;uni<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(u&nbsp;v&nbsp;s&nbsp;ks&nbsp;kf)<br>
+
+<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(symbol?&nbsp;u)&nbsp;(try-subst&nbsp;u&nbsp;v&nbsp;s&nbsp;ks&nbsp;kf)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(symbol?&nbsp;v)&nbsp;(try-subst&nbsp;v&nbsp;u&nbsp;s&nbsp;ks&nbsp;kf)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(and&nbsp;(eq?&nbsp;(car&nbsp;u)&nbsp;(car&nbsp;v))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(=&nbsp;(length&nbsp;u)&nbsp;(length&nbsp;v)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([u&nbsp;(cdr&nbsp;u)]&nbsp;[v&nbsp;(cdr&nbsp;v)]&nbsp;[s&nbsp;s])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;u)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(ks&nbsp;s)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(uni&nbsp;(car&nbsp;u)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;v)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(s)&nbsp;(f&nbsp;(cdr&nbsp;u)&nbsp;(cdr&nbsp;v)&nbsp;s))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kf)))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(kf&nbsp;"clash")])))
+<br>
+<br>
+&nbsp;;&nbsp;unify&nbsp;shows&nbsp;one&nbsp;possible&nbsp;interface&nbsp;to&nbsp;uni,&nbsp;where&nbsp;the&nbsp;initial<br>
+
+&nbsp;;&nbsp;substitution&nbsp;is&nbsp;the&nbsp;identity&nbsp;procedure,&nbsp;the&nbsp;initial&nbsp;success<br>
+
+&nbsp;;&nbsp;continuation&nbsp;returns&nbsp;the&nbsp;unified&nbsp;term,&nbsp;and&nbsp;the&nbsp;initial&nbsp;failure<br>
+
+&nbsp;;&nbsp;continuation&nbsp;returns&nbsp;the&nbsp;error&nbsp;message.<br>
+
+&nbsp;&nbsp;(define&nbsp;unify<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(u&nbsp;v)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(uni&nbsp;u<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(s)&nbsp;(s&nbsp;u))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(msg)&nbsp;msg)))))</tt>
+</p><p>
+</p><h4>Exercise <a name="g205"></a>12.10.1</h4>
+<a name="./examples:s79"></a>Измените <tt>unify</tt>, так что бы она возвращала свою подстановку а не  унифицированный терм.
+Примените эту подстановку к обоим входным термам, чтобы убедиться, что она
+возвращает одинаковый результат для каждого.
+
+<p>
+
+</p><h4>Exercise <a name="g206"></a>12.10.2</h4>
+<a name="./examples:s80"></a>Как упоминалось выше, подстановки на терме
+выполняются последовательно, требуя один полный проход по входному выражению
+для каждой замещаемой переменной.
+Представьте подстановку так что бы был необходим только один проход по выражению.
+Убедитесь, что подстановки выполняются не только на входном выражении, но и на
+любых выражениях, которые вы вставляете во время замещения.
+
+<p>
+
+</p><h4>Exercise <a name="g207"></a>12.10.3</h4>
+<a name="./examples:s81"></a>Расширьте алгоритм унификации созданный в стиле передачи продолжений,
+на всю  систему логического программирования созданную в стиле передачи продолжений.
+
+<p>
+
+</p><h3><a name="g208"></a><a name="./examples:h11"></a>Section 12.11. Многозадачность с Движком(Engines)<a name="SECTEXENGINES"></a></h3>
+
+<p>
+<a name="./examples:s82"></a>Движки-это абстракция процесса высокого-уровня, обеспечивающая
+
+<a name="./examples:s83"></a><i>выгрузку(вытеснение) по времени</i>&nbsp;[<a class="citation" href="bibliography.html#g228">10</a>,<a class="citation" href="bibliography.html#g233">15</a>].
+Движок может использоваться для имитации <a name="./examples:s84"></a>многопроцессорной обработки,
+реализации <a name="./examples:s85"></a><a name="./examples:s86"></a>легковесных потоков,
+реализации ядер операционной системы и выполнения
+ <a name="./examples:s87"></a> недетерминированных вычислений.
+Реализация Движка является одним из наиболее интересных применений
+ <a name="./examples:s88"></a>продолжений в Scheme.
+
+</p><p>
+Движок создается передачей чанка(thunk) (процедуры без аргументов)
+в процедуру <tt>make-engine</tt>.
+Тело чанка(thunk) это вычисление которое будет выполнять Движок.
+Сам движок это процедура с тремя аргументами:
+
+</p><p>
+</p><ol>
+<a name="g209"></a><li><a name="./examples:s89"></a><tt><i>ticks</i></tt>,
+положительное целое число, определяющее количество <i>топлива(fuel)</i> которое
+должно быть передано Движку.
+Движок работает до тех пор пока это топливо не закончиться или пока вычисление не
+закончиться(до того как закончаться тики).
+
+<p>
+<a name="g210"></a></p></li><li><a name="./examples:s90"></a><tt><i>complete</i></tt>,
+процедура из двух аргументов, которая указывает, что делать, если вычисление
+завершиться.
+Его аргументами будет количество оставшегося "топлива" и результат вычислений.
+
+<p>
+<a name="g211"></a></p></li><li><a name="./examples:s91"></a><tt><i>expire</i></tt>,
+процедура одного аргумента, которая указывает, что делать, если топливо закончиться
+до завершения вычисления.
+Его аргументом будет новый Движок, способный продолжать вычисление с точки прерывания.
+</li></ol>
+<p>
+
+</p><p>
+Когда Движок применяется к своим аргументам, он устанавливает таймер срабатывающий
+когда истекут <tt><i>ticks</i></tt> единиц времени.
+Если вычисления в Движке завершаться до истечения времени таймера,
+система вызывает <tt><i>complete</i></tt>, передавая ему количество оставшихся
+тиков(<tt><i>ticks</i></tt>) и вычисленное значение.
+Если, с другой стороны, таймер сработает до завершения вычислений в Движке,
+система создает новый Движок из продолжения прерванного вычисления и передает
+этот Движок процедуре <tt><i>expire</i></tt>.
+<tt><i>complete</i></tt> и <tt><i>expire</i></tt> вызываются в продолжении
+вызова Движка.
+
+</p><p>
+В следующем примере создается движок с тривиальным вычислением,
+3, и дает движку 10 тиков(ticks).
+
+</p><p>
+
+</p><p><tt>(define&nbsp;eng<br>
+
+&nbsp;&nbsp;(make-engine<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;3)))
+<br>
+<br>
+(eng&nbsp;10<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ticks&nbsp;value)&nbsp;value)<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)&nbsp;x))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3</tt>
+</p><p>Часто бывает полезно передать движку <tt>list</tt> в качестве процедуры <tt><i>complete</i></tt>,
+заставив движок вернуть список оставшихся тиков(ticks) и значение, если завершение вычислений завершено.
+
+</p><p>
+
+</p><p><tt>(eng&nbsp;10<br>
+
+&nbsp;&nbsp;list<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)&nbsp;x))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(9&nbsp;3)</tt>
+</p><p>В приведенном выше примере, значение это 3 и оставалось 9 тиков, т.е. для вычисления 3 потребовалась
+всего одна едищица топлива.
+(Указанные здесь величины топлива приведены только для илюстрации, фактическое значение может отличаться.)
+
+</p><p>
+Как правило, вычислегния в Движке не завершается с одной попытки.
+<a name="./examples:s92"></a>В следующем примере показано использование движка для вычисления
+10-го числа Фибоначчи (см, раздел&nbsp;<a href="further.html#g55">3.2</a>)
+в шагах.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;fibonacci<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(&lt;&nbsp;n&nbsp;2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;(fibonacci&nbsp;(-&nbsp;n&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fibonacci&nbsp;(-&nbsp;n&nbsp;2))))))
+<br>
+<br>
+(define&nbsp;eng<br>
+
+&nbsp;&nbsp;(make-engine<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fibonacci&nbsp;10))))
+<br>
+<br>
+(eng&nbsp;50<br>
+
+&nbsp;&nbsp;list<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(new-eng)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;eng&nbsp;new-eng)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;"expired"))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"expired"
+<br>
+<br>
+(eng&nbsp;50<br>
+
+&nbsp;&nbsp;list<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(new-eng)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;eng&nbsp;new-eng)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;"expired"))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"expired"
+<br>
+<br>
+(eng&nbsp;50<br>
+
+&nbsp;&nbsp;list<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(new-eng)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;eng&nbsp;new-eng)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;"expired"))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"expired"
+<br>
+<br>
+(eng&nbsp;50<br>
+
+&nbsp;&nbsp;list<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(new-eng)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;eng&nbsp;new-eng)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;"expired"))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(22&nbsp;55)</tt>
+</p><p>Каждый раз когда топливо в Движке заканчивается, процедура <tt><i>expire</i></tt> присваивала переменной
+<tt>eng</tt> новый Движок.
+Для полного расчета потребовалось четыре выделения по 50 тиков; из последних
+50 он использовал все, кроме 23.
+Таким образом, общее количество использованного топлива составило 177 тиков.
+Это приводи нас к следующей процедуре <tt>mileage</tt>, которая использует
+Движки для вычисления "времени" вычисления.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;mileage<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(thunk)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;loop&nbsp;([eng&nbsp;(make-engine&nbsp;thunk)]&nbsp;[total-ticks&nbsp;0])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(eng&nbsp;50<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ticks&nbsp;value)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;total-ticks&nbsp;(-&nbsp;50&nbsp;ticks)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(new-eng)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;new-eng&nbsp;(+&nbsp;total-ticks&nbsp;50)))))))
+<br>
+<br>
+(mileage&nbsp;(lambda&nbsp;()&nbsp;(fibonacci&nbsp;10)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;178</tt>
+</p><p>Разумеется выбор 50 для количества тиков используемых каждый раз произволен.
+Возможно имеет смысл передать гораздо большее число, скажем 10000,
+чтобы сократить количество раз, когда вычисление прерывается.
+
+</p><p>
+Следующая процедура, <a name="./examples:s93"></a><tt>round-robin</tt>, может быть основой для
+простой <a name="./examples:s94"></a>операционной системы с разделением времени.
+<tt>round-robin</tt> поддерживает очередь процессов(список Движков) и
+циклически перемещается по очереди в стиле <i>round-robin</i>, позволяя каждому
+процессу работать в течении определенного времени.
+<tt>round-robin</tt> возвращает возвращает список значений, возвращаемых вычислениями в Движках
+в порядке завершения вычислений.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;round-robin<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(engs)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;engs)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((car&nbsp;engs)&nbsp;1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ticks&nbsp;value)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;value&nbsp;(round-robin&nbsp;(cdr&nbsp;engs))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(eng)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(round-robin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(append&nbsp;(cdr&nbsp;engs)&nbsp;(list&nbsp;eng))))))))</tt>
+</p><p>Предполагая что количличество вычислений, соответствующее одному тику,
+является постоянным, результатом <tt>round-robin</tt> будет возврат списка значений
+отсортированных от самого быстрого завершения до самого медленного.
+Таким образом, когда мы вызываем <tt>round-robin</tt> со списком движков, каждый из
+которых вычисляет одно из чисел Фибоначчи, список результатов сначала сортируется так,
+что более ранние числа Фибоначчи стоят впереди, независимо от порядка входного спика.
+
+</p><p>
+
+</p><p><tt>(round-robin<br>
+
+&nbsp;&nbsp;(map&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(make-engine<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fibonacci&nbsp;x))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(4&nbsp;5&nbsp;2&nbsp;8&nbsp;3&nbsp;7&nbsp;6&nbsp;2)))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;1&nbsp;2&nbsp;3&nbsp;5&nbsp;8&nbsp;13&nbsp;21)</tt>
+</p><p>Более интересные вещи могут произойти, если количество топлива изменяется каждый раз по проходе цикла.
+<a name="./examples:s95"></a>В этом случае вычисление будет недетерминированным, т.е
+результаты будут варьироваться от вызова к вызову.
+
+</p><p>
+Следующая синтаксическая форма, <a name="./examples:s96"></a><tt>por</tt> (parallel-or), возвращает
+первое из своих выражений завершившихся с истинным значением.
+<tt>por</tt> реализуется с процедурой <tt>first-true</tt>, которая похожа
+на <tt>round-robin</tt> но прекращается, когда любой из движков завершается с 
+истинным значением.
+Если все движки завершены, но ни один не вернул истинного значения.
+<tt>first-true</tt> (и следовательно <tt>por</tt>) возвращает <tt>#f</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;por<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;x&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(first-true<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;(make-engine&nbsp;(lambda&nbsp;()&nbsp;x))&nbsp;...))]))
+<br>
+<br>
+(define&nbsp;first-true<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(engs)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;engs)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#f<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((car&nbsp;engs)&nbsp;1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ticks&nbsp;value)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;value&nbsp;(first-true&nbsp;(cdr&nbsp;engs))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(eng)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(first-true<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(append&nbsp;(cdr&nbsp;engs)&nbsp;(list&nbsp;eng))))))))</tt>
+</p><p>Даже если одно из выражений представляет собой бесконечный цикл,
+<tt>por</tt> все равно может завершиться (когда одно из остальных выражений завершиться и
+вернет истинное значение).
+
+</p><p>
+
+</p><p><tt>(por&nbsp;1&nbsp;2)&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+(por&nbsp;((lambda&nbsp;(x)&nbsp;(x&nbsp;x))&nbsp;(lambda&nbsp;(x)&nbsp;(x&nbsp;x)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fibonacci&nbsp;10))&nbsp;<img src="./examples_files/0.gif" alt="&lt;graphic&gt;">&nbsp;55</tt>
+</p><p>Первое подвыражение второго выражения <tt>por</tt> является
+непрерываемым, поэтому ответ является значением второго подвыражения.
+
+</p><p>
+Давайте обратимся к реализации Движков.
+Любой вытесняющий многозадачный примитив должен иметь возможность
+прервывать выполняемый процесс после заданного количества вычислений.
+Эта возможность обеспечивается механизмом прерывания примитива <a name="./examples:s97"></a>timer
+в некоторых реализациях Scheme.
+Здесь мы построим подходящий.
+
+</p><p>
+Наша система таймера определяет три процедуры: <tt>start-timer</tt>, <tt>stop-timer</tt>,
+и <tt>decrement-timer</tt>, которые можно описать следующим образом.
+
+</p><p>
+</p><ul>
+<li><tt>(start-timer&nbsp;<i>ticks</i>&nbsp;<i>handler</i>)</tt>
+устанавливает таймер на <tt><i>ticks</i></tt> и устанавливает <tt><i>handler</i></tt> в качестве
+процедуры, которую нужно вызвать(без аргументов) когда тики таймера закончаться, т.е. достигнут нуля.
+
+<p>
+</p></li><li><tt>(stop-timer)</tt>
+сбрасывает таймер и возвращает количество оставшихся тиков.
+
+<p>
+</p></li><li><tt>(decrement-timer)</tt>
+уменьшает таймер на один тик, если таймер включен,т.е. если
+он не равен нулю.
+Когда таймер достигает нуля, <tt>decrement-timer</tt> вызывает сохраненный
+обработчик.
+Если таймер уже достиг нулевого значения, <tt>decrement-timer</tt> возвращается
+без изменения таймера.
+</li></ul>
+<p>
+
+</p><p>
+Код для реализации этих процедур реализован вместе с приведенной
+ниже версией движка.
+
+</p><p>
+Использование системы таймера требует вставки вызовов <tt>decrement-timer</tt> в
+соответствующих местах.
+Потребление таймером тиков при входе в процедуру обычно обеспечивает достаточный
+уровень детализации. Это может быть достигнуто с использованием <tt>timed-lambda</tt>
+как определено ниже, вместо of <tt>lambda</tt>.
+<tt>timed-lambda</tt> просто вызывает <tt>decrement-timer</tt> перед выполнением
+выражений в своем теле.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;timed-lambda<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;formals&nbsp;exp1&nbsp;exp2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;formals&nbsp;(decrement-timer)&nbsp;exp1&nbsp;exp2&nbsp;...)]))</tt>
+</p><p>Может быть полезно переопределить именованный <tt>let</tt> и <tt>do</tt> чтобы использовать <tt>timed-lambda</tt>,
+так что рекурсии, выраженные с помощью этих конструкций, были ограничиваемы по времени(timed).
+Если вы используете этот механизм, на забудьте использовать timed(ограничивающие время выполнения) версии
+<tt>lambda</tt> и других форм при запуске кода с движком, или никакие тики не будут
+потребляться.
+
+</p><p>
+Теперь, когда у нас есть подходящий таймер, мы можем реализовать Движки в терминах
+таймера и продолжений.
+Мы использоуем <a name="./examples:s98"></a><tt>call/cc</tt> в двух местах при
+реализации движка: (1) чтобы получить продолжение вычисления, которое вызывает
+движок, чтобы мы могли вернуться к этому продожению при завершении вычисления
+Движка или истечении таймера, и (2) для получения продолжения вычисления движка
+при истечении таймера, чтобы мы могли вернуться к этому вычислению, если в последствии
+будет запущен вновь созданный движок.
+
+</p><p>
+Состояние системы Движка содержиться в двух переменных, локальных для
+системы движка: <tt>do-complete</tt> и <tt>do-expire</tt>.
+Когда Движок запускается, движку назначаются процедуры <tt>do-complete</tt> и
+<tt>do-expire</tt>, которые при вызове возвращают продолжение движка вызывающее
+<tt><i>complete</i></tt> или <tt><i>expire</i></tt>.
+Движок запускает (или перезапускает) вычисление, вызывая процедуру, переданную
+в качестве аргумента в процедуру <tt>make-engine</tt> с указанным числом тиков.
+Затем тики и локальная процедура <tt>timer-handler</tt> используются для
+запуска таймера.
+
+</p><p>
+Предположим, что таймер истекает до завершения вычисления Движка.
+При этом вызывается <tt>timer-handler</tt>.
+Он инициирует вызов <tt>start-timer</tt> но получает тики вызывая
+<tt>call/cc</tt> с <tt>do-expire</tt>.
+В результате, <tt>do-expire</tt> вызывается  с продолженинем,
+которое при вызове перезапускает таймер и продолжит прерванное
+вычисление.
+<tt>do-expire</tt> создает новый движок из этого продолжения и встраивает
+процедуру <tt><i>expire</i></tt> в этот движок для вызова с новым движком
+в правильном продолжении.
+
+</p><p>
+Если, с другой стороны, вычисление движка завершиться до истечения таймера,
+таймер останавливается и количество оставшихся тиков передается вместе со
+значением в процедуру <tt>do-complete</tt>;
+<tt>do-complete</tt> организует для нового движка процедуру <tt><i>complete</i></tt>
+запускаемую с тиками и значением в правильном продолжении.
+
+</p><p>
+Давайте обсудим несколько тонких аспектов этого кода.
+Первый относится к методу, используемому для запуска таймера при вызове
+движка.
+Очевидно, что код будет упрощен, позволяя <tt>new-engine</tt> запускать
+таймер до того, как он начнет или возобновит вычисление движка, вместо
+того чтобы передавать движку тики на вычисление и позволять ему запускать
+таймер.
+Однако запуск таймера в вычслении, передотвращает преждевременное
+потребление тиков.
+Если сама система запуска движков сама потребляет топливо, тогда движок
+снабженный небольшим количеством топлива может не продвинуться к
+завершению вычислений.
+(Это может, на самом деле, отритцательно повлиять на прогресс.)
+Если используется таймер, описанный выше, этой проблемы фактически избегают,
+компилируя код реалзицации движка без ограничивающей время выполнения(timed) 
+версии <tt>lambda</tt>.
+
+</p><p>
+Вторая тонкость относиться к процедурам, созданным <tt>do-complete</tt> и
+<tt>do-expire</tt>, и затем применяемым продолжением применяющим
+<a name="./examples:s99"></a><a name="./examples:s100"></a><tt>call/cc</tt>.
+Может показаться, что <tt>do-complete</tt> может сначала вызывать процедуру
+движка <tt><i>complete</i></tt>, а затем передать результат в продолжение
+(и аналогично для <tt>do-expire</tt>) следующим образом.
+
+</p><p>
+
+</p><p><tt>(escape&nbsp;(complete&nbsp;value&nbsp;ticks))</tt>
+</p><p>Однако, это приведет к неправильному обращению с хвостовой рекурсией.
+Проблема заключается в том, что текущее продолжение не будт заменено продолжением,
+сохраненным в <tt>escape</tt>, до тех пор, пока не вернется вызов процедуры <tt>complete</tt>.
+Следовательно, как продолжение выполняющегося движка, так и продолжение
+вызываемого движка могут сохраняться в течении неопределенного периода фремени,
+хотя фактически настощий вызов движка может вызываться в хвостовой рекурсии.
+Это особенно не уместно, потому что интерфейс движка поощряет испольозвание
+стиля передачи продолжений и, следовательно хвостовой рекурсии.
+Планировщик round-robin и <tt>first-true</tt> предоставляют хорошие примеры этого,
+так как процедура <tt><i>expire</i></tt> в каждом вызове рекурсивно вызывает
+движки с правильной хвостовой рекурсией.
+
+</p><p>
+Мы поддерживаем надлежащее обращение с хвостовой рекурсией, организуя для
+<tt>do-complete</tt> и <tt>do-expire</tt> выход из продолжения
+запустившего движок, прежде чем вызвать процедуры <tt>complete</tt> или
+<tt>expire</tt>.
+Поскольку продолжение вызвавшее движок является применением процедуры,
+передача его без аргументов приводит к применению процедуры
+в продолжении вызвавшем движок.
+
+</p><p>
+
+</p><p><tt>
+(library&nbsp;(tspl&nbsp;timer)<br>
+
+&nbsp;&nbsp;(export&nbsp;start-timer&nbsp;stop-timer&nbsp;decrement-timer)<br>
+
+&nbsp;&nbsp;(import&nbsp;(rnrs))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;clock&nbsp;0)<br>
+
+&nbsp;&nbsp;(define&nbsp;handler&nbsp;#f)
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;start-timer<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ticks&nbsp;new-handler)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;handler&nbsp;new-handler)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;clock&nbsp;ticks)))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;stop-timer<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([time-left&nbsp;clock])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;clock&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;time-left)))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;decrement-timer<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(when&nbsp;(&gt;&nbsp;clock&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;clock&nbsp;(-&nbsp;clock&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(when&nbsp;(=&nbsp;clock&nbsp;0)&nbsp;(handler)))))
+<br>
+<br>
+&nbsp;&nbsp;(define-syntax&nbsp;timed-lambda<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;formals&nbsp;exp1&nbsp;exp2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;formals&nbsp;(decrement-timer)&nbsp;exp1&nbsp;exp2&nbsp;...)])))
+<br>
+<br>
+(library&nbsp;(tspl&nbsp;engines)<br>
+
+&nbsp;&nbsp;(export&nbsp;make-engine&nbsp;timed-lambda)<br>
+
+&nbsp;&nbsp;(import&nbsp;(rnrs)&nbsp;(tspl&nbsp;timer))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;make-engine<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([do-complete&nbsp;#f]&nbsp;[do-expire&nbsp;#f])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;timer-handler<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(start-timer&nbsp;(call/cc&nbsp;do-expire)&nbsp;timer-handler)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;new-engine<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(resume)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ticks&nbsp;complete&nbsp;expire)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(escape)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;do-complete<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ticks&nbsp;value)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(escape&nbsp;(lambda&nbsp;()&nbsp;(complete&nbsp;ticks&nbsp;value)))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;do-expire<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(resume)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(escape&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(expire&nbsp;(new-engine&nbsp;resume))))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(resume&nbsp;ticks)))))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(proc)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(new-engine<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ticks)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(start-timer&nbsp;ticks&nbsp;timer-handler)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([value&nbsp;(proc)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([ticks&nbsp;(stop-timer)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do-complete&nbsp;ticks&nbsp;value))))))))
+<br>
+<br>
+&nbsp;&nbsp;(define-syntax&nbsp;timed-lambda<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;formals&nbsp;exp1&nbsp;exp2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;formals&nbsp;(decrement-timer)&nbsp;exp1&nbsp;exp2&nbsp;...)])))</tt>
+</p><p>
+</p><h4>Exercise <a name="g212"></a>12.11.1</h4>
+<a name="./examples:s101"></a>Если ваша реализация Scheme позволяет определять и импортировать
+библиотеки на интерактивном верхнем уровне, попробуйте определить библиотеки выше, затем введите
+
+<p>
+
+</p><p><tt>(import&nbsp;(rename&nbsp;(tspl&nbsp;engines)&nbsp;(timed-lambda&nbsp;lambda)))</tt>
+</p><p>для определения <tt>make-engine</tt> и переопределения <tt>lambda</tt>.
+Затем попробуйте примеры, приведенные ранее в этом разделе.
+
+</p><p>
+
+</p><h4>Exercise <a name="g213"></a>12.11.2</h4>
+<a name="./examples:s102"></a>Может показаться, что вложенные выражения <tt>let</tt> в теле
+<tt>make-engine</tt>:
+
+<p>
+
+</p><p><tt>(let&nbsp;([value&nbsp;(proc)])<br>
+
+&nbsp;&nbsp;(let&nbsp;([ticks&nbsp;(stop-timer)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(do-complete&nbsp;ticks&nbsp;value)))</tt>
+</p><p>могут быть замененеы следующими.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([value&nbsp;(proc)]&nbsp;[ticks&nbsp;(stop-timer)])<br>
+
+&nbsp;&nbsp;(do-complete&nbsp;value&nbsp;ticks))</tt>
+</p><p>Почему это не правильно?
+
+</p><p>
+
+</p><h4>Exercise <a name="g214"></a>12.11.3</h4>
+<a name="./examples:s103"></a>Также было бы неправильно заменять вложенные
+выражения <tt>let</tt> рассмотренные в предыдущем упражнении, следующими.
+
+<p>
+
+</p><p><tt>(let&nbsp;([value&nbsp;(proc)])<br>
+
+&nbsp;&nbsp;(do-complete&nbsp;value&nbsp;(stop-timer)))</tt>
+</p><p>Почему?
+
+</p><p>
+
+</p><h4>Exercise <a name="g215"></a>12.11.4</h4>
+<a name="./examples:s104"></a>Измените реализацию движка, чтобы предоставить процедуру
+<tt>engine-return</tt>, которая немедленно возвращается из движка.
+
+<p>
+
+</p><h4>Exercise <a name="g216"></a>12.11.5</h4>
+<a name="./examples:s105"></a>Реализуйте ядро небольшой <a name="./examples:s106"></a>операционной
+системы используя движки для процессов.
+Процессы должны запрашивать службы(такие как чтение ввода от пользователя)
+путем вычисления выражений формы <tt>(trap&nbsp;'request)</tt>.
+Используйте <tt>call/cc</tt> и <tt>engine-return</tt> из предыдущего упражнения для
+реализации <tt>trap</tt>.
+
+<p>
+
+</p><h4>Exercise <a name="g217"></a>12.11.6</h4>
+<a name="./examples:s107"></a>Напишите одно и тоже ядро опреационной системы без использования движков,
+создавая вместо этого продолжения и прерывания таймера.
+
+<p>
+
+</p><h4>Exercise <a name="g218"></a>12.11.7</h4>
+<a name="./examples:s108"></a>Эта реализация движков не позволяет одному движку вызывать другие,
+т.е вкладывать движки &nbsp;[<a class="citation" href="bibliography.html#g228">10</a>].
+Измените реализацию, чтобы разрешить <a name="./examples:s109"></a>вложение движков.
+
+<p>
+
+</p><hr class="copyright" align="left">
+<p>
+R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</it><br>
+Copyright © 2009 <a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">The MIT Press</a>.  Electronically reproduced by permission.<br>
+Illustrations © 2009 <a class="plain" href="http://hebert.kitp.ucsb.edu/">Jean-Pierre Hébert</a><br>
+ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>
+<a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">to order this book</a> / <a class="plain" href="canned/about.html">about this book</a>
+</p>
+<p><a class="plain" href="http://www.scheme.com/">http://www.scheme.com</a></p>
+
+</body></html>

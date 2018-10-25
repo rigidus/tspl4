@@ -1,0 +1,2230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0050)further.html#./further:h0 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Идем Дальше</title>
+<link href="./further_files/tspl.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a name="g49"></a>
+<a name="./further:h0"></a>
+
+<div>
+<img  src="./further_files/ch3.png">
+</div>
+<h1>Глава 3. Идем Дальше<a name="CHPTGOINGFURTHER"></a></h1>
+
+<p>
+В предыдущей главе вам было предложено написать программу Scheme используя
+небольшой набор наиболее полезных примитивных синтаксических форм и процедур.
+В этой главе представлен ряд дополнительных функций и методов программирования,
+которые позволят вам писать более сложные и эффективные программы.
+
+</p><p>
+
+</p><h3><a name="g50"></a><a name="./further:h1"></a>Section 3.1. Синтаксические Расширения<a name="SECTGFSYNTAX"></a></h3>
+
+<p>
+Как мы видели в Разделе &nbsp;<a href="start.html#g21">2.5</a>, синтаксическая форма <tt>let</tt> это
+просто <i>синтаксическое расширение</i>, определенное в терминах <tt>lambda</tt> выражений и
+применения процедур, и та и другая являются <a name="./further:s0"></a>основными синтаксическими формами.
+На данный момент, вам может быть интересно, какие <a name="./further:s1"></a>синтаксические формы
+являются основными синтаксическими формами, а какие <a name="./further:s2"></a>синтаксическими
+расширениями, и как можно определить новые синтаксические расширения. 
+В этом разделе приведены некоторые  ответы на эти вопросы.
+
+</p><p>
+По правде говоря, нам не нужно проводить различие между основными формами и
+синтаксическими расширениями, поскольку после определения синтаксическое расширение
+имеет точно такой же  статус, как и основная форма.
+Однако выделение различий облегчает понимание языка, поскольку оно позволяет
+сосредоточить внимание на основных формах и понять все остальные в терминах
+этих форм.
+
+</p><p>
+Для  <i>реализации</i> Scheme необходимо различать основные формы и синтаксические
+расширения.
+Реализация Scheme <a name="./further:s3"></a>развертывает синтаксические расширения
+в основные формы в качестве первого этапа компиляции или интерпретации, позволяя
+остальной части компилятора или интерпретатора сосредоточиться только на
+основных формах.
+Однако набор основных форм, оставшихся после развертывания, обрабатываемых
+непосредственно компилятором или интерпретатором, зависит от реализации и может
+отличаться от набора основных форм, описанных здесь как как оснвных.
+
+</p><p>
+Таким образом, точный набор синтаксических форм составляющих ядро языка,
+может быть предметом обсуждения, хотя должна быть возможность вывести
+все формы из любого набора форм, объявленных как основные формы.
+Описанное здесь множество относиться к числу простейших, для которых
+это ограничение выполнено.
+
+</p><p>
+Основные синтаксические формы включают в себя формы определений <tt>define</tt> верхнего уровня,
+константы(constants), переменные(variables), применения процедур(procedure applications),
+<a name="./further:s4"></a><a name="./further:s5"></a> выражения в кавычках(<tt>quote</tt> expressions),
+<a name="./further:s6"></a><tt>lambda</tt> выражения,
+<a name="./further:s7"></a><tt>if</tt> выражения,
+and <a name="./further:s8"></a><tt>set!</tt> выражения.
+В приведенной ниже граматике описывается основной синтаксис Scheme в терминах
+этих определений и выражений.
+В граматике, вертикальные черты (&nbsp;|&nbsp;) разделяют альтернативы, а форма
+за которой следует звездочка(&nbsp;*&nbsp;) представляет собой ноль или более
+возможных форм.
+&lt;variable&gt; это идентификатор Scheme.
+&lt;datum&gt; это любой объект Scheme, такой как число, список, символ или вектор.
+&lt;boolean&gt; либо <tt>#t</tt>, либо <tt>#f</tt>,
+&lt;number&gt; любое число,
+&lt;character&gt; любой знак, и
+&lt;string&gt; произвольная строка.
+Мы уже видели примеры чисел, строк, списков, символов и булевых значений.
+См. Главу&nbsp;<a href="objects.html#g106">6</a> или формальное описание синтаксиса,
+начиная со страницы &nbsp;<a href="grammar.html#APPENDIXFORMALSYNTAX">455</a>
+для получения дополнительной информации о синтаксисе на уровне этих или
+других объектов.
+
+</p><p>
+
+  </p><table><tbody><tr><td nowrap="">
+&lt;program&gt;</td><td align="center"><img src="./further_files/8.gif" alt="&lt;graphic&gt;"></td><td nowrap="">&lt;form&gt;*</td></tr><tr><td nowrap="">
+&lt;form&gt;</td><td align="center"><img src="./further_files/8.gif" alt="&lt;graphic&gt;"></td><td nowrap="">&lt;definition&gt; | &lt;expression&gt; </td></tr><tr><td nowrap="">
+&lt;definition&gt;</td><td align="center"><img src="./further_files/8.gif" alt="&lt;graphic&gt;"></td><td nowrap="">&lt;variable definition&gt; | <tt>(begin</tt> &lt;definition&gt;*<tt>)</tt> </td></tr><tr><td nowrap="">
+&lt;variable definition&gt;</td><td align="center"><img src="./further_files/8.gif" alt="&lt;graphic&gt;"></td><td nowrap=""><tt>(define</tt> &lt;variable&gt; &lt;expression&gt;<tt>)</tt> </td></tr><tr><td nowrap="">
+&lt;expression&gt;</td><td align="center"><img src="./further_files/8.gif" alt="&lt;graphic&gt;"></td><td nowrap="">&lt;constant&gt; </td></tr><tr><td nowrap="">
+      </td><td align="center">|</td><td nowrap="">&lt;variable&gt; </td></tr><tr><td nowrap="">
+      </td><td align="center">|</td><td nowrap=""><tt>(quote</tt> &lt;datum&gt;<tt>)</tt> </td></tr><tr><td nowrap="">
+      </td><td align="center">|</td><td nowrap=""><tt>(lambda</tt> &lt;formals&gt; &lt;expression&gt; &lt;expression&gt;*<tt>)</tt> </td></tr><tr><td nowrap="">
+      </td><td align="center">|</td><td nowrap=""><tt>(if</tt> &lt;expression&gt; &lt;expression&gt; &lt;expression&gt;<tt>)</tt> </td></tr><tr><td nowrap="">
+      </td><td align="center">|</td><td nowrap=""><tt>(set!</tt> &lt;variable&gt; &lt;expression&gt;<tt>)</tt> </td></tr><tr><td nowrap="">
+      </td><td align="center">|</td><td nowrap="">&lt;application&gt; </td></tr><tr><td nowrap="">
+&lt;constant&gt;</td><td align="center"><img src="./further_files/8.gif" alt="&lt;graphic&gt;"></td><td nowrap="">&lt;boolean&gt; | &lt;number&gt; | &lt;character&gt; | &lt;string&gt; </td></tr><tr><td nowrap="">
+&lt;formals&gt;</td><td align="center"><img src="./further_files/8.gif" alt="&lt;graphic&gt;"></td><td nowrap="">&lt;variable&gt; </td></tr><tr><td nowrap="">
+       </td><td align="center">|</td><td nowrap=""><tt>(</tt>&lt;variable&gt;*<tt>)</tt> </td></tr><tr><td nowrap="">
+       </td><td align="center">|</td><td nowrap=""><tt>(</tt>&lt;variable&gt; &lt;variable&gt;* <tt>.</tt> &lt;variable&gt;<tt>)</tt> </td></tr><tr><td nowrap="">
+&lt;application&gt;</td><td align="center"><img src="./further_files/8.gif" alt="&lt;graphic&gt;"></td><td nowrap=""><tt>(</tt>&lt;expression&gt; &lt;expression&gt;*<tt>)</tt>
+</td></tr></tbody></table>
+
+<p>
+Граматика не однозначна в том, что синтаксис для  применения процедур конфликтует
+с синтаксисом для выражений <tt>quote</tt>, <tt>lambda</tt>,
+<tt>if</tt>, and <tt>set!</tt>.
+Чтобы определить применение процедуры, первое выражение(&lt;expression&gt;) НЕ должно
+быть одним из этих ключевых слов, если ключевое слово не было переопределено или
+локально связано.
+
+</p><p>
+Синтаксис <a name="./further:s9"></a>"defun" для <tt>define</tt> указанный в
+Разделе &nbsp;<a href="start.html#g25">2.6</a>
+не включается в ядро, так как определения в этой форме прямо переводятся
+в более простой сиснтаксис <tt>define</tt>.
+Аналогичным образом, базовый синтаксис для <tt>if</tt> не позволяет исключить
+альтернативу(<tt><i>alternative</i></tt>), как в одном из примеров в Разделе
+&nbsp;<a href="start.html#g40">2.9</a>.
+Выражение <tt>if</tt> не имеющее альтернативы(<tt><i>alternative</i></tt>) может
+быть преобразовано в  базовый синтаксис <tt>if</tt> простой заменой отсутствующего
+подвыражения на произвольную константу, например <tt>#f</tt>.
+
+</p><p>
+Форма <a name="./further:s10"></a><tt>begin</tt> которая содержит только определения,
+считается определением в граматике; это разрешено, чтобы позволить синтаксическим
+расширениям расширяться более чем на одно определение.
+Выражение <tt>begin</tt>, т.е., форма <tt>begin</tt> содержащая выражения, несчитается
+основной формой.
+Выражение <tt>begin</tt> формы
+
+</p><p>
+
+</p><p><tt>(begin&nbsp;<i>e<sub>1</sub></i>&nbsp;<i>e<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>эквивалентно применению <tt>lambda</tt>
+
+</p><p>
+
+</p><p><tt>((lambda&nbsp;()&nbsp;<i>e<sub>1</sub></i>&nbsp;<i>e<sub>2</sub></i>&nbsp;...))</tt>
+</p><p>и следовательно, ее не следует считать основной формой.
+
+</p><p>
+<a name="./further:s11"></a>Теперь, когда мы установили набор основных
+синтаксических форм, обратимся к обсуждению 
+<a name="./further:s12"></a>синтаксических расширений.
+Синтаксические расширения так называются, потому что они расширяют 
+синтаксис Scheme, за пределы базового синтаксиса.
+Все синтаксические расширения в  программе Scheme должны быть в 
+конечном итоге получены из основных форм.
+Однако одно синтаксическое расширение может быть определено в терминах
+другого синтаксического расширения, если последнее в некотором смысле 
+"ближе" к базовому синтаксису.
+Синтаксические формы могут появляться везде, где ожидается выражение или
+определение, если расширенная форма будет расширяться в определение или
+выражение в зависимости от ситуации.
+
+</p><p>
+Синтаксические расширения определяются с помощью <a name="./further:s13"></a><tt>define-syntax</tt>.
+<tt>define-syntax</tt> аналогичен  <tt>define</tt>, за исключением того, что <tt>define-syntax</tt>
+связывает процедуру синтаксического преобразования, или <a name="./further:s14"></a><i>преобразователь</i>,
+с <a name="./further:s15"></a>ключевы  словом (например, <tt>let</tt>), а не связывает значение с переменной.
+Вот как мы можем определить <tt>let</tt> с помощью <tt>define-syntax</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;let<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((x&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)&nbsp;e&nbsp;...)]))</tt>
+</p><p>Идентификатор, появляющийся после <tt>define-syntax</tt> это имя, или ключевое слово,
+определяемого синтаксического расширения, в данном случае это <tt>let</tt>.
+Форма  <tt>syntax-rules</tt> это выражение которое выполняется преобразователем.
+Элемент следующий за <tt>syntax-rules</tt> это список
+<a name="./further:s16"></a><i>вспомогательных ключевых слов</i> и почти всегда он будет <tt>()</tt>.
+Примером вспомогательного ключевого слова является <tt>else</tt> в форме <tt>cond</tt>.
+(Другие примеры, тербующие использования вспомогательных ключевых слов, приведены в главе
+&nbsp;<a href="syntax.html#g133">8</a>.)
+Следующие за списком ключевых слов это последовательность одного или больше 
+правил(<i>rules</i>), или пар образец/шаблон(<i>pattern/template</i>).
+Только одно правило появляется в нашем определении <tt>let</tt>.
+Образец(pattern) в части правила определяет форму, которую должен принять ввод,
+и шаблон(template) указывающий на то во что ввод должен быть преобразован.
+
+</p><p>
+Образец(pattern) всегда должен быть структурированным выражением, первым элементом которого
+яляется знак <a name="./further:s17"></a>подчеркивания (&nbsp;<tt>_</tt>&nbsp;)<a name="./further:s18"></a>.
+(Как мы увидим в главе&nbsp;<a href="syntax.html#g133">8</a>, использование <tt>_</tt> это только
+соглашение, но это хорошее соглашение.)
+Если присутствуют более одного правила, подходящее выбирается путем сопоставления образцов, в порядке 
+их следования во время развертывания.
+Нарушением синтаксиса будет, если ввод не соответствует ни одному из образцов.
+
+</p><p>
+Идентификаторы, отличные от подчеркивания или многоточия, фигурирующие внутри образца
+являются <a name="./further:s19"></a><i>переменными образца(pattern variables)</i>, 
+если только они не указаны как вспомогательные ключевые слова.
+Переменные образца соответствуют любой подструктуре и связываются с этой
+подструктурой в соответствующем шаблоне(template).
+<a name="./further:s20"></a><a name="./further:s21"></a>Обозначение
+<tt><i>pat</i>&nbsp;...</tt> в образце допускает ноль или больше выражений
+совпадающих с прототипом многоточия <tt><i>pat</i></tt> на входе.
+Точно так же, обозначение <tt><i>expr</i>&nbsp;...</tt> в шаблоне(template) генерирует
+ноль или более выражений из прототипа многоточия <tt><i>expr</i></tt> на выходе.
+Количество <tt><i>pat</i></tt> на входе определяет количество <tt><i>expr</i></tt>
+на выходе; чтобы это сработало, любой прототип многоточия в шаблоне(template) должен
+содержать по крайней мере одну переменную образца(pattern) из прототипа многоточия в
+образце(ellipsis).
+
+</p><p>
+Единственное правило(rule) в нашем определении <tt>let</tt> должно быть
+достаточно самоочевидным, но стоит упомянуть несколько моментов.
+Первое, синтаксис <tt>let</tt> требует, чтобы тело содержало хотябы одну форму;
+следовательно, мы указали <tt>b1&nbsp;b2&nbsp;...</tt> вместо <tt>b&nbsp;...</tt>,
+что могло бы показатся более естественным.
+С другой стороны, <tt>let</tt> не требует, чтобы была хотя бы одна пара 
+переменная/значение, поэтому мы можем использовать, простое <tt>(x&nbsp;e)&nbsp;...</tt>.
+Во-вторых, переменные образца <tt>x</tt> и <tt>e</tt>, хотя и находятся вместе
+в образце, разделены в шаблоне; возможна любая перегруппировка или рекомбинация.
+Наконец, три переменных образца <tt>x</tt>, <tt>e</tt>, и <tt>b2</tt> которые
+опявляются в прототипах многоточия в образце, также отображаются в прототипах
+многоточиях в шаблоне(template).
+Это не случайность; это требование.
+В общем случае, если переменная образца появляется в прототипе многоточии образца ,
+оне не может появиться вне прототипа многоточия шаблона.
+
+</p><p>
+Определение <a name="./further:s22"></a><tt>and</tt> ниже несколько сложнее, чем определение
+для <tt>let</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;and<a name="defn:and"></a><br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_)&nbsp;#t]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e)&nbsp;e]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e1&nbsp;e2&nbsp;e3&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;e1&nbsp;(and&nbsp;e2&nbsp;e3&nbsp;...)&nbsp;#f)]))</tt>
+</p><p>Это определение является рекурсивным и включает в себя несколько правил.
+Напомним, что <tt>(and)</tt> вычисляется как <tt>#t</tt>; первое правило заботиться как раз
+об этом случае.
+Второе и третье правила определяют базовый случай и шаг рекурсии и совместно преобразуют
+выражение <tt>and</tt> с двумя или больше подвыражениями во вложенные выражения <tt>if</tt>.
+Например, <tt>(and&nbsp;a&nbsp;b&nbsp;c)</tt> сначала развертывается
+
+</p><p>
+
+</p><p><tt>(if&nbsp;a&nbsp;(and&nbsp;b&nbsp;c)&nbsp;#f)</tt>
+</p><p>затем
+
+</p><p>
+
+</p><p><tt>(if&nbsp;a&nbsp;(if&nbsp;b&nbsp;(and&nbsp;c)&nbsp;#f)&nbsp;#f)</tt>
+</p><p>и наконец
+
+</p><p>
+
+</p><p><tt>(if&nbsp;a&nbsp;(if&nbsp;b&nbsp;c&nbsp;#f)&nbsp;#f)</tt>
+</p><p>При этом развертывании, если <tt>a</tt> и <tt>b</tt> вычисляются в истинное значение, тогда значение
+представляет собой значение <tt>c</tt>, иначе <tt>#f</tt>, что и требовалось.
+
+</p><p>
+Примечание: В Guile можно выполнить развертывание макроса по крайней мере 3-мя способами:
+я определил аналогичный макрос с именем s_and, развертываение командой REPL<br>
+,expand (s_and a b c) ;; (and a b c)<br>
+развертываение в язык tree-il<br>
+(macroexpand '(s_and a b c)) ;; #&lt;tree-il (if (toplevel a) (if (toplevel b) (toplevel c) (const #f)) (const #f))&gt;<br>
+и развертывание в язык Scheme<br>
+(use-modules (language tree-il))<br>
+(tree-il-&gt;scheme (macroexpand '(s_and a b c))) ;; (and a b c)<br>
+</p><p>
+Версия <tt>and</tt> ниже проще, но к сожалению, неверна.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;and&nbsp;;&nbsp;incorrect!<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_)&nbsp;#t]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;e1&nbsp;(and&nbsp;e2&nbsp;...)&nbsp;#f)]))</tt>
+</p><p>Выражение
+
+</p><p>
+
+</p><p><tt>(and&nbsp;(not&nbsp;(=&nbsp;x&nbsp;0))&nbsp;(/&nbsp;1&nbsp;x))</tt>
+</p><p>должно возвращать значение <tt>(/&nbsp;1&nbsp;x)</tt> когда <tt>x</tt>
+не равно нулю.
+С неправильной версией <tt>and</tt>, выражение развертывается следующим
+образом.
+
+</p><p>
+
+</p><p><tt>(if&nbsp;(not&nbsp;(=&nbsp;x&nbsp;0))&nbsp;(and&nbsp;(/&nbsp;1&nbsp;x))&nbsp;#f)&nbsp;<img src="./further_files/9.gif" alt="&lt;graphic&gt;"><br>
+
+&nbsp;&nbsp;(if&nbsp;(not&nbsp;(=&nbsp;x&nbsp;0))&nbsp;(if&nbsp;(/&nbsp;1&nbsp;x)&nbsp;(and)&nbsp;#f)&nbsp;#f)&nbsp;<img src="./further_files/9.gif" alt="&lt;graphic&gt;"><br>
+
+&nbsp;&nbsp;(if&nbsp;(not&nbsp;(=&nbsp;x&nbsp;0))&nbsp;(if&nbsp;(/&nbsp;1&nbsp;x)&nbsp;#t&nbsp;#f)&nbsp;#f)</tt>
+</p><p>Окончательный ответ, если <tt>x</tt> не равно нулю, равен <tt>#t</tt>, а не значение
+<tt>(/&nbsp;1&nbsp;x)</tt>.
+</p><p>
+В Guile определив аналогичную форму с именем b_and, получаем для выражения (b_and a b c):<br>
+(tree-il->scheme (macroexpand '(b_and a b c))) ;; =&gt; (and a b c #t)
+
+</p><p>
+Определение <a name="./further:s23"></a><tt>or</tt> ниже, аналогично определению для <tt>and</tt> 
+за исключением того, что временная переменная должна вводиться для для каждого промежуточного
+значения, чтобы мы могли как проверить значение, так и вернуть его, если оно
+является истинным значением.
+(Временная переменная не нужна для <tt>and</tt> поскольку существует только одно ложнное
+значение, <tt>#f</tt>.)
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;or<a name="defn:or"></a><br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_)&nbsp;#f]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e)&nbsp;e]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e1&nbsp;e2&nbsp;e3&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([t&nbsp;e1])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;t&nbsp;t&nbsp;(or&nbsp;e2&nbsp;e3&nbsp;...)))]))</tt>
+</p><p>Подобно переменным, связанным <tt>lambda</tt> или <tt>let</tt>, идентификаторы,
+введенные шаблоном являются <a name="./further:s24"></a>лексически ограниченными т.е., видимыми только в
+выражениях, введенных шаблоном.
+Таким образом, даже если одно из выражений <tt>e2&nbsp;e3&nbsp;...</tt> содержит ссылку на
+<tt>t</tt>, введенная связка для <tt>t</tt> не "захватывает" эти ссылки.
+Обычно это выполняется путем автоматического переименования введенных идентификаторов.
+
+</p><p>
+Как и в более простой версии <tt>and</tt> указанной выше, более простая версия
+ <tt>or</tt> указанная ниже, неверна.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;or&nbsp;;&nbsp;incorrect!<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_)&nbsp;#f]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([t&nbsp;e1])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;t&nbsp;t&nbsp;(or&nbsp;e2&nbsp;...)))]))</tt>
+</p><p>Однако причина более тонкая, и является предметом 
+упражнения&nbsp;<a href="further.html#g61">3.2.6</a>.
+
+</p><p>
+
+</p><h4>Упражнение <a name="g51"></a>3.1.1</h4>
+<a name="./further:s25"></a>Выпишите шаги развертывания, необходимые для развертки
+
+<p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;(memv&nbsp;'a&nbsp;ls)])<br>
+
+&nbsp;&nbsp;(and&nbsp;x&nbsp;(memv&nbsp;'b&nbsp;x)))</tt>
+</p><p>в основные формы.
+
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g52"></a>3.1.2</h4>
+<a name="./further:s26"></a>Выпишите шаги развертывания, необходимые для развертывания
+
+<p>
+
+</p><p><tt>(or&nbsp;(memv&nbsp;x&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;(list&nbsp;x))</tt>
+</p><p>
+
+</p><p>
+в основные формы.
+
+</p><p>
+
+</p><h4>Упражнение <a name="g53"></a>3.1.3</h4>
+<a name="./further:s27"></a><a name="./further:s28"></a><tt>let*</tt> похоже на <tt>let</tt> но вычисляет
+привязки последовательно.
+Каждое из правых выражений находиться в области охвата более ранних привязок.
+
+<p>
+
+</p><p><tt>(let*&nbsp;([a&nbsp;5]&nbsp;[b&nbsp;(+&nbsp;a&nbsp;a)]&nbsp;[c&nbsp;(+&nbsp;a&nbsp;b)])<br>
+
+&nbsp;&nbsp;(list&nbsp;a&nbsp;b&nbsp;c))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(5&nbsp;10&nbsp;15)</tt>
+</p><p><tt>let*</tt> можно реализовать как вложенные выражения <tt>let</tt>.
+Например, приведенное выше выражение <tt>let*</tt> эквивалентно приведенным ниже вложенным выражениям
+<tt>let</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([a&nbsp;5])<br>
+
+&nbsp;&nbsp;(let&nbsp;([b&nbsp;(+&nbsp;a&nbsp;a)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([c&nbsp;(+&nbsp;a&nbsp;b)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;a&nbsp;b&nbsp;c))))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(5&nbsp;10&nbsp;15)</tt>
+</p><p>Определите <tt>let*</tt> с помощью <tt>define-syntax</tt>.
+
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g54"></a>3.1.4</h4>
+<a name="./further:s29"></a>Как мы видели в разделе&nbsp;<a href="start.html#g40">2.9</a>,
+законно опустить третье или альтернативное( <i>alternative</i>) подвыражение
+в выражении <tt>if</tt>.
+Однако это, часто приводит к путанице.
+Scheme предоставляет две синтаксические формы,
+<a name="./further:s30"></a><tt>when</tt> и <a name="./further:s31"></a><tt>unless</tt>,
+которые можно использовать вместо таких "одноруких/односторонних"  <tt>if</tt> выражений.
+
+<p>
+
+</p><p><tt>(when&nbsp;<i>test</i>&nbsp;<i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...)<br>
+
+(unless&nbsp;<i>test</i>&nbsp;<i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>В обеих формах сначала вычисляется <tt>test</tt>.
+Для <tt>when</tt>, если вычисленный <tt>test</tt> это истина, остальные формы вычисляются
+последовательно, как если бы они были заключены в неявное выражение
+<tt>begin</tt>.
+Если вычисление <tt>test</tt> даст ложь, остальные формы не вычисляются и результат не определен.
+<tt>unless</tt> вычисляется аналогично, за исключением того, что остальные формы вычисляются
+только в том случае, если результат вычисления <tt>test</tt> будет ложь.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;3])<br>
+
+&nbsp;&nbsp;(unless&nbsp;(=&nbsp;x&nbsp;0)&nbsp;(set!&nbsp;x&nbsp;(+&nbsp;x&nbsp;1)))<br>
+
+&nbsp;&nbsp;(when&nbsp;(=&nbsp;x&nbsp;4)&nbsp;(set!&nbsp;x&nbsp;(*&nbsp;x&nbsp;2)))<br>
+
+&nbsp;&nbsp;x)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;8</tt>
+</p><p>Определите <tt>when</tt> как синтаксическое расширение в терминах <tt>if</tt>
+и <tt>begin</tt>, и определите  <tt>unless</tt>
+в терминах <tt>when</tt>.
+
+</p><p>
+
+</p><p>
+
+</p><h3><a name="g55"></a><a name="./further:h2"></a>Раздел 3.2. Больше Рекурсии<a name="SECTGFMORERECURSION"></a></h3>
+
+<p>
+<a name="./further:s32"></a>В разделе&nbsp;<a href="start.html#g32">2.8</a>, мы рассмотрели,
+как определять рекурсивные процедуры используя определения верхнего уровня.
+До этого мы видели как создавать локальные привязки для процедур с использованием
+<a name="./further:s33"></a><tt>let</tt>.
+Естественно задаться вопросом, может ли <tt>let</tt>-связанная процедура быть
+рекурсивной.
+Ответ - нет!!! по крайней мере не напрямую.
+Если вы попытаетесь выполнить <a name="./further:s34"></a>выражение
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([sum&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;(car&nbsp;ls)&nbsp;(sum&nbsp;(cdr&nbsp;ls)))))])<br>
+
+&nbsp;&nbsp;(sum&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5)))</tt>
+</p><p>это, вероятно, вызовет исключение с сообщением о том, что <tt>sum</tt> 
+не определена.
+Это связано с тем, что переменная <tt>sum</tt> видна только внутри тела выражения
+<tt>let</tt>, а не внутри <tt>lambda</tt> выражения, значение которого связывается
+с  <tt>sum</tt>.
+Мы можем обойти эту проблему, передав в процедуру <tt>sum</tt> ссылку на себя
+следующим образом.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([sum&nbsp;(lambda&nbsp;(sum&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;(car&nbsp;ls)&nbsp;(sum&nbsp;sum&nbsp;(cdr&nbsp;ls)))))])<br>
+
+&nbsp;&nbsp;(sum&nbsp;sum&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5)))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;15</tt>
+</p><p>Это работает и является умным решением, но есть более простой способ
+использующий <a name="./further:s35"></a><tt>letrec</tt>.
+Подобно <tt>let</tt>, синтаксическая форма
+<tt>letrec</tt> включает в себя набор пар переменная-значение,
+а также последовательность выражений, называемую телом(<i>body</i>)
+<tt>letrec</tt>.
+
+</p><p>
+
+</p><p><tt>(letrec&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>В отличии от <tt>let</tt>, переменные <tt><i>var</i>&nbsp;...</tt> видны не только внутри
+тела <tt>letrec</tt>, но и внутри 
+<tt><i>expr</i>&nbsp;...</tt>.
+Таким образом, мы можем переписать выражение выше следующим образом.
+
+</p><p>
+
+</p><p><tt>(letrec&nbsp;([sum&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;(car&nbsp;ls)&nbsp;(sum&nbsp;(cdr&nbsp;ls)))))])<br>
+
+&nbsp;&nbsp;(sum&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5)))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;15</tt>
+</p><p>Используя <tt>letrec</tt>, мы можем определить <a name="./further:s36"></a>взаимно рекурсивные
+процедуры(mutually recursive procedures), такие как процедуры
+<a name="./further:s37"></a><tt>even?</tt> и <a name="./further:s38"></a><tt>odd?</tt> которые были предметом
+упражнения &nbsp;<a href="start.html#g38">2.8.6</a>.
+
+</p><p>
+
+</p><p><tt>(letrec&nbsp;([even?<a name="defn:even?/odd?"></a><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(=&nbsp;x&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(odd?&nbsp;(-&nbsp;x&nbsp;1))))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[odd?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(not&nbsp;(=&nbsp;x&nbsp;0))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(even?&nbsp;(-&nbsp;x&nbsp;1))))])<br>
+
+&nbsp;&nbsp;(list&nbsp;(even?&nbsp;20)&nbsp;(odd?&nbsp;20)))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(#t&nbsp;#f)</tt>
+</p><p>В выражении <tt>letrec</tt>,
+<tt><i>expr</i>&nbsp;...</tt> чаще всего являются <tt>lambda</tt> выражениями,
+хотя это не обязательно.
+Однако одно ограничение на выражения должно выполняться.
+Должна быть возможность вычисления каждого <tt><i>expr</i></tt> без
+вычисления любой из переменных <tt><i>var</i>&nbsp;...</tt>.
+Это ограничение всегда выполняется, если все выражения  являются
+<tt>lambda</tt> выражениями, поскольку, хотя переменные могут появляться
+в  <tt>lambda</tt> выражениях, они не могут быть вычислены до тех пор,
+пока результирующие процедуры не вызовут в теле <tt>letrec</tt>.
+Следующее выражение <tt>letrec</tt> подчиняется этому ограничению.
+
+</p><p>
+
+</p><p><tt>(letrec&nbsp;([f&nbsp;(lambda&nbsp;()&nbsp;(+&nbsp;x&nbsp;2))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[x&nbsp;1])<br>
+
+&nbsp;&nbsp;(f))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3</tt>
+</p><p>в то время как следующее - нет.
+
+</p><p>
+
+</p><p><tt>(letrec&nbsp;([y&nbsp;(+&nbsp;x&nbsp;2)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[x&nbsp;1])<br>
+
+&nbsp;&nbsp;y)</tt>
+</p><p>В этом случае возникает исключение, указывающее, что <tt>x</tt> не определено
+в том месте, где на него есть ссылка.(выражение (+&nbsp;x&nbsp;2))
+
+</p><p>
+Мы можем использовать <tt>letrec</tt> чтобы скрыть определения "вспомогательных" процедур,
+чтобы они не загромождали пространство имен верхнего уровня.
+Это показано ниже в определении <a name="./further:s39"></a><tt>list?</tt>, которое
+следует алгоритму "<a name="./further:s40"></a>заяц и черепаха", изложенному
+в упражнении &nbsp;<a href="start.html#g48">2.9.8</a>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;list?<a name="defn:list?"></a><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(letrec&nbsp;([race<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(h&nbsp;t)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(pair?&nbsp;h)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([h&nbsp;(cdr&nbsp;h)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(pair?&nbsp;h)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(not&nbsp;(eq?&nbsp;h&nbsp;t))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(race&nbsp;(cdr&nbsp;h)&nbsp;(cdr&nbsp;t)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(null?&nbsp;h)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(null?&nbsp;h)))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(race&nbsp;x&nbsp;x))))</tt>
+</p><p>Когда рекурсивная процедура вызывается только в одном месте
+вне процедуры, как в примере выше, часто проще испольовать выражение
+<a name="./further:s41"></a> именованный (<i>named</i>) <tt>let</tt>.
+Именованные(Named) выражения <tt>let</tt> принимают следующую форму.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;<i>name</i>&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)<br>
+
+&nbsp;&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><pИменованный <tt>let</tt> похож на неименованный <tt>let</tt> в том что он
+связывает переменные <tt><i>var</i>&nbsp;...</tt> с значениями
+<tt><i>expr</i>&nbsp;...</tt> внутри тела 
+<tt><i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...</tt>.
+Как и с неименованным <tt>let</tt>, переменные видны только внутри тела,
+а не внутри <tt><i>expr</i>&nbsp;...</tt>.
+Кроме того, переменная <tt><i>name</i></tt> привязывается к внутреннему телу
+процедуры(body), которая может быть вызвана рекурсивно; аргументы
+процедуры становяться новыми значениями переменных
+<tt><i>var</i>&nbsp;...</tt>.
+
+</p><p>
+Определение <a name="./further:s42"></a><tt>list?</tt> было переписано ниже, с использованием
+именованного  <tt>let</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;list?<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;race&nbsp;([h&nbsp;x]&nbsp;[t&nbsp;x])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(pair?&nbsp;h)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([h&nbsp;(cdr&nbsp;h)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(pair?&nbsp;h)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(not&nbsp;(eq?&nbsp;h&nbsp;t))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(race&nbsp;(cdr&nbsp;h)&nbsp;(cdr&nbsp;t)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(null?&nbsp;h)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(null?&nbsp;h)))))</tt>
+</p><p>Подобно тому, как <tt>let</tt> может быть выражено как простое прямое применение
+ <tt>lambda</tt> выражения к аргументам, именнованный <tt>let</tt> может быть
+выражен как применение рекурсивной процедуры к аругментам.
+Именованный <tt>let</tt> имеющий форму
+
+</p><p>
+
+</p><p><tt>(let&nbsp;<i>name</i>&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)<br>
+
+&nbsp;&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>можно переписать в терминах <tt>letrec</tt> следующим образом.
+
+</p><p>
+
+</p><p><tt>((letrec&nbsp;((<i>name</i>&nbsp;(lambda&nbsp;(<i>var</i>&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)))<br>
+
+&nbsp;&nbsp;&nbsp;<i>name</i>)<br>
+
+&nbsp;<i>expr</i>&nbsp;...)</tt>
+</p><p>В качестве альтернативы его можно переписать как
+
+</p><p>
+
+</p><p><tt>(letrec&nbsp;((<i>name</i>&nbsp;(lambda&nbsp;(<i>var</i>&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)))<br>
+
+&nbsp;&nbsp;(<i>name</i>&nbsp;<i>expr</i>&nbsp;...))</tt>
+</p><p>при условии, что переменная <tt><i>name</i></tt> не появляется свободно в
+<tt><i>expr</i>&nbsp;...</tt>.
+
+</p><p>
+Как мы обсуждали в разделе&nbsp;<a href="start.html#g32">2.8</a>, некоторые рекурсии
+по существу являются  <a name="./further:s43"></a>итерацией и выполняются как таковые.
+Когда вызов процедуры находиться в хвостовой позиции (смотри ниже) относительно
+<tt>lambda</tt> выражения, он считается <a name="./further:s44"></a><i>хвостовым вызовом
+(tail call)</i>, и системы Scheme должны обрабатывать его <i>должным образом</i>, как "goto"
+или jump.
+Когда процедура вызывает себя "хвостовым вызовом" или вызывает себя косвенно через серию
+хвостовых вызовов, результатом будет <a name="./further:s45"></a><i>хвостовая рекурсия</i>.
+Поскольку хвостовые вызовы рассматриваются как переходы(jumps), хвостовая рекурсия
+может использоваться для неопределенной итерации(допустим бесконечной) вместо
+более строгих итерационных конструкций, предоставляемых другими языками программирования,
+без опасения реукрсивного переполнения стека любого типа.
+
+</p><p>
+Вызов находиться в хвостовом положении относительно <tt>lambda</tt> выражения
+если значение возвращается непосредственно из лямбда (<tt>lambda</tt>) выражения,
+т.е. если после вызова больше ничего не делается кроме возврата из
+<tt>lambda</tt> выражения.
+Например, вызов находится в хвостовом положении, если он является последним
+выражением в теле <tt>lambda</tt> выражения,
+является <i>consequent</i> или <i>alternative</i> частью выражения  <tt>if</tt> 
+в хвотовой позиции, последним подвыражением в выражении <tt>and</tt> или <tt>or</tt>
+в хвостовой позиции,
+последним выражением в теле <tt>let</tt> или <tt>letrec</tt>
+в хвостовой позиции, и т.д.
+Каждый из вызовов <tt>f</tt> в выражениях ниже
+является хвостовым вызовом, но вызовы <tt>g</tt> таковыми не являются.
+
+</p><p>
+
+</p><p><tt>(lambda&nbsp;()&nbsp;(f&nbsp;(g)))<br>
+
+(lambda&nbsp;()&nbsp;(if&nbsp;(g)&nbsp;(f)&nbsp;(f)))<br>
+
+(lambda&nbsp;()&nbsp;(let&nbsp;([x&nbsp;4])&nbsp;(f)))<br>
+
+(lambda&nbsp;()&nbsp;(or&nbsp;(g)&nbsp;(f)))</tt>
+</p><p>В каждом случае, значения вызовов <tt>f</tt> возвращаются напрямую,
+тогда как вызов <tt>g</tt> нет.
+
+</p><p>
+Рекурсия вообще и именнованные <tt>let</tt>, в частности, обеспечивает
+естественный способ реализации многих алгоритмов, будь то итеративный,
+рекурсивный, частично итеративный или частично рекурсивный; программист
+не обременен двумя различными механизмами.
+
+</p><p>
+Следующие два определения <a name="./further:s46"></a><tt>factorial</tt> используют именнованное
+выражение <tt>let</tt> для вычисления факториала(factorial), <i>n</i>!, неотритцательного целого
+числа <i>n</i>.
+Первое использует рекурсивное опредееление <i>n</i>! = <i>n</i> × (<i>n</i> - 1)!,
+где 0! определяется как 1.(это плохая рекурсия, активно использующая ресурсы стека)
+
+</p><p>
+
+</p><p><tt>(define&nbsp;factorial<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;fact&nbsp;([i&nbsp;n])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;i&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;i&nbsp;(fact&nbsp;(-&nbsp;i&nbsp;1)))))))</tt>
+</p><p>
+</p><p><tt>(factorial&nbsp;0)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+(factorial&nbsp;1)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+(factorial&nbsp;2)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2<br>
+
+(factorial&nbsp;3)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;6<br>
+
+(factorial&nbsp;10)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3628800</tt>
+</p><p>Вторая - итеративная версия, в которой используется итеративное определение
+<i>n</i>! = <i>n</i> × (<i>n</i> - 1) × (<i>n</i> - 2) × ... × 1, использующая аккумулятор(промежуточную переменную),
+<tt>a</tt>, для хранения промежуточных результатов. Используя этот прием мы построили "хорошую" рекурисию,
+использующую хвостовой вызов factorial, команда <tt>,trace (factorial 30) </tt> не фиксирует увеличения стека.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;factorial<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;fact&nbsp;([i&nbsp;n]&nbsp;[a&nbsp;1])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;i&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fact&nbsp;(-&nbsp;i&nbsp;1)&nbsp;(*&nbsp;a&nbsp;i))))))</tt>
+</p><p><a name="fibonacci"></a>Аналогичная задача состоит в вычислении <i>n</i> го числа Фибоначчи для
+данного <i>n</i>.
+<a name="./further:s47"></a> <a name="./further:s48"></a><i>Числа Фибоначчи</i> представляют собой бесконечную
+последовательность целых чисел, 0, 1, 1, 2, 3, 5, 8, и т.д., в которой каждое число является
+суммой двух предыдущих чисел последовательности.
+Процедура вычисления <i>n</i> го числа Фибоначчи наиболее естественно определяется рекурсивно
+следующим образом.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;fibonacci<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;fib&nbsp;([i&nbsp;n])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(=&nbsp;i&nbsp;0)&nbsp;0]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(=&nbsp;i&nbsp;1)&nbsp;1]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(+&nbsp;(fib&nbsp;(-&nbsp;i&nbsp;1))&nbsp;(fib&nbsp;(-&nbsp;i&nbsp;2)))]))))
+<br>
+<br>
+(fibonacci&nbsp;0)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0<br>
+
+(fibonacci&nbsp;1)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+(fibonacci&nbsp;2)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+(fibonacci&nbsp;3)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2<br>
+
+(fibonacci&nbsp;4)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3<br>
+
+(fibonacci&nbsp;5)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5<br>
+
+(fibonacci&nbsp;6)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;8<br>
+
+(fibonacci&nbsp;20)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;6765<br>
+
+(fibonacci&nbsp;30)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;832040</tt>
+</p><p>Это решение требует вычисления двух предыдущих чисел Фибоначчи на каждом шаге и,
+следовательно, является <a name="./further:s49"></a><i>двойной рекурсией</i>.
+Например, для вычисления <tt>(fibonacci&nbsp;4)</tt> требуется вычислить два значения
+<tt>(fib&nbsp;3)</tt> и <tt>(fib&nbsp;2)</tt>, вычисление <tt>(fib&nbsp;3)</tt> требует вычисления
+двух значений <tt>(fib&nbsp;2)</tt> и <tt>(fib&nbsp;1)</tt>, и вычисление <tt>(fib&nbsp;2)</tt> требует
+вычисления двух чисел <tt>(fib&nbsp;1)</tt> и <tt>(fib&nbsp;0)</tt>.
+Это очень не эффективно, и становиться более не эффективным по мере роста <tt>n</tt>.
+Более эффективным решением является адаптация решения поиска <tt>factorial</tt> использующая аккумулятор, 
+определенная выше, используем два аккумулятора, <tt>a1</tt> для текущего числа Фибоначчи и
+<tt>a2</tt> для предыдущего.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;fibonacci<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;n&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;fib&nbsp;([i&nbsp;n]&nbsp;[a1&nbsp;1]&nbsp;[a2&nbsp;0])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;i&nbsp;1)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fib&nbsp;(-&nbsp;i&nbsp;1)&nbsp;(+&nbsp;a1&nbsp;a2)&nbsp;a1))))))</tt>
+</p><p>Здесь ноль рассматривается как частный случай, так как он не имеет предыдущего значения.
+Это позволяет использовать основной случай <tt>(=&nbsp;i&nbsp;1)</tt>.
+Время, затрачиваемое на вычисление <i>n</i>-го числа Фибоначчи с использованием
+итерационного решения, растет линейно с  <i>n</i>, что существенно
+отличается по сравнению с версией использующей двойную рекурсию.
+Чтобы почувствовать разницу попробуйте вычислить <tt>(fibonacci&nbsp;35)</tt> и
+<tt>(fibonacci&nbsp;40)</tt> используя
+оба определения, чтобы узнать, сколько времени занимает каждый из них.
+
+</p><p>
+Мы также можем почувствовать разницу, глядя на  трассу для каждого варианта
+при небольших значениях вызова.
+Первая трасса ниже показывает вызовы <tt>fib</tt> в нехвостовой рекурсивной
+верссии <tt>fibonacci</tt>, с входом 5.
+
+</p><p>
+
+</p><p><tt>|(fib&nbsp;5)<br>
+
+|&nbsp;(fib&nbsp;4)<br>
+
+|&nbsp;|(fib&nbsp;3)<br>
+
+|&nbsp;|&nbsp;(fib&nbsp;2)<br>
+
+|&nbsp;|&nbsp;|(fib&nbsp;1)<br>
+
+|&nbsp;|&nbsp;|1<br>
+
+|&nbsp;|&nbsp;|(fib&nbsp;0)<br>
+
+|&nbsp;|&nbsp;|0<br>
+
+|&nbsp;|&nbsp;1<br>
+
+|&nbsp;|&nbsp;(fib&nbsp;1)<br>
+
+|&nbsp;|&nbsp;1<br>
+
+|&nbsp;|2<br>
+
+|&nbsp;|(fib&nbsp;2)<br>
+
+|&nbsp;|&nbsp;(fib&nbsp;1)<br>
+
+|&nbsp;|&nbsp;1<br>
+
+|&nbsp;|&nbsp;(fib&nbsp;0)<br>
+
+|&nbsp;|&nbsp;0<br>
+
+|&nbsp;|1<br>
+
+|&nbsp;3<br>
+
+|&nbsp;(fib&nbsp;3)<br>
+
+|&nbsp;|(fib&nbsp;2)<br>
+
+|&nbsp;|&nbsp;(fib&nbsp;1)<br>
+
+|&nbsp;|&nbsp;1<br>
+
+|&nbsp;|&nbsp;(fib&nbsp;0)<br>
+
+|&nbsp;|&nbsp;0<br>
+
+|&nbsp;|1<br>
+
+|&nbsp;|(fib&nbsp;1)<br>
+
+|&nbsp;|1<br>
+
+|&nbsp;2<br>
+
+|5</tt>
+</p><p>Обратите внимание на то, что существует несколько вызвовов <tt>fib</tt> с
+аргументами 2, 1, и 0.
+Вторая трассировка показывает вызовы <tt>fib</tt> с версией хвостовой рекурсии,
+опять же с входом 5.
+
+</p><p>
+
+</p><p><tt>|(fib&nbsp;5&nbsp;1&nbsp;0)<br>
+
+|(fib&nbsp;4&nbsp;1&nbsp;1)<br>
+
+|(fib&nbsp;3&nbsp;2&nbsp;1)<br>
+
+|(fib&nbsp;2&nbsp;3&nbsp;2)<br>
+
+|(fib&nbsp;1&nbsp;5&nbsp;3)<br>
+
+|5</tt>
+</p><p>Ясно, что есть большая разница.
+
+</p><p>
+</p><p><a name="./further:s50">Примеры </a>Именованных <tt>let</tt> показанные до сих пор,
+являются либо с хвостовой рекурсией, либо без хвостовой рекурсии.
+Часто бывает, в выражении несколько рекурсивных вызовов, и один рекурсивный вызов внутри одного и того же выражения является хвостовой рекурсией, а другой нет.
+Определение <a name="./further:s51"></a><tt>factor</tt> ниже вычисляет простые множители его 
+неотритцательного целочисленного аргумента.
+Первый вызов <tt>f</tt> не является хвостовой рекурсией, но второй является.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;factor<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([n&nbsp;n]&nbsp;[i&nbsp;2])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(&gt;=&nbsp;i&nbsp;n)&nbsp;(list&nbsp;n)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(integer?&nbsp;(/&nbsp;n&nbsp;i))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;i&nbsp;(f&nbsp;(/&nbsp;n&nbsp;i)&nbsp;i))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(f&nbsp;n&nbsp;(+&nbsp;i&nbsp;1))]))))
+<br>
+<br>
+(factor&nbsp;0)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(0)<br>
+
+(factor&nbsp;1)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1)<br>
+
+(factor&nbsp;12)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(2&nbsp;2&nbsp;3)<br>
+
+(factor&nbsp;3628800)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(2&nbsp;2&nbsp;2&nbsp;2&nbsp;2&nbsp;2&nbsp;2&nbsp;2&nbsp;3&nbsp;3&nbsp;3&nbsp;3&nbsp;5&nbsp;5&nbsp;7)<br>
+
+(factor&nbsp;9239)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(9239)</tt>
+</p><p>Трассировка вызовов <tt>f</tt>, созданных в Chez&nbsp;Scheme заменой
+<tt>let</tt> на <tt>trace-let</tt>,
+при вычислении <tt>(factor&nbsp;120)</tt>
+ниже, подчеркивает разницу между нехвостовыми и хвостовыми вызовами.
+
+</p><p>
+
+</p><p><tt>|(f&nbsp;120&nbsp;2)<br>
+
+|&nbsp;(f&nbsp;60&nbsp;2)<br>
+
+|&nbsp;|(f&nbsp;30&nbsp;2)<br>
+
+|&nbsp;|&nbsp;(f&nbsp;15&nbsp;2)<br>
+
+|&nbsp;|&nbsp;(f&nbsp;15&nbsp;3)<br>
+
+|&nbsp;|&nbsp;|(f&nbsp;5&nbsp;3)<br>
+
+|&nbsp;|&nbsp;|(f&nbsp;5&nbsp;4)<br>
+
+|&nbsp;|&nbsp;|(f&nbsp;5&nbsp;5)<br>
+
+|&nbsp;|&nbsp;|(5)<br>
+
+|&nbsp;|&nbsp;(3&nbsp;5)<br>
+
+|&nbsp;|(2&nbsp;3&nbsp;5)<br>
+
+|&nbsp;(2&nbsp;2&nbsp;3&nbsp;5)<br>
+
+|(2&nbsp;2&nbsp;2&nbsp;3&nbsp;5)</tt>
+</p><p>Нехвостовой вызов <tt>f</tt> отображается с отступом относительно его вызывающего,
+так как вызывающий объект все еще активен, тогда как хвостовые вызовы отображаются на том же
+уровне отступов.
+
+</p><p>
+
+</p><h4>Упражнение <a name="g56"></a>3.2.1</h4>
+<a name="./further:s52"></a>Какие из рекурсивных процедур определенных в разделе &nbsp;<a href="further.html#g55">3.2</a> являются рекурсивными с хвостовой рекурсией, а какие нет?
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g57"></a>3.2.2</h4>
+<a name="./further:s53"></a>Перепишите <a name="./further:s54"></a><tt>factor</tt> используя <tt>letrec</tt> 
+чтобы связать <tt>f</tt> вместо именованного <tt>let</tt>.
+Какую версию вы предпочтете?
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g58"></a>3.2.3</h4>
+<a name="./further:s55"></a>Может ли выражение <tt>letrec</tt> ниже, быть
+переписанным с помощью именованного <tt>let</tt>?
+Если нет, почему нет?
+Если да, сделайте это.
+
+<p>
+
+</p><p><tt>(letrec&nbsp;([even?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(=&nbsp;x&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(odd?&nbsp;(-&nbsp;x&nbsp;1))))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[odd?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(not&nbsp;(=&nbsp;x&nbsp;0))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(even?&nbsp;(-&nbsp;x&nbsp;1))))])<br>
+
+&nbsp;&nbsp;(even?&nbsp;20))</tt>
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g59"></a>3.2.4</h4>
+<a name="./further:s56"></a>Перепишите оба определения <tt>fibonacci</tt> приведенные в этом разделе,
+чтобы подсчитать количество рекурсивных вызовов <tt>fib</tt>, используя счетчик, аналогичный
+тому, который используется в примере <tt>cons-count</tt> из раздела&nbsp;<a href="start.html#g40">2.9</a>.
+Подсчитайте количество рекурсивных вызовов, сделанных в каждом случае для нескольких входных значений.
+Что вы заметили?
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g60"></a>3.2.5</h4>
+<a name="./further:s57"></a>Увеличьте определение <tt>let</tt> данное в разделе&nbsp;<a href="further.html#g50">3.1</a> для обработки именованного <tt>let</tt>, а также неименованного <tt>let</tt>,
+используя два правила.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g61"></a>3.2.6</h4>
+<a name="./further:s58"></a><a name="ex:incorrect-or"></a>Следующее определение <tt>or</tt> проще чем
+приведеное в разделе &nbsp;<a href="further.html#g50">3.1</a>.
+
+<p>
+
+</p><p><tt>(define-syntax&nbsp;or&nbsp;;&nbsp;incorrect!<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_)&nbsp;#f]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([t&nbsp;e1])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;t&nbsp;t&nbsp;(or&nbsp;e2&nbsp;...)))]))</tt>
+</p><p>Скажите почему оно неверно.
+[<i>Подсказка</i>: Подумайте, что произойдет если эта версия была бы использована в
+ <tt>even?</tt> и <tt>odd?</tt> примерах данных на странице
+&nbsp;<a href="further.html#defn:even?/odd?">66</a> для очень больших входных значений.]
+
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g62"></a>3.2.7</h4>
+<a name="./further:s59"></a>Определение <a name="./further:s60"></a><tt>factor</tt> не является наиболее
+эффективным.
+Во-первых, никакие делители <i>n</i> кроме самого <i>n</i> не могут быть найдены вне
+<img src="./further_files/10.gif" alt="&lt;graphic&gt;">.
+Во-вторых, деление <tt>(/&nbsp;n&nbsp;i)</tt> выполняетя дважды при обнаружении делителя.
+В-третьих, после 2, нет никаких четных делителей.
+Перепишите <tt>factor</tt> устранив все три проблемы.
+Что является самой важной проблемой для решения?
+Есть ли дополнительные улучшения, которые вы можете сделать?
+
+<p>
+
+</p><p>
+
+</p><h3><a name="g63"></a><a name="./further:h3"></a>Section 3.3. Продолжнения<a name="SECTGFCONTINUATIONS"></a></h3>
+
+<p>
+<a name="./further:s61"></a>Во время вычисления выражения Scheme, 
+реализация должна отслеживать две вещи:
+(1) Что вычислять и (2) что делать со значением.
+Рассмотрим вычисление <tt>(null?&nbsp;x)</tt> в приведенном ниже
+выражении.
+
+</p><p>
+
+</p><p><tt>(if&nbsp;(null?&nbsp;x)&nbsp;(quote&nbsp;())&nbsp;(cdr&nbsp;x))</tt>
+</p><p>Реализация должна сначала выполнить <tt>(null?&nbsp;x)</tt> и, основываясь на его
+значении, вычислить либо <tt>(quote&nbsp;())</tt>, либо <tt>(cdr&nbsp;x)</tt>.
+"Что вычислять" <tt>(null?&nbsp;x)</tt>, и "что делать со значением"
+это решение, которое должно указать, какое из выражений <tt>(quote&nbsp;())</tt> или <tt>(cdr&nbsp;x)</tt> 
+будет вычилено при выполнение этого вычисления.
+Мы называем "что делать со значением"  <i>продолжением</i> вычисления.
+
+</p><p>
+Таким образом, в любой момент вычисления любого выражения, существует
+продолжение, готовое завершиться, или, по крайней мере, <i>продолжить</i> вычисление
+с этой точки.
+Предположим, что <tt>x</tt> имеет значение <tt>(a&nbsp;b&nbsp;c)</tt>.
+Мы можем выделить шесть продолжений при вычислении 
+<tt>(if&nbsp;(null?&nbsp;x)&nbsp;(quote&nbsp;())&nbsp;(cdr&nbsp;x))</tt>, продолжения ожидаются для
+
+</p><p>
+</p><ol>
+<a name="g64"></a><li>значения от <tt>(if&nbsp;(null?&nbsp;x)&nbsp;(quote&nbsp;())&nbsp;(cdr&nbsp;x))</tt>,
+<a name="g65"></a></li><li>значения от <tt>(null?&nbsp;x)</tt>,
+<a name="g66"></a></li><li>значения от <tt>null?</tt>,
+<a name="g67"></a></li><li>значения от <tt>x</tt>,
+<a name="g68"></a></li><li>значения от <tt>cdr</tt>, и
+<a name="g69"></a></li><li>значения от <tt>x</tt> (again).
+</li></ol>
+<p>
+
+</p><p>
+Продолжение <tt>(cdr&nbsp;x)</tt> нет в списке, потому что оно совпадает
+с ожидающим для <tt>(if&nbsp;(null?&nbsp;x)&nbsp;(quote&nbsp;())&nbsp;(cdr&nbsp;x))</tt>.
+
+</p><p>
+Scheme позволяет продолжить любое выражение, которое будет завхвачено
+процедурой <a name="./further:s62"></a><tt>call/cc</tt>.
+В <tt>call/cc</tt> должна быть передана процедура <tt><i>p</i></tt> принимающая
+один аргумент(захваченный контекст, в примерах ниже p создается на месте лямбда выражением).
+<tt>call/cc</tt> создает конкретное представление текущего продолжения и 
+передает его в <tt><i>p</i></tt>.
+Само продолжение представлено процедурой <tt><i>k</i></tt>.
+Каждый раз, когда <tt><i>k</i></tt> применяется к значению, оно возвращает значение для 
+продолжения применяемое в <tt>call/cc</tt>.
+Это значение становиться, по сути, значением применения <tt>call/cc</tt>.
+
+</p><p>
+Если <tt><i>p</i></tt> возвращается без вызова <tt><i>k</i></tt>,
+значение, возвращаемое процедурой, становиться значением применения <tt>call/cc</tt>.
+
+</p><p>
+Рассмотрим простые примеры ниже.
+
+</p><p>
+
+</p><p><tt>(call/cc<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;5&nbsp;4)))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;20
+<br>
+<br>
+(call/cc<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;5&nbsp;(k&nbsp;4))))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4
+<br>
+<br>
+(+&nbsp;2<br>
+
+&nbsp;&nbsp;&nbsp;(call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;5&nbsp;(k&nbsp;4)))))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;6</tt>
+</p><p>В первом примере, продолжение захватывается и привязывается к <tt>k</tt>,
+но <tt>k</tt> никогда не используется, поэтому значение является просто произведением
+5 и 4.
+Во втором, продолжение вызывается перед умножением, поэтому значение
+представляет собой значение переходящее продолжению, 4.
+В третьем, продолжение включает суммирование с 2; таким образом, значение
+представляет собой значение, переданное в продолжение 4, суммируем с 2.
+
+</p><p>
+<a name="./further:s63"></a>Вот более простой пример, показывающий использование
+<tt>call/cc</tt> для обеспечения нелокального выхода из рекурсии.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;product<a name="defn:product-call/cc"></a><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(break)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([ls&nbsp;ls])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;ls)&nbsp;1]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(=&nbsp;(car&nbsp;ls)&nbsp;0)&nbsp;(break&nbsp;0)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(*&nbsp;(car&nbsp;ls)&nbsp;(f&nbsp;(cdr&nbsp;ls)))]))))))</tt>
+</p><p>
+</p><p><tt>(product&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;120<br>
+
+(product&nbsp;'(7&nbsp;3&nbsp;8&nbsp;0&nbsp;1&nbsp;9&nbsp;5))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0</tt>
+</p><p>Нелокальный выход позволяет <tt>product</tt> немедленно выполнить возврат(выход из процедуры),
+не выполняя ожидающие умножения, когда обнаруживается нулевое значение.
+
+</p><p>
+Каждое из приведенных выше вызовов продолжений возвращается к продолжению,
+тогда как управление остается в процедуре, переданной  <tt>call/cc</tt>.
+Следующий пример использует продолжение после того как процедура выполнила
+возврат.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;(call/cc&nbsp;(lambda&nbsp;(k)&nbsp;k))])<br>
+
+&nbsp;&nbsp;(x&nbsp;(lambda&nbsp;(ignore)&nbsp;"hi")))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"hi"</tt>
+</p><p>Продолжение, захваченное этим вызовом <tt>call/cc</tt> может быть описано
+как: "Возьмите значение, привяжите его к <tt>x</tt>, и примените значение <tt>x</tt> к
+значению <tt>(lambda&nbsp;(ignore)&nbsp;"hi")</tt>."
+Поскольку <tt>(lambda&nbsp;(k)&nbsp;k)</tt> возвращает свой аргумент, <tt>x</tt> связывается с самим
+продолжением; это продолжение применяется к процедуре, полученной в результате вычисления выражения
+<tt>(lambda&nbsp;(ignore)&nbsp;"hi")</tt>.
+Это приводит к связыванию <tt>x</tt> (снова!) к этой процедуре и применению
+процедуры к себе.
+Процедура игнорирует свой аргумент и возвращает <tt>"hi"</tt>.
+
+</p><p>
+Следующий вариант вышеприведенного примера, вероятно, является самой запутанной
+программой Scheme такого размера; было бы легко догадаться, что она возвращает,
+но нужно подумать о том, почему.
+
+</p><p>
+
+</p><p><tt>(((call/cc&nbsp;(lambda&nbsp;(k)&nbsp;k))&nbsp;(lambda&nbsp;(x)&nbsp;x))&nbsp;"HEY!")&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"HEY!"</tt>
+</p><p>Значение <tt>call/cc</tt> является его собственным продолжением, как в предыдущем
+примере.
+Оно применяется к процедуре идентификации возвращающей свой аргумент <tt>(lambda&nbsp;(x)&nbsp;x)</tt>, 
+поэтому <tt>call/cc</tt> возвращается второй раз с этим значением.
+Затем процедура идентификации применяет сама себя, что дает процедуру идентификации.
+И наконец применяется <tt>"HEY!"</tt>, получается <tt>"HEY!"</tt>.
+
+</p><p>
+Продолжения, используемые таким образом, не всгда так озадачивают.
+Рассмотрим следующее определение факториала <a name="./further:s64"></a><tt>factorial</tt> которое
+сохраняет продолжение в основе рекурсии перед возвратом 1, назначая его переменной
+верхнего уровня <a name="./further:s65"></a><tt>retry</tt><a name="retry"></a>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;retry&nbsp;#f)
+<br>
+<br>
+(define&nbsp;factorial<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;x&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(call/cc&nbsp;(lambda&nbsp;(k)&nbsp;(set!&nbsp;retry&nbsp;k)&nbsp;1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;x&nbsp;(factorial&nbsp;(-&nbsp;x&nbsp;1))))))</tt>
+</p><p>С этим определением, <tt>factorial</tt> работает, поскольку мы ожидаем что
+<tt>factorial</tt> будет работать, за исключением того, что он имеет побочный эффект устанавливающий
+переменную <tt>retry</tt>.
+
+</p><p>
+
+</p><p><tt>(factorial&nbsp;4)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;24<br>
+
+(retry&nbsp;1)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;24<br>
+
+(retry&nbsp;2)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;48</tt>
+</p><p>Продолжение связанное с <tt>retry</tt> может быть описано как "Умножить значение
+на 1, а затем умножить результат на 2, затем умножить результат на 3, затем умножить
+результат на 4."
+Если мы передадим продолжению другое значение, т.е не 1, мы будем
+вызывать базовое значение как нечто отличное от 1 и, следовательно, изменять конечный
+результат.
+
+</p><p>
+
+</p><p><tt>(retry&nbsp;2)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;48<br>
+
+(retry&nbsp;5)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;120</tt>
+</p><p>Этот механизм может быть основой для пакета установки контрольных точе(breakpoint),
+реализованного с помощью <tt>call/cc</tt>; каждый раз, когда встречается контраольная
+точка(breakpoint), продолжение точки останова сохраняется, так что вычисление может быть
+перезапущено из точки останова(более одного раза, если потребуется).
+
+</p><p>
+Продолжения можно использовать для реализации различных форм многозадачности.
+Простой механизм "легковесного процесса", определенный ниже, позволяет
+чередовать несколько вычислений.
+Поскольку он <i>невытесняющий(nonpreemptive)</i>, он требует чтобы каждый процесс добровольно
+"приостанавливался" время от времени, чтобы позволить другим работать.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;lwp-list&nbsp;'())<br>
+
+(define&nbsp;lwp<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(thunk)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;lwp-list&nbsp;(append&nbsp;lwp-list&nbsp;(list&nbsp;thunk)))))
+<br>
+<br>
+(define&nbsp;start<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([p&nbsp;(car&nbsp;lwp-list)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;lwp-list&nbsp;(cdr&nbsp;lwp-list))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(p))))</tt>
+</p><p>
+</p><p><tt>(define&nbsp;pause<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lwp&nbsp;(lambda&nbsp;()&nbsp;(k&nbsp;#f)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(start)))))</tt>
+</p><p>Следующие легковесные процессы взаимодействуют для печати
+бесконечной последовательности строк, содежащих <tt>"hey!"</tt>.
+
+</p><p>
+
+</p><p><tt>(lwp&nbsp;(lambda&nbsp;()&nbsp;(let&nbsp;f&nbsp;()&nbsp;(pause)&nbsp;(display&nbsp;"h")&nbsp;(f))))<br>
+
+(lwp&nbsp;(lambda&nbsp;()&nbsp;(let&nbsp;f&nbsp;()&nbsp;(pause)&nbsp;(display&nbsp;"e")&nbsp;(f))))<br>
+
+(lwp&nbsp;(lambda&nbsp;()&nbsp;(let&nbsp;f&nbsp;()&nbsp;(pause)&nbsp;(display&nbsp;"y")&nbsp;(f))))<br>
+
+(lwp&nbsp;(lambda&nbsp;()&nbsp;(let&nbsp;f&nbsp;()&nbsp;(pause)&nbsp;(display&nbsp;"!")&nbsp;(f))))<br>
+
+(lwp&nbsp;(lambda&nbsp;()&nbsp;(let&nbsp;f&nbsp;()&nbsp;(pause)&nbsp;(newline)&nbsp;(f))))<br>
+
+(start)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>hey!</i><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./further_files/ghostRightarrow.gif">&nbsp;<i>hey!</i><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./further_files/ghostRightarrow.gif">&nbsp;<i>hey!</i><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./further_files/ghostRightarrow.gif">&nbsp;<i>hey!</i><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./further_files/ghostRightarrow.gif">&nbsp;<img src="./further_files/3.gif" alt="&lt;graphic&gt;"></tt>
+</p><p>См. Раздел&nbsp;<a href="examples.html#g208">12.11</a> для реализации движков(<i>engines</i>),
+поддерживающих preemptive многозадачность с <tt>call/cc</tt>.
+
+</p><p>
+
+</p><h4>Exercise <a name="g70"></a>3.3.1</h4>
+<a name="./further:s66"></a>Используйте <tt>call/cc</tt> для написания программы которая бесконечно
+повторяет печать последовательности чисел начиная с нуля.
+Не используйте рекурсивных процедур и не используйте присваиваний.
+
+<p>
+
+</p><p>
+
+</p><h4>Exercise <a name="g71"></a>3.3.2</h4>
+<a name="./further:s67"></a>Перепишите <tt>product</tt> без использования <tt>call/cc</tt>, retaining the feature that no
+multiplications are performed if any of the list elements are zero.
+
+<p>
+
+</p><p>
+
+</p><h4>Exercise <a name="g72"></a>3.3.3</h4>
+<a name="./further:s68"></a>What would happen if a process created by <tt>lwp</tt> as defined above
+were to terminate, i.e., simply return without calling
+<tt>pause</tt>?
+Define a <tt>quit</tt> procedure that allows a process to terminate
+without otherwise affecting the <tt>lwp</tt> system.
+Be sure to handle the case in which the only remaining process
+terminates.
+
+<p>
+
+</p><p>
+
+</p><h4>Exercise <a name="g73"></a>3.3.4</h4>
+<a name="./further:s69"></a>Each time <tt>lwp</tt> is called, the list of processes is copied
+because <tt>lwp</tt> uses <tt>append</tt> to add its argument to the
+end of the process list.
+Modify the original <tt>lwp</tt> code to
+use the queue data type developed in Section&nbsp;<a href="start.html#g40">2.9</a>
+to avoid this problem.
+
+<p>
+
+</p><p>
+
+</p><h4>Exercise <a name="g74"></a>3.3.5</h4>
+<a name="./further:s70"></a>The light-weight process mechanism allows new processes to be created
+dynamically, although the example given in this section does not
+do so.
+Design an application that requires new processes to be created
+dynamically and implement it using the light-weight process mechanism.
+
+<p>
+
+</p><h3><a name="g75"></a><a name="./further:h4"></a>Section 3.4. Программирование в стиле передачи продолжений<a name="SECTGFCPS"></a></h3>
+
+<p>
+<a name="./further:s71"></a><a name="./further:s72"></a>Как мы обсуждали в
+предыдущем разделе, продолжение ожидает значения каждого выражения.
+В частности, с каждым  вызовом процедуры связано продолжение.
+Когда одна процедура вызывает другую с помощью не хвостового вызова, 
+вызываемая процедура получает неявное продолжение, которое отвечает за 
+завершение того, что осталось от тела вызывающей процедуры плюс
+возвращение к продолжению вызывающей процедуры.
+Если вызов является хвостовым вызовом, вызываемая процедура просто
+получает продолжение вызывающей процедуры.
+
+</p><p>
+Мы можем сделать продолжение явным, инкапсулируя "что делать"
+в явный процедурный аргумент, передаваемый в каждый вызов.
+Например, продолжение вызова функции <tt>f</tt> в
+
+</p><p>
+
+</p><p><tt>(letrec&nbsp;([f&nbsp;(lambda&nbsp;(x)&nbsp;(cons&nbsp;'a&nbsp;x))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[g&nbsp;(lambda&nbsp;(x)&nbsp;(cons&nbsp;'b&nbsp;(f&nbsp;x)))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[h&nbsp;(lambda&nbsp;(x)&nbsp;(g&nbsp;(cons&nbsp;'c&nbsp;x)))])<br>
+
+&nbsp;&nbsp;(cons&nbsp;'d&nbsp;(h&nbsp;'())))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(d&nbsp;b&nbsp;a&nbsp;c)</tt>
+</p><p>создает пару из символа <tt>b</tt> и возвращаемого в него значения, затем возвращает
+результат данного создания пары(cons) продолжению вызова <tt>g</tt>.
+Это продолжение совпадает с продолжением вызова <tt>h</tt>, которое создает пару(conses) из символа <tt>d</tt> 
+и возвращаемого в него значения.
+Мы можем переписать это в <i>стиле передачи продолжений</i>, или CPS,
+заменив эти неявные продолжения на явные процедуры.
+
+</p><p>
+
+</p><p><tt>(letrec&nbsp;([f&nbsp;(lambda&nbsp;(x&nbsp;k)&nbsp;(k&nbsp;(cons&nbsp;'a&nbsp;x)))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[g&nbsp;(lambda&nbsp;(x&nbsp;k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(f&nbsp;x&nbsp;(lambda&nbsp;(v)&nbsp;(k&nbsp;(cons&nbsp;'b&nbsp;v)))))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[h&nbsp;(lambda&nbsp;(x&nbsp;k)&nbsp;(g&nbsp;(cons&nbsp;'c&nbsp;x)&nbsp;k))])<br>
+
+&nbsp;&nbsp;(h&nbsp;'()&nbsp;(lambda&nbsp;(v)&nbsp;(cons&nbsp;'d&nbsp;v))))</tt>
+</p><p>Подобно неявным продолжениям <tt>h</tt> и <tt>g</tt> в предыдущем
+примере, явное продолжение передается в  <tt>h</tt> и в <tt>g</tt>,
+
+</p><p>
+
+</p><p><tt>(lambda&nbsp;(v)&nbsp;(cons&nbsp;'d&nbsp;v))</tt>
+</p><p>создает пару из символа <tt>d</tt> и переданному ему значению.
+Аналогично, продолжение передается в <tt>f</tt>,
+
+</p><p>
+
+</p><p><tt>(lambda&nbsp;(v)&nbsp;(k&nbsp;(cons&nbsp;'b&nbsp;v)))</tt>
+</p><p>создает пару <tt>b</tt> и переданного ему значения, затем передает ее в продолжение <tt>g</tt>.
+
+</p><p>
+Выражения написанные в CPS, конечно сложнее, но этот стиль программирования
+имеет некоторые полезные приложения. 
+CPS позволяет процедуре передать более одного результата в ее продолжение,
+потому что процедура, которая реализует продолжение, может принимать любое
+количесвтво аргументов.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;car&amp;cdr<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p&nbsp;k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(k&nbsp;(car&nbsp;p)&nbsp;(cdr&nbsp;p))))
+<br>
+<br>
+(car&amp;cdr&nbsp;'(a&nbsp;b&nbsp;c)<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;y&nbsp;x)))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((b&nbsp;c)&nbsp;a)<br>
+
+(car&amp;cdr&nbsp;'(a&nbsp;b&nbsp;c)&nbsp;cons)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)<br>
+
+(car&amp;cdr&nbsp;'(a&nbsp;b&nbsp;c&nbsp;a&nbsp;d)&nbsp;memv)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;d)</tt>
+</p><p>(Это можно сделать и с несколькими значениями; см. Раздел&nbsp;<a href="control.html#g104">5.8</a>.)
+CPS также позволяет процедуре принимать отдельно "успешные" и
+"неудачные" продолжения, которые могут принимать различные количества аргументов.
+Примером является <a name="./further:s73"></a><tt>целочисленное деление</tt> ниже, которое передает
+частное и остаток от его первых двух аргументов в его третий, если только второй аргумент
+(делительн) не равен нулю, и в этом случае он передает сообщение об ошибке своему четвертому
+аргументу.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;integer-divide<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y&nbsp;success&nbsp;failure)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;y&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(failure&nbsp;"divide&nbsp;by&nbsp;zero")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([q&nbsp;(quotient&nbsp;x&nbsp;y)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(success&nbsp;q&nbsp;(-&nbsp;x&nbsp;(*&nbsp;q&nbsp;y)))))))
+<br>
+<br>
+(integer-divide&nbsp;10&nbsp;3&nbsp;list&nbsp;(lambda&nbsp;(x)&nbsp;x))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(3&nbsp;1)<br>
+
+(integer-divide&nbsp;10&nbsp;0&nbsp;list&nbsp;(lambda&nbsp;(x)&nbsp;x))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"divide&nbsp;by&nbsp;zero"</tt>
+</p><p>Процедура <tt>quotient</tt>, используемая <tt>integer-divide</tt>,
+возвращает частное от двух своих аргументов, truncated toward zero.
+
+</p><p>
+Явные успех и неудача продолжений могут иногда помочь избежать
+дополнительной коммуникации, необходимой для того, чтобы отделить
+успешное выполнение процедуры от неудачного выполнения.
+Кроме того, возможно иметь несколько успешных или неудачных продолжений
+для разных вкусов успеха и неудачи, каждый из которых может принимать
+разное число и типы аргументов.
+См. Раздел&nbsp;<a href="examples.html#g204">12.10</a> и &nbsp;<a href="examples.html#g208">12.11</a> 
+для ознакомления с расширенными примерами, в которых используется стиль передачи продолжений.
+
+</p><p>
+На данный момент вам может быть интересно узнать о связи между
+CPS и продолжениями, полученными с помощью <tt>call/cc</tt>.
+Оказывается, любая программа, использующая <tt>call/cc</tt> может быть
+переписана в CPS без <tt>call/cc</tt>, но может потребоваться полная
+переработка программы(иногда включая даже системные примитивы).
+Попробуйте преобразовать пример <a name="./further:s74"></a><tt>product</tt> со страницы
+&nbsp;<a href="further.html#defn:product-call/cc">75</a>
+в CPS, прежде чем смотреть на версию ниже.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;product<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ls&nbsp;k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([break&nbsp;k])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([ls&nbsp;ls]&nbsp;[k&nbsp;k])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;ls)&nbsp;(k&nbsp;1)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(=&nbsp;(car&nbsp;ls)&nbsp;0)&nbsp;(break&nbsp;0)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(f&nbsp;(cdr&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(k&nbsp;(*&nbsp;(car&nbsp;ls)&nbsp;x))))])))))</tt>
+</p><p>
+</p><p><tt>(product&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5)&nbsp;(lambda&nbsp;(x)&nbsp;x))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;120<br>
+
+(product&nbsp;'(7&nbsp;3&nbsp;8&nbsp;0&nbsp;1&nbsp;9&nbsp;5)&nbsp;(lambda&nbsp;(x)&nbsp;x))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0</tt>
+</p><p>
+</p><h4>Упражнение <a name="g76"></a>3.4.1</h4>
+<a name="./further:s75"></a>Перепишите пример <a name="./further:s76"></a><tt>reciprocal</tt> приведенный в разделе &nbsp;<a href="start.html#g5">2.1</a> чтобы принять как успешные, так и неуспешные продолжения, такие как
+ <tt>integer-divide</tt> выше.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g77"></a>3.4.2</h4>
+<a name="./further:s77"></a>Перепишите пример <a name="./further:s78"></a><tt>retry</tt> со страницы&nbsp;<a href="further.html#retry">75</a> используя CPS.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g78"></a>3.4.3</h4>
+<a name="./further:s79"></a>Перепишите в CPS следующие выражения, чтобы избежать использования <tt>call/cc</tt>.
+
+<p>
+
+</p><p><tt>(define&nbsp;reciprocals<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;x&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(k&nbsp;"zero&nbsp;found")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(/&nbsp;1&nbsp;x)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ls)))))</tt>
+</p><p>
+</p><p><tt>(reciprocals&nbsp;'(2&nbsp;1/3&nbsp;5&nbsp;1/4))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1/2&nbsp;3&nbsp;1/5&nbsp;4)<br>
+
+(reciprocals&nbsp;'(2&nbsp;1/3&nbsp;0&nbsp;5&nbsp;1/4))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;"zero&nbsp;found"</tt>
+</p><p>[<i>Подсказка</i>: версия <tt>map</tt> для простого списка определена на странице
+&nbsp;<a href="start.html#defn:map1">46</a>.]
+
+</p><p>
+
+</p><p>
+
+</p><h3><a name="g79"></a><a name="./further:h5"></a>Section 3.5. Внутренние определения<a name="SECTGFINTERNAL"></a></h3>
+
+<p>
+<a name="./further:s80"></a><a name="./further:s81"></a>В разделе&nbsp;<a href="start.html#g25">2.6</a>, 
+мы обсудили определения верхнего уровня.
+Определения также могут появляться внутри в начале тела выражений <tt>lambda</tt>, <tt>let</tt>,
+или <tt>letrec</tt>, и в этом случае созданные ими привязки будут являться локальными
+для тела этих выражений.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;f&nbsp;(lambda&nbsp;(x)&nbsp;(*&nbsp;x&nbsp;x)))<br>
+
+(let&nbsp;([x&nbsp;3])<br>
+
+&nbsp;&nbsp;(define&nbsp;f&nbsp;(lambda&nbsp;(y)&nbsp;(+&nbsp;y&nbsp;x)))<br>
+
+&nbsp;&nbsp;(f&nbsp;4))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;7<br>
+
+(f&nbsp;4)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;16</tt>
+</p><p>Процедуры, связанные внутренними определениями,
+могут быть взаимно рекурсивными, как с <tt>letrec</tt>.
+Например, мы можем переписать <a name="./further:s82"></a><tt>even?</tt> и <a name="./further:s83"></a><tt>odd?</tt> 
+из примера в Разделе&nbsp;<a href="further.html#g55">3.2</a>
+используя внутренние определения следующим образом.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;()<br>
+
+&nbsp;&nbsp;(define&nbsp;even?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(=&nbsp;x&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(odd?&nbsp;(-&nbsp;x&nbsp;1)))))<br>
+
+&nbsp;&nbsp;(define&nbsp;odd?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(not&nbsp;(=&nbsp;x&nbsp;0))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(even?&nbsp;(-&nbsp;x&nbsp;1)))))<br>
+
+&nbsp;&nbsp;(even?&nbsp;20))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t</tt>
+</p><p>Точно так же мы можем заменить использование <a name="./further:s84"></a><tt>letrec</tt> чтобы связать <tt>race</tt>
+с внутренним определением <tt>race</tt> в нашем первом определении 
+<a name="./further:s85"></a><tt>list?</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;list?<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(define&nbsp;race<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(h&nbsp;t)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(pair?&nbsp;h)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([h&nbsp;(cdr&nbsp;h)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(pair?&nbsp;h)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(not&nbsp;(eq?&nbsp;h&nbsp;t))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(race&nbsp;(cdr&nbsp;h)&nbsp;(cdr&nbsp;t)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(null?&nbsp;h)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(null?&nbsp;h))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(race&nbsp;x&nbsp;x)))</tt>
+</p><p>Фактически, определения внутренних переменных и <tt>letrec</tt> практически взаимозаменяемы.
+Единственная разница, отличная от очевидной разницы в синтаксисе, заключается в том, что определения
+переменных гарантированно вычисляются слева на право, а привязки letrec могут вычисляться в любом
+порядке.
+Поэтому мы не можем полностью заменить
+<tt>lambda</tt>, <tt>let</tt>, или
+<tt>letrec</tt> телом содержащим внутренние определения с выраженем <tt>letrec</tt>.
+Однако мы можем использовать <tt>letrec*</tt>, который, как и
+<tt>let*</tt>, гарантирует порядок вычислений с лева на право.
+Тело формы
+
+</p><p>
+
+</p><p><tt>(define&nbsp;<i>var</i>&nbsp;<i>expr<sub>0</sub></i>)<br>
+
+&nbsp;&nbsp;<img src="./further_files/3.gif" alt="&lt;graphic&gt;"><br>
+
+<i>expr<sub>1</sub></i><br>
+
+<i>expr<sub>2</sub></i><br>
+
+&nbsp;&nbsp;<img src="./further_files/3.gif" alt="&lt;graphic&gt;"></tt>
+</p><p>эквивалентно выражению <tt>letrec*</tt>,
+связывающему определяемые переменные со связываемыми значениями в
+теле, содержащем выражения.
+
+</p><p>
+
+</p><p><tt>(letrec*&nbsp;((<i>var</i>&nbsp;<i>expr<sub>0</sub></i>)&nbsp;...)&nbsp;<i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>Напротив, <tt>letrec*</tt> вида
+
+</p><p>
+
+</p><p><tt>(letrec*&nbsp;((<i>var</i>&nbsp;<i>expr<sub>0</sub></i>)&nbsp;...)&nbsp;<i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>можно заменить выражением  <tt>let</tt> содержащим внутренние определения и 
+выражения из тела letrec* следующим образом.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;()<br>
+
+&nbsp;&nbsp;(define&nbsp;<i>var</i>&nbsp;<i>expr<sub>0</sub></i>)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="./further_files/3.gif" alt="&lt;graphic&gt;"><br>
+
+&nbsp;&nbsp;<i>expr<sub>1</sub></i><br>
+
+&nbsp;&nbsp;<i>expr<sub>2</sub></i><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="./further_files/3.gif" alt="&lt;graphic&gt;"><br>
+
+)</tt>
+</p><p>Казалось, что отсутствие симетрии между этими преобразованиями связано с тем,
+что выражения <tt>letrec*</tt> могут появляться в любом месте, где выражение действительно,
+тогда как внутренние определения могут появляться только в передней части тела.
+Таким образом, при замене <tt>letrec*</tt> на внутреннее определение, мы должны,
+как правило, вводить выражение  <tt>let</tt> для хранения определений.
+
+</p><p>
+Другое различие между внутренними определениями и <tt>letrec</tt> или
+<tt>letrec*</tt> заключается в том, что определения синтаксиса могут быть
+внутренними определениями, а <tt>letrec</tt> и <tt>letrec*</tt> связывают
+только переменные.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;3])<br>
+
+&nbsp;&nbsp;(define-syntax&nbsp;set-x!<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e)&nbsp;(set!&nbsp;x&nbsp;e)]))<br>
+
+&nbsp;&nbsp;(set-x!&nbsp;(+&nbsp;x&nbsp;x))<br>
+
+&nbsp;&nbsp;x)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;6</tt>
+</p><p>Область действия синтаксического расширения, установленного внутренним
+определением синтаксиса, как и определение внутренней переменной, ограничена телом,
+в котором появляется определение синтаксиса.
+
+</p><p>
+Внутренние определения могут использоваться в сочетании с
+определениями верхнего уровня и присваиваниями, чтобы помочь
+в модулизации программ.
+Каждый модуль программы должен делать видимыми только те привязки,
+которые необходимы другим модулям, а также скрывать другие привязки,
+котоыре в противном случае загромождали бы пространство имен верхнего уровня и,
+возможно, приводили к непреднамеренному использованию или переопределению
+этих привязок. Ниже приведен общий способ  структурирования модуля.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;<i>export-var</i>&nbsp;#f)<br>
+
+&nbsp;&nbsp;<img src="./further_files/3.gif" alt="&lt;graphic&gt;"><br>
+
+(let&nbsp;()<br>
+
+&nbsp;&nbsp;(define&nbsp;<i>var</i>&nbsp;<i>expr</i>)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="./further_files/3.gif" alt="&lt;graphic&gt;"><br>
+
+&nbsp;&nbsp;<i>init-expr</i><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="./further_files/3.gif" alt="&lt;graphic&gt;"><br>
+
+&nbsp;&nbsp;(set!&nbsp;<i>export-var</i>&nbsp;<i>export-val</i>)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="./further_files/3.gif" alt="&lt;graphic&gt;"><br>
+
+)</tt>
+</p><p>Первый набор определений устанавливает привязки верхнего уровня для
+переменных, которые мы хотим экспортировать (делает видимыми их глобально).
+Второй набор определений устанавливает локальные привязки видимые только
+внутри модуля.
+Выражения <tt><i>init-expr</i>&nbsp;...</tt> выполняют любую инициализацию,
+которая должна произойти после установления локальных привязок.
+Наконец, выражения <tt>set!</tt> присваивают экспортируемым переменным
+соответствующие значения.
+
+</p><p>
+Преимущство этой формы модульности заключается в том, что выражение
+со скобками <tt>let</tt> может быть удалено или
+"закоментировано" во время разработки программы, делая внутренние 
+определения определениями верхнего уровня  для облегчения интерактивного
+тестирования.
+Такая форма модульности также имеет несколько недостатков, о чем
+мы поговорим в следующем разделе.
+
+</p><p>
+Следующий модуль экспортирует одну переменную  <tt>calc</tt>, которая 
+связана с процедурой, которая реализует простой четырех функциональный
+калькулятор.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;calc&nbsp;#f)<br>
+
+(let&nbsp;()<br>
+
+&nbsp;&nbsp;(define&nbsp;do-calc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ek&nbsp;expr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(number?&nbsp;expr)&nbsp;expr]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(and&nbsp;(list?&nbsp;expr)&nbsp;(=&nbsp;(length&nbsp;expr)&nbsp;3))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([op&nbsp;(car&nbsp;expr)]&nbsp;[args&nbsp;(cdr&nbsp;expr)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(case&nbsp;op<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(add)&nbsp;(apply-op&nbsp;ek&nbsp;+&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(sub)&nbsp;(apply-op&nbsp;ek&nbsp;-&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(mul)&nbsp;(apply-op&nbsp;ek&nbsp;*&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(div)&nbsp;(apply-op&nbsp;ek&nbsp;/&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(complain&nbsp;ek&nbsp;"invalid&nbsp;operator"&nbsp;op)]))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(complain&nbsp;ek&nbsp;"invalid&nbsp;expression"&nbsp;expr)])))<br>
+
+&nbsp;&nbsp;(define&nbsp;apply-op<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ek&nbsp;op&nbsp;args)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(op&nbsp;(do-calc&nbsp;ek&nbsp;(car&nbsp;args))&nbsp;(do-calc&nbsp;ek&nbsp;(cadr&nbsp;args)))))<br>
+
+&nbsp;&nbsp;(define&nbsp;complain<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ek&nbsp;msg&nbsp;expr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(ek&nbsp;(list&nbsp;msg&nbsp;expr))))<br>
+
+&nbsp;&nbsp;(set!&nbsp;calc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(expr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;grab&nbsp;an&nbsp;error&nbsp;continuation&nbsp;ek<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ek)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do-calc&nbsp;ek&nbsp;expr))))))
+<br>
+<br>
+(calc&nbsp;'(add&nbsp;(mul&nbsp;3&nbsp;2)&nbsp;-4))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2<br>
+
+(calc&nbsp;'(div&nbsp;1/2&nbsp;1/6))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3<br>
+
+(calc&nbsp;'(add&nbsp;(mul&nbsp;3&nbsp;2)&nbsp;(div&nbsp;4)))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;("invalid&nbsp;expression"&nbsp;(div&nbsp;4))<br>
+
+(calc&nbsp;'(mul&nbsp;(add&nbsp;1&nbsp;-2)&nbsp;(pow&nbsp;2&nbsp;7)))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;("invalid&nbsp;operator"&nbsp;pow)</tt>
+</p><p>В этом примере используется выражение <tt>case</tt> для определение того, какой оператор должен применяться.
+<tt>case</tt> похож на <tt>cond</tt> за исключением того, что test в case всегда один и тот же: <tt>(memv&nbsp;<i>val</i>&nbsp;(<i>key</i>&nbsp;...))</tt>, где <tt><i>val</i></tt>
+это значение формы первой субформы <tt>case</tt> и <tt>(<i>key</i>&nbsp;...)</tt>
+это список элементов впереди каждого предложения <tt>case</tt>.
+Выражение <tt>case</tt> в примере выше может быть переписано с использованием <tt>cond</tt> 
+следующим образом.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([temp&nbsp;op])<br>
+
+&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(memv&nbsp;temp&nbsp;'(add))&nbsp;(apply-op&nbsp;ek&nbsp;+&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(memv&nbsp;temp&nbsp;'(sub))&nbsp;(apply-op&nbsp;ek&nbsp;-&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(memv&nbsp;temp&nbsp;'(mul))&nbsp;(apply-op&nbsp;ek&nbsp;*&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(memv&nbsp;temp&nbsp;'(div))&nbsp;(apply-op&nbsp;ek&nbsp;/&nbsp;args)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(complain&nbsp;ek&nbsp;"invalid&nbsp;operator"&nbsp;op)]))</tt>
+</p><p>
+</p><h4>Упражнение <a name="g80"></a>3.5.1</h4>
+<a name="./further:s86"></a>Переопределить <tt>complain</tt> в примере <tt>calc</tt> как эквивалентное
+синтаксическое расширение.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g81"></a>3.5.2</h4>
+<a name="./further:s87"></a>В примере <tt>calc</tt>, продолжение ошибки <tt>ek</tt> передается
+по каждому вызову <tt>apply-op</tt>, <tt>complain</tt>, и <tt>do-calc</tt>.
+Переместите определение <tt>apply-op</tt>, <tt>complain</tt>, и
+<tt>do-calc</tt> внутрь, насколько это необходимо, чтобы исключить аргумент
+<tt>ek</tt> из определения и применения этих процедур.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g82"></a>3.5.3</h4>
+<a name="./further:s88"></a>Устраните <tt>call/cc</tt> из <tt>calc</tt> и перепишите <tt>complain</tt>,
+чтобы вызвать исключение используя <tt>assertion-violation</tt>.
+
+<p>
+
+</p><p>
+
+</p><h4>Упражнение<a name="g83"></a>3.5.4</h4>
+<a name="./further:s89"></a>Расширить <tt>calc</tt> для обработки выражения унарного минуса, например.
+
+<p>
+
+</p><p><tt>(calc&nbsp;'(minus&nbsp;(add&nbsp;2&nbsp;3)))&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;-5</tt>
+</p><p>и других операторов по вашему выбору.
+
+</p><p>
+
+</p><p>
+
+</p><h3><a name="g84"></a><a name="./further:h6"></a>Section 3.6. Библиотеки<a name="SECTGFLIBRARIES"></a></h3>
+
+<p>
+В конце предыдущего раздела мы обсудили форму модулизации, которая включет
+в себя установку переменных верхнего уровня изнутри <tt>let</tt>
+сохраняя при этом непубличными локальные вспомогательные процедуры и переменные для <tt>let</tt>.
+Такая форма модульности имеет несколько недостатков:
+
+</p><p>
+</p><ul>
+  <li>Он не переносим, потому что поведение и даже наличие интреактивного
+         верхенго уровня не гарантируется  Revised<sup>6</sup> Report.
+  </li><li>Он требует присваиваний, которые делают код несколько неудобным и могут препятствовать
+         анализу и оптимизации компилятором.
+  </li><li>Он не поддерживает публикацию привязок ключевых слов, так как нет никакого аналога 
+          <tt>set!</tt> для ключевых слов.
+</li></ul>
+<p>
+
+</p><p>
+Альтернативой, которая не разделяет эти недостатки, является создание библиотеки.
+Библиотека экспортирует набор идентификаторов, каждый из которых определен в 
+библиотеке или импортируется из какой либо другой библиотеки. Экспортируемый
+идентификатор не обязательно должен быть привязан к переменной; он може быть 
+привязан как ключевое слово.
+
+</p><p>
+Следующая библиотека экспортирует два идентификатора: переменную
+<tt>gpa-&gt;grade</tt> и ключевое слово <tt>gpa</tt>.
+Переменная <tt>gpa-&gt;grade</tt> связана с процедурой которая принимает
+среднее значение баллов(grade-point average (GPA)), представленное как число,
+и возвращает соответствующий литерал класса, на основе четырех уровневой шкалы.
+Ключевое слово <tt>gpa</tt> именует синтаксическое расширение, чьи подформы должны
+быть литералами оценок, а значение GPA, вычисленное из этих литеральных оценок.
+
+</p><p>
+
+</p><p><tt>(library&nbsp;(grades)<br>
+
+&nbsp;&nbsp;(export&nbsp;gpa-&gt;grade&nbsp;gpa)<br>
+
+&nbsp;&nbsp;(import&nbsp;(rnrs))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;in-range?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;n&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(&gt;=&nbsp;n&nbsp;x)&nbsp;(&lt;&nbsp;n&nbsp;y))))
+<br>
+<br>
+&nbsp;&nbsp;(define-syntax&nbsp;range-case&nbsp;<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;(-&nbsp;else)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;expr&nbsp;((x&nbsp;-&nbsp;y)&nbsp;e1&nbsp;e2&nbsp;...)&nbsp;...&nbsp;[else&nbsp;ee1&nbsp;ee2&nbsp;...])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([tmp&nbsp;expr])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(in-range?&nbsp;x&nbsp;tmp&nbsp;y)&nbsp;e1&nbsp;e2&nbsp;...]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;ee1&nbsp;ee2&nbsp;...]))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;expr&nbsp;((x&nbsp;-&nbsp;y)&nbsp;e1&nbsp;e2&nbsp;...)&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([tmp&nbsp;expr])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(in-range?&nbsp;x&nbsp;tmp&nbsp;y)&nbsp;e1&nbsp;e2&nbsp;...]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...))]))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;letter-&gt;number<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(case&nbsp;x<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(a)&nbsp;&nbsp;4.0]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(b)&nbsp;&nbsp;3.0]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(c)&nbsp;&nbsp;2.0]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(d)&nbsp;&nbsp;1.0]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(f)&nbsp;&nbsp;0.0]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(assertion-violation&nbsp;'grade&nbsp;"invalid&nbsp;letter&nbsp;grade"&nbsp;x)])))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;gpa-&gt;grade<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(range-case&nbsp;x<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(0.0&nbsp;-&nbsp;0.5)&nbsp;'f]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(0.5&nbsp;-&nbsp;1.5)&nbsp;'d]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(1.5&nbsp;-&nbsp;2.5)&nbsp;'c]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(2.5&nbsp;-&nbsp;3.5)&nbsp;'b]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;'a])))
+<br>
+<br>
+&nbsp;&nbsp;(define-syntax&nbsp;gpa<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;g1&nbsp;g2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([ls&nbsp;(map&nbsp;letter-&gt;number&nbsp;'(g1&nbsp;g2&nbsp;...))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(/&nbsp;(apply&nbsp;+&nbsp;ls)&nbsp;(length&nbsp;ls)))])))</tt>
+</p><p>Имя библиотеки это <tt>(grades)</tt>.
+Это может показаться забавным видом имени, но все имена библиотек заключаются
+в скобки.
+Библиотека импортирует из стандартной <tt>(rnrs)</tt> библиотеки,
+которые содержат большинство примитивов и привязок ключевых слов, которые мы
+использовали в этой главе и пооследней, и все, что нам нужно для реализации
+<tt>gpa-&gt;grade</tt> и <tt>gpa</tt>.
+
+</p><p>
+Наряду с <tt>gpa-&gt;grade</tt> и <tt>gpa</tt>, в библиотеке определены
+несколько других синтаксических расширений и процедур, но ни одна из них
+не экспортируется.
+Те, которые не экспортируются, являются просто помощниками для импортируемых.
+Все, что используется  в библиотеке, должно быть знакомым, за исключением
+процедуры <tt>apply</tt>, описанной на странице 
+&nbsp;<a href="control.html#desc:apply">107</a>.
+
+</p><p>
+Если ваша реализация Scheme поддерживает  <tt>import</tt> в интерактивном
+верхнем уровне, вы можете протестировать два экспорта, как показано ниже.
+
+</p><p>
+
+</p><p><tt>(import&nbsp;(grades))<br>
+
+(gpa&nbsp;c&nbsp;a&nbsp;c&nbsp;b&nbsp;b)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2.8<br>
+
+(gpa-&gt;grade&nbsp;2.8)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;b</tt>
+</p><p>В главе&nbsp;<a href="libraries.html#g142">10</a> более подробно описаны библиотеки и приведены
+дополнительные примеры их использования.
+
+</p><p>
+
+</p><h4>Упражнение <a name="g85"></a>3.6.1</h4>
+<a name="./further:s90"></a>Имените <tt>gpa</tt> для обработки оценок "<tt>x</tt>", которые
+не учитываются в среднем значении баллов.
+Будьте осторожны, чтобы грамотно обрабатывать ситуацию, когда каждый балл это <tt>x</tt>.
+
+<p>
+
+</p><p><tt>(import&nbsp;(grades))<br>
+
+(gpa&nbsp;a&nbsp;x&nbsp;b&nbsp;c)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3.0</tt>
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g86"></a>3.6.2</h4>
+<a name="./further:s91"></a>Экспортируйте из <tt>(grades)</tt> новую синтаксическую форму, <tt>distribution</tt>,
+которая принимает набор оценок, таких как <tt>gpa</tt>, но возвращает список формы
+<tt>((<i>n</i>&nbsp;<i>g</i>)&nbsp;...)</tt>, где <tt><i>n</i></tt> количество раз в <tt><i>g</i></tt> в наборе,
+с одной записью для каждого <tt><i>g</i></tt>.
+Вызов <tt>distribution</tt> требует неэкспортируемой процедуры для фактической работы.
+
+<p>
+
+</p><p><tt>(import&nbsp;(grades))<br>
+
+(distribution&nbsp;a&nbsp;b&nbsp;a&nbsp;c&nbsp;c&nbsp;c&nbsp;a&nbsp;f&nbsp;b&nbsp;a)&nbsp;<img src="./further_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((4&nbsp;a)&nbsp;(2&nbsp;b)&nbsp;(3&nbsp;c)&nbsp;(0&nbsp;d)&nbsp;(1&nbsp;f))</tt>
+</p><p>
+
+</p><p>
+
+</p><h4>Упражнение <a name="g87"></a>3.6.3</h4>
+<a name="./further:s92"></a>Теперь прочитайте об операторах вывода в разделе&nbsp;<a href="io.html#g129">7.8</a> и
+определите новый экспорт, <tt>histogram</tt>, как процедуру, которая принимает 
+<tt><i>текстовый выходной порт</i></tt> и распределение, например, может быть получена
+процедурой <tt>distribution</tt>, и печатает гистограмму в стиле, показанном
+в примере ниже.
+
+<p>
+
+</p><p><tt>(import&nbsp;(grades))<br>
+
+(histogram<br>
+
+&nbsp;&nbsp;(current-output-port)<br>
+
+&nbsp;&nbsp;(distribution&nbsp;a&nbsp;b&nbsp;a&nbsp;c&nbsp;c&nbsp;a&nbsp;c&nbsp;a&nbsp;f&nbsp;b&nbsp;a))
+<br>
+<br>
+<i>prints:</i><br>
+
+&nbsp;&nbsp;a:&nbsp;*****<br>
+
+&nbsp;&nbsp;b:&nbsp;**<br>
+
+&nbsp;&nbsp;c:&nbsp;***<br>
+
+&nbsp;&nbsp;d:&nbsp;<br>
+
+&nbsp;&nbsp;f:&nbsp;*</tt>
+</p><p>
+
+</p><hr class="copyright" align="left">
+<p>
+R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</it><br>
+Copyright © 2009 <a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">The MIT Press</a>.  Electronically reproduced by permission.<br>
+Illustrations © 2009 <a class="plain" href="http://hebert.kitp.ucsb.edu/">Jean-Pierre Hébert</a><br>
+ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>
+<a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">to order this book</a> / <a class="plain" href="canned/about.html">about this book</a>
+</p>
+<p><a class="plain" href="http://www.scheme.com/">http://www.scheme.com</a></p>
+
+</body></html>

@@ -1,0 +1,909 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0050)https://scheme.com/tspl4/binding.html#./binding:h0 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<title>Процедуры и Связывание Переменных</title>
+<link href="./binding_files/tspl.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a name="g88"></a>
+<a name="./binding:h0"></a>
+
+<div>
+<img  src="./binding_files/ch4.png">
+</div>
+<h1>Глава 4. Процедуры и Связывание Переменных<a name="CHPTBINDING"></a></h1>
+
+<p>
+<a name="./binding:s0"></a><a name="./binding:s1"></a>Процедуры и Связывание
+Переменных являются основными строительными блоками программ Scheme.
+В этой главе описывается небольшой набор синтаксических форм, основным 
+назначением которых является создание процедур и управление связыванием
+переменных.
+Она начинается с двух наиболее фундаментальных строительных блоков
+программ Scheme: ссылочных переменных(variable references) и <tt>лямбда(lambda)</tt> выражений,
+и продолжается описанием форм связывания переменных и присваивания,
+такими как <tt>define</tt>,
+<tt>letrec</tt>, <tt>let-values</tt>, and <tt>set!</tt>.
+
+</p><p>
+Различные другие формы, которые связывают или присваивают переменные, для которых
+связывание или присвоение не являются основной целью(например именованный <tt>let</tt>)
+можно найти в главе &nbsp;<a href="https://scheme.com/tspl4/control.html#g96">5</a>.
+
+</p><p>
+
+</p><h3><a name="g89"></a><a name="./binding:h1"></a>Section 4.1. Переменные Ссылки<a name="SECTVARREF"></a></h3>
+
+<p>
+<a name="./binding:s2"></a><span class="formdef"><b>syntax</b>: <tt><i>variable</i></tt></span>
+<br>
+<b>returns: </b>значение переменной <tt><i>variable</i></tt>
+
+</p><p>Любой идентификатор, являющийся выражением в программе, является переменной,
+если существует видимая связанная переменная для используемого идентификатора,
+например, идентификатора появляющегося в пределах области привязки создаваемой <tt>define</tt>,
+<tt>lambda</tt>, <tt>let</tt>, или другой конструкции связывающей переменную со значением.
+
+</p><p>
+
+</p><p><tt>list&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#&lt;procedure&gt;<br>
+
+(define&nbsp;x&nbsp;'a)<br>
+
+(list&nbsp;x&nbsp;x)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;a)<br>
+
+(let&nbsp;([x&nbsp;'b])<br>
+
+&nbsp;&nbsp;(list&nbsp;x&nbsp;x))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;b)<br>
+
+(let&nbsp;([let&nbsp;'let])&nbsp;let)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;let</tt>
+</p><p>Будет нарушением синтаксиса для ссылочного идентификатора, который появляется
+в форме <tt>library</tt> или в программе верхнего уровня, если этот идентификатор
+не связан как переменная, ключевое слово, имя записи, или другой сущности.
+Поскольку область определения в <tt>library</tt>, программе верхнего уровня,
+<tt>lambda</tt>, или другом локальном теле это все внутренне тело, нет необходимости
+чтобы  определение переменной появлялось до первой  ссылки на него, если ссылка
+по факту не вычисляется до тех пор, пока определение не будет завершено.
+Как, например, ссылка на <tt>g</tt> в определении <tt>f</tt> ниже
+
+</p><p>
+
+</p><p><tt>(define&nbsp;f<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(g&nbsp;x)))<br>
+
+(define&nbsp;g<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;x)))</tt>
+</p><p>все в порядке, но ссылка на <tt>g</tt> в определении
+<tt>q</tt> ниже, не правильна.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;q&nbsp;(g&nbsp;3))<br>
+
+(define&nbsp;g<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;x)))</tt>
+</p><p>
+</p><h3><a name="g90"></a><a name="./binding:h2"></a>Section 4.2. Лямбда(Lambda)<a name="SECTLAMBDA"></a></h3>
+
+<p>
+<a name="./binding:s3"></a><span class="formdef"><b>syntax</b>: <tt>(lambda&nbsp;<i>formals</i>&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b> процедуру
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Синтаксическая форма <tt>lambda</tt> используется для создания
+процедур<a name="./binding:s4"></a>.
+Любая операция, которая создает процедуру или устанавливает привязки
+локальных переменных, в конечном счете определяется в терминах
+лямбда <tt>lambda</tt> или <tt>case-lambda</tt>.
+
+</p><p>
+Переменные в <tt><i>formals</i></tt> являются <a name="./binding:s5"></a>формальными
+параметрами процедуры, а последовательность подчиненных форм
+<tt><i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...</tt> является ее
+телом.
+
+</p><p>
+<a name="./binding:s6"></a>Тело может начнаться с последовательности
+определений, и в этом случаее привязки, созданные определениями являются
+локальными для тела.
+Если определения присутствуют, привязки ключевых слов используются и
+отбрасываются при расширении тела, а тело расширяется в выражение
+<tt>letrec*</tt>, сформированное из определений переменных и остальных
+выражений, как описано на странице&nbsp;<a href="syntax.html#body-expansion">292</a>.
+Остальная часть этого описания <tt>lambda</tt> предполагает, что это
+преобразование имело место, если это необходимо, так что тело представляет
+собой последовательность выражений без определений.
+
+</p><p>
+Когда процедура создается, привязки всех переменных, входящих в тело,
+исключая формальные параметры, сохраняются с процедурой.
+Впоследствии, всякий раз, когда процедура применяется к последовательности
+фактических параметров <a name="./binding:s7"></a>, формальные параметры
+привязываются к фактическим параметрам, сохраненные привязки востанавливаются и
+тело вычисляется.
+
+</p><p>
+При применении формальные параметры <a name="./binding:s8"></a>, определенные в <tt><i>formals</i></tt> 
+связываюся с фактическими параметрами следующим образом.
+
+</p><p>
+</p><ul>
+<li>Если <tt><i>formals</i></tt> является правильным списком переменных, например
+<tt>(x&nbsp;y&nbsp;z)</tt>, каждая переменная привязывается к соответствующему
+фактическому параметру. Исключение с типом условия <tt>&amp;assertion</tt> возникает,
+если задано слишком мало или слишком много фактических параметров.
+
+<p>
+</p></li><li>Если <tt><i>formals</i></tt> это единственная переменная (не в списке), например, <tt>z</tt>, 
+она связывается со списком фактических параметров.
+
+<p>
+</p></li><li>Если <tt><i>formals</i></tt> является неправильным списком переменных,
+заканчивающийся переменной, например <tt>(x&nbsp;y&nbsp;.&nbsp;z)</tt>, каждая переменная
+кроме последней связывается с фактическим параметром.
+Последняя переменная связывается со списком оставшихся фактических параметров.
+Исключение с условием типа <tt>&amp;assertion</tt> возникает, если задано
+слишком мало фактических параметров.
+</li></ul>
+<p>
+
+</p><p>
+Когда тело вычисляется, выражения в теле вычисляются последовательно, и процедура
+возвращает значение последнего выражения.
+
+</p><p>
+Процедуры не имеют печатного представления в обычном смысле.
+Ситемы Scheme печатают процедуры по разному; в этой книге испльзуется обозначение
+<tt>#&lt;procedure&gt;</tt>.
+
+</p><p>
+
+</p><p><tt>(lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;3))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#&lt;procedure&gt;<br>
+
+((lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;3))&nbsp;7)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;10<br>
+
+((lambda&nbsp;(x&nbsp;y)&nbsp;(*&nbsp;x&nbsp;(+&nbsp;x&nbsp;y)))&nbsp;7&nbsp;13)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;140<br>
+
+((lambda&nbsp;(f&nbsp;x)&nbsp;(f&nbsp;x&nbsp;x))&nbsp;+&nbsp;11)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;22<br>
+
+((lambda&nbsp;()&nbsp;(+&nbsp;3&nbsp;4)))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;7
+<br>
+<br>
+((lambda&nbsp;(x&nbsp;.&nbsp;y)&nbsp;(list&nbsp;x&nbsp;y))<br>
+
+&nbsp;28&nbsp;37)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(28&nbsp;(37))<br>
+
+((lambda&nbsp;(x&nbsp;.&nbsp;y)&nbsp;(list&nbsp;x&nbsp;y))<br>
+
+&nbsp;28&nbsp;37&nbsp;47&nbsp;28)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(28&nbsp;(37&nbsp;47&nbsp;28))<br>
+
+((lambda&nbsp;(x&nbsp;y&nbsp;.&nbsp;z)&nbsp;(list&nbsp;x&nbsp;y&nbsp;z))<br>
+
+&nbsp;1&nbsp;2&nbsp;3&nbsp;4)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;(3&nbsp;4))<br>
+
+((lambda&nbsp;x&nbsp;x)&nbsp;7&nbsp;13)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(7&nbsp;13)</tt>
+</p><p>
+</p><h3><a name="g91"></a><a name="./binding:h3"></a>Section 4.3. Case-Lambda<a name="SECTOPTARGS"></a></h3>
+
+<p>
+Scheme <a name="./binding:s9"></a><tt>lambda</tt> выражение всегда
+выдает процедуру с фиксированным числом аргументов или с неопределенным
+числом аргументов, большим или равным определенному числу. В частности,
+
+</p><p>
+
+</p><p><tt>(lambda&nbsp;(<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</sub></i>)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>принимает ровно <tt><i>n</i></tt> аргументов,
+
+</p><p>
+
+</p><p><tt>(lambda&nbsp;<i>r</i>&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>принимает ноль или больше аргументов, и
+
+</p><p>
+
+</p><p><tt>(lambda&nbsp;(<i>var<sub>1</sub></i>&nbsp;...&nbsp;<i>var<sub>n</sub></i>&nbsp;.&nbsp;<i>r</i>)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>принимает <tt><i>n</i></tt> или больше аргументов.
+
+</p><p>
+Однако <tt>lambda</tt> не может напрямую создать процедуру, которая принимает, скажем, два или
+три аргумента.
+В частности, процедуры, которые принимают <a name="./binding:s10"></a>необязательные аргументы,
+напрямую не поддерживаются <tt>lambda</tt>.
+Последняя форма <tt>lambda</tt> показанная выше, может использоваться вместе с проверкою длины,
+и композицией <tt>car</tt> и <tt>cdr</tt>, для реализации процедур с необязательными аргументами,
+хотя это и ухудшает ясность и эффективность кода.
+
+</p><p>
+Синтаксическая форма <a name="./binding:s11"></a><tt>case-lambda</tt> напрямую поддерживает
+процедуры с необязательными аргументами, а также процедуры с фиксированным или неопределенным
+числом аргументов.
+<tt>case-lambda</tt> основана на синтаксической форме <a name="./binding:s12"></a><tt>lambda*</tt>
+введенной в статье "Новый подход к процедурам с переменной арностью"(A New Approach to Procedures with Variable
+Arity)&nbsp;[<a class="citation" href="bibliography.html#g229">11</a>].
+
+</p><p>
+<a name="./binding:s13"></a><span class="formdef"><b>syntax</b>: <tt>(case-lambda&nbsp;<i>clause</i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>процедуру
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;control)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Выражение <tt>case-lambda</tt> состоит из набора предложений, каждое из которых
+напоминает <tt>lambda</tt> выражение.
+Каждое предложение(<tt><i>clause</i></tt>) имеет следующую форму.
+
+</p><p>
+
+</p><p><tt>[<i>formals</i>&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...]</tt>
+</p><p>Формальные параметры предложения определенняются формой <tt><i>formals</i></tt> также, как 
+и для <tt>lambda</tt> выражения.
+Количество аргументов, принимаемых значением процедуры для выражения
+<tt>case-lambda</tt> определяется числом аргументов, принимаемых отдельными предложениями.
+
+</p><p>
+Когда вызываеся процедура, созданная с помощью <tt>case-lambda</tt>,
+предложения рассматриваются в порядке следования в определении.
+Выбирается первое предложение, которое принимает заданное количество
+фактических параметров, формальные параметры определенные <tt><i>formals</i></tt>
+связываются с соответствующими фактическими параметрами, и тело вычисляется,
+как описано выше для  <tt>lambda</tt> выражений.
+Если <tt><i>formals</i></tt> в предложении является правильным списком идентификаторов,
+то предложение принимает ровно столько же фактических параметров, сколько формальных
+параметров(идентификаторов) в <tt><i>formals</i></tt>.
+Как и в случае <tt>lambda</tt> <tt><i>formals</i></tt>, в <tt>case-lambda</tt> предложение
+<tt><i>formals</i></tt> может быть одиночным идентификатором, и в этом случае
+предложение принимает любое количество аргументов или неправильный список идентификаторов, 
+завершающийся идентификатором, и в этом случае предложение принимает любое количество
+аргументов большее или равное числу формальных параметров, исключая завершающий
+идентификатор.
+Если никакое предложение не принимает имеющееся количество фактических параметров,
+возникает исключение типа <tt>&amp;assertion</tt>.
+
+</p><p>
+В следующем определении для  <a name="./binding:s14"></a><tt>make-list</tt> используется <tt>case-lambda</tt> для
+поддержки необязательного параметра заполненителя.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;make-list<br>
+
+&nbsp;&nbsp;(case-lambda<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(n)&nbsp;(make-list&nbsp;n&nbsp;#f)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(n&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([n&nbsp;n&nbsp;(-&nbsp;n&nbsp;1)]&nbsp;[ls&nbsp;'()&nbsp;(cons&nbsp;x&nbsp;ls)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((zero?&nbsp;n)&nbsp;ls))]))</tt>
+</p><p>Процедура <a name="./binding:s15"></a><tt>substring</tt> может быть расширена с помощью
+<tt>case-lambda</tt>, чтобы принимать либо конечный(<tt><i>end</i></tt>) индекс, и в этом случае он по
+умолчению соответствует концу строки, или индексы начала(<tt><i>start</i></tt>) и конца(<tt><i>end</i></tt>),
+и в этом случае <tt>substring</tt> эквивалентна процедуре <tt>string-copy</tt>:
+
+</p><p>
+
+</p><p><tt>(define&nbsp;substring1<br>
+
+&nbsp;&nbsp;(case-lambda<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(s)&nbsp;(substring1&nbsp;s&nbsp;0&nbsp;(string-length&nbsp;s))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;start)&nbsp;(substring1&nbsp;s&nbsp;start&nbsp;(string-length&nbsp;s))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;start&nbsp;end)&nbsp;(substring&nbsp;s&nbsp;start&nbsp;end)]))</tt>
+</p><p>Так же можно указать индекс начала(<tt><i>start</i></tt>), а не конечный индекс(<tt><i>end</i></tt>),
+когда указывается только один индекс:
+
+</p><p>
+
+</p><p><tt>(define&nbsp;substring2<br>
+
+&nbsp;&nbsp;(case-lambda<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(s)&nbsp;(substring2&nbsp;s&nbsp;0&nbsp;(string-length&nbsp;s))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;end)&nbsp;(substring2&nbsp;s&nbsp;0&nbsp;end)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;start&nbsp;end)&nbsp;(substring&nbsp;s&nbsp;start&nbsp;end)]))</tt>
+</p><p>Можно даже потребовать, чтобы оба, или один как <tt><i>start</i></tt>
+так и <tt><i>end</i></tt> индексы были опущены, просто удалив среднее предложение:
+
+</p><p>
+
+</p><p><tt>(define&nbsp;substring3<br>
+
+&nbsp;&nbsp;(case-lambda<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(s)&nbsp;(substring3&nbsp;s&nbsp;0&nbsp;(string-length&nbsp;s))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(s&nbsp;start&nbsp;end)&nbsp;(substring&nbsp;s&nbsp;start&nbsp;end)]))</tt>
+</p><p>
+</p><h3><a name="g92"></a><a name="./binding:h4"></a>Section 4.4. Локальное связывание(локальные переменные)<a name="SECTLOCALBINDING"></a></h3>
+
+<p>
+<a name="./binding:s16"></a><span class="formdef"><b>syntax</b>: <tt>(let&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>значение последнего выражения тела let
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>let</tt> устанавливает <a name="./binding:s17"></a>локальное связывание переменных.
+Каждая переменная <tt><i>var</i></tt> связывается со значением(образуется привязка) соответствующего
+выражения <tt><i>expr</i></tt>.
+Тело <tt>let</tt>, в котором связываются переменные, представляет собой последовательность подчиненных
+форм <tt><i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...</tt> и обрабатывается
+и вычисляется как тело <tt>lambda</tt>.
+
+</p><p>
+Формы <tt>let</tt>, <tt>let*</tt>, <tt>letrec</tt>, и <tt>letrec*</tt>
+(остальные описываются после <tt>let</tt>) аналогичны, но используются
+для разных целей.
+С <tt>let</tt>, в отличии от <tt>let*</tt>, <tt>letrec</tt>, и <tt>letrec*</tt>,
+выражения <tt><i>expr</i>&nbsp;...</tt> выходят за область действия переменных
+<tt><i>var</i>&nbsp;...</tt>.
+Кроме того, в отличии от <tt>let*</tt> и <tt>letrec*</tt>, нет определенного порядка
+для вычисления выражений <tt><i>expr</i>&nbsp;...</tt>.
+Они могут вычисляться слева на право, справа налево или в любом другом порядке
+по усмотрению реализации. Используйте <tt>let</tt> когда значения не зависят от
+переменных, а порядок вычисления не важен.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;(*&nbsp;3.0&nbsp;3.0)]&nbsp;[y&nbsp;(*&nbsp;4.0&nbsp;4.0)])<br>
+
+&nbsp;&nbsp;(sqrt&nbsp;(+&nbsp;x&nbsp;y)))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5.0
+<br>
+<br>
+(let&nbsp;([x&nbsp;'a]&nbsp;[y&nbsp;'(b&nbsp;c)])<br>
+
+&nbsp;&nbsp;(cons&nbsp;x&nbsp;y))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)
+<br>
+<br>
+(let&nbsp;([x&nbsp;0]&nbsp;[y&nbsp;1])<br>
+
+&nbsp;&nbsp;(let&nbsp;([x&nbsp;y]&nbsp;[y&nbsp;x])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;x&nbsp;y)))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;0)</tt>
+</p><p>Следующее определение <tt>let</tt> показывает типичный
+вывод <tt>let</tt> из <tt>lambda</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;let<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((x&nbsp;e)&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((lambda&nbsp;(x&nbsp;...)&nbsp;b1&nbsp;b2&nbsp;...)&nbsp;e&nbsp;...)]))</tt>
+</p><p>Другая форма <tt>let</tt>, <i>Именованный</i> <tt>let</tt>, описана в разделе
+&nbsp;<a href="control.html#g100">5.4</a>, а определение полного 
+<tt>let</tt> можно найти на странице&nbsp;<a href="syntax.html#defn:let">312</a>.
+
+</p><p>
+<a name="./binding:s18"></a><span class="formdef"><b>syntax</b>: <tt>(let*&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>значение последнего выражения тела
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>let*</tt> аналогично <tt>let</tt> исключаяя того что
+выражения <tt><i>expr</i>&nbsp;...</tt> вычисляются последовательно
+слева на право, и какждое из этих выражений находиться в области действия
+переменных слева.
+Используйте <tt>let*</tt> когда существует линейная зависимость между значениями
+или когда порядок вычисления важен.
+
+</p><p>
+
+</p><p><tt>(let*&nbsp;([x&nbsp;(*&nbsp;5.0&nbsp;5.0)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[y&nbsp;(-&nbsp;x&nbsp;(*&nbsp;4.0&nbsp;4.0))])<br>
+
+&nbsp;&nbsp;(sqrt&nbsp;y))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3.0
+<br>
+<br>
+(let&nbsp;([x&nbsp;0]&nbsp;[y&nbsp;1])<br>
+
+&nbsp;&nbsp;(let*&nbsp;([x&nbsp;y]&nbsp;[y&nbsp;x])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;x&nbsp;y)))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;1)</tt>
+</p><p>Любое <tt>let*</tt> выражение может быть преобразовано в набор
+<a name="./binding:s19"></a>вложенных <tt>let</tt> выражений.
+Следующее определение  <tt>let*</tt> демонстриурет типичное
+преобразование.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;let*<a name="defn:let*"></a><br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;()&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;()&nbsp;e1&nbsp;e2&nbsp;...)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((x1&nbsp;v1)&nbsp;(x2&nbsp;v2)&nbsp;...)&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;((x1&nbsp;v1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let*&nbsp;((x2&nbsp;v2)&nbsp;...)&nbsp;e1&nbsp;e2&nbsp;...))]))</tt>
+</p><p><a name="./binding:s20"></a><span class="formdef"><b>syntax</b>: <tt>(letrec&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b> значение последнего выражения тела
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>letrec</tt> аналогичен <tt>let</tt> и <tt>let*</tt>, за исключением
+того, что все выражения <tt><i>expr</i>&nbsp;...</tt>
+входят в область действия всех переменных <tt><i>var</i>&nbsp;...</tt>.
+<tt>letrec</tt> позволяет определять
+<a name="./binding:s21"></a>взаимно-рекурсивные процедуры.
+
+</p><p>
+
+</p><p><tt>(letrec&nbsp;([sum&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(zero?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;(sum&nbsp;(-&nbsp;x&nbsp;1)))))])<br>
+
+&nbsp;&nbsp;(sum&nbsp;5))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;15</tt>
+</p><p>Порядок вычисления выражений
+<tt><i>expr</i>&nbsp;...</tt> не определен, поэтому программа не должна вычислять
+ссылку на любую из переменных, связанных выражением <tt>letrec</tt>, прежде чем
+все значения будут вычислены.
+(Возникновение переменной в <tt>lambda</tt> выражении не считается ссылкой,
+если только результирующая процедура не применяется до того, как будут
+вычислены все значения.)
+Если это ограничение нарушено, возникает исключение с условием типа
+<tt>&amp;assertion</tt>.
+
+</p><p>
+Выражение <tt><i>expr</i></tt> не должно возвращаться более одного раза.
+То есть, оно не должно возвращаться как нормально, так и посредством
+вызова продолжения, полученного во время его вычисления, и оно не должно
+возвращаться дважды через два вызова такого продолжения.
+От реализации не требуют определения нарушения данного ограничения, но
+если они это делают, возникает исключение с типом <tt>&amp;assertion</tt>.
+
+</p><p>
+Выбирайте <tt>letrec</tt> прежде <tt>let</tt> или <tt>let*</tt> когда существует
+циклическая зависимость между переменными и их значениями, и когда
+порядок вычисления неважен.
+Выбирайте <tt>letrec*</tt> прежде <tt>letrec</tt> когда есть циклическая зависимость
+и привязки необходимо вычислять слева на право(когда важен порядок вычислений).
+
+</p><p>
+Форма выражения <tt>letrec</tt>
+
+</p><p>
+
+</p><p><tt>(letrec&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>может быть выражен в терминах <tt>let</tt> и <tt>set!</tt> в виде
+
+</p><p>
+
+</p><p><tt>(let&nbsp;((<i>var</i>&nbsp;#f)&nbsp;...)<br>
+
+&nbsp;&nbsp;(let&nbsp;((<i>temp</i>&nbsp;<i>expr</i>)&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;<i>var</i>&nbsp;<i>temp</i>)&nbsp;...<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;()&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)))</tt>
+</p><p>где <tt><i>temp</i>&nbsp;...</tt> является новыми переменными, то есть теми, которые
+еще не появлялись в выражении  <tt>letrec</tt>,
+по одному для каждой пары <tt>(<i>var</i>&nbsp;<i>expr</i>)</tt>.
+Внешнее выражение <tt>let</tt> устанавливает привязки переменных.
+Начальное значение каждой переменной не имеет значения, поэтому можно использовать
+любое значение вместо <tt>#f</tt>.
+Связывание устнавливается сначала так, что <tt><i>expr</i>&nbsp;...</tt>
+может содержать вхождение переменных, т.е. чтобы выражения вычислялись
+в пределах области видимости переменных.
+Среднее <tt>let</tt> вычисляет значения и связывает их с временными переменными,
+и выражение <tt>set!</tt> присваивает какждой переменной соответствующее
+значение.
+Внутреннее <tt>let</tt> присутствует если тело содержит внутренние определения.
+
+</p><p>
+Определение <tt>letrec</tt> использующее это преобразование показано
+на странице&nbsp;<a href="syntax.html#defn:letrec">310</a>.
+
+</p><p>
+Это преобразование не приводит к ограничению того, что выражения
+<tt><i>expr</i></tt> не должны вычислять ссылки или присваивать
+переменные.
+Воможны более сложные преобразования, которые обеспечивают это
+ограничение и фактически создают более эффективный код
+&nbsp;[<a class="citation" href="bibliography.html#g249">31</a>].
+
+</p><p>
+<a name="./binding:s22"></a><a name="desc:letrec*"></a>
+<span class="formdef"><b>syntax</b>: <tt>(letrec*&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>значение последнего выражения тела
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>letrec*</tt> аналогичен <tt>letrec</tt>, за исключением того, что
+<tt>letrec*</tt> вычисляет выражения <tt><i>expr</i>&nbsp;...</tt> последовательно
+слева на право.
+Хотя программы все равно не должны вычислять ссылки на любой <tt><i>var</i></tt>
+до того, как будет обработано соответствующее выражение <tt><i>expr</i></tt>, ссылки на
+<tt><i>var</i></tt> могут быть вычислены в любое время после этого, в том числе при
+вычислении <tt><i>expr</i></tt> любой последующей привязки.
+
+</p><p>
+Выражение <tt>letrec*</tt> имеющее форму
+
+</p><p>
+
+</p><p><tt>(letrec*&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>может быть выражено в терминах <tt>let</tt> и <tt>set!</tt> как
+
+</p><p>
+
+</p><p><tt>(let&nbsp;((<i>var</i>&nbsp;#f)&nbsp;...)<br>
+
+&nbsp;&nbsp;(set!&nbsp;<i>var</i>&nbsp;<i>expr</i>)&nbsp;...<br>
+
+&nbsp;&nbsp;(let&nbsp;()&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...))</tt>
+</p><p>Внешнее выражение <tt>let</tt> создает привязки, каждое присваивание
+вычисляет выражение и сразу же устанавливает соответствующую переменную в свое 
+значение, в указанной последовательности, а внутренний let вычисляет тело(body).
+<tt>let</tt> используемый в последнем случае лучше чем <tt>begin</tt>
+поскльку тело может включать внутренние определения, а также выражения.
+
+</p><p>
+
+</p><p><tt>(letrec*&nbsp;([sum&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(zero?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;(sum&nbsp;(-&nbsp;x&nbsp;1)))))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[f&nbsp;(lambda&nbsp;()&nbsp;(cons&nbsp;n&nbsp;n-sum))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[n&nbsp;15]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[n-sum&nbsp;(sum&nbsp;n)])<br>
+
+&nbsp;&nbsp;(f))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(15&nbsp;.&nbsp;120)
+<br>
+<br>
+(letrec*&nbsp;([f&nbsp;(lambda&nbsp;()&nbsp;(lambda&nbsp;()&nbsp;g))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[g&nbsp;(f)])<br>
+
+&nbsp;&nbsp;(eq?&nbsp;(g)&nbsp;g))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t
+<br>
+<br>
+(letrec*&nbsp;([g&nbsp;(f)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[f&nbsp;(lambda&nbsp;()&nbsp;(lambda&nbsp;()&nbsp;g))])<br>
+
+&nbsp;&nbsp;(eq?&nbsp;(g)&nbsp;g))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>exception:&nbsp;attempt&nbsp;to&nbsp;reference&nbsp;undefined&nbsp;variable&nbsp;f</i></tt>
+</p><p>
+</p><h3><a name="g93"></a><a name="./binding:h5"></a>Section 4.5. Множественные значения<a name="SECTLETVALUES"></a></h3>
+
+<p>
+<a name="./binding:s23"></a><a name="desc:let-values"></a>
+<span class="formdef"><b>syntax</b>: <tt>(let-values&nbsp;((<i>formals</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>(let*-values&nbsp;((<i>formals</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>значения последнего выражения
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>let-values</tt> удобный способ получить несколько
+значений и привязать их к переменным.
+Он структурирован как <tt>let</tt> но принимает произвольный
+формальный список (подобно <tt>lambda</tt>) на каждой левой
+стороне.
+<tt>let*-values</tt> работает аналогично, но выполняет привязки
+в порядке слева на право, как <tt>let*</tt>.
+Исключение типа <tt>&amp;assertion</tt> возникает, когда число
+значений возвращенных из <tt><i>expr</i></tt> не подходит
+для соответствующих <tt><i>formals</i></tt>, как описано выше 
+для <tt>lambda</tt>.
+Определение <tt>let-values</tt> приведено на странице&nbsp;<a href="syntax.html#fullletvalues">310</a>.
+
+</p><p>
+
+</p><p><tt>(let-values&nbsp;([(a&nbsp;b)&nbsp;(values&nbsp;1&nbsp;2)]&nbsp;[c&nbsp;(values&nbsp;1&nbsp;2&nbsp;3)])<br>
+
+&nbsp;&nbsp;(list&nbsp;a&nbsp;b&nbsp;c))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;(1&nbsp;2&nbsp;3))
+<br>
+<br>
+(let*-values&nbsp;([(a&nbsp;b)&nbsp;(values&nbsp;1&nbsp;2)]&nbsp;[(a&nbsp;b)&nbsp;(values&nbsp;b&nbsp;a)])<br>
+
+&nbsp;&nbsp;(list&nbsp;a&nbsp;b))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(2&nbsp;1)</tt>
+</p><p>
+</p><h3><a name="g94"></a><a name="./binding:h6"></a>Section 4.6. Определение Переменных<a name="SECTDEFINITIONS"></a></h3>
+
+<p>
+<a name="./binding:s24"></a><span class="formdef"><b>syntax</b>: <tt>(define&nbsp;<i>var</i>&nbsp;<i>expr</i>)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>(define&nbsp;<i>var</i>)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>(define&nbsp;(<i>var<sub>0</sub></i>&nbsp;<i>var<sub>1</sub></i>&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>(define&nbsp;(<i>var<sub>0</sub></i>&nbsp;.&nbsp;<i>var<sub>r</sub></i>)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>(define&nbsp;(<i>var<sub>0</sub></i>&nbsp;<i>var<sub>1</sub></i>&nbsp;<i>var<sub>2</sub></i>&nbsp;...&nbsp;.&nbsp;<i>var<sub>r</sub></i>)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>В первой форме, <tt>define</tt> создается новая связь(привязка) <tt><i>var</i></tt> с
+значением выражения <tt><i>expr</i></tt>.
+Выражение <tt><i>expr</i></tt> не должно возвращаться более одного раза.
+То есть, оно не должно возвращаться как нормально, так и посредством вызова
+продолжения, полученного во время его вычисления, и оно не должно возвращаться
+через два вызова такого продолжения.
+От реализации не требуется обнаружения нарушения этого ограничения, но если оно
+это делает, возникает исключение типа <tt>&amp;assertion</tt>.
+
+</p><p>
+Вторая форма эквивалентна <tt>(define&nbsp;<i>var</i>&nbsp;<i>unspecified</i>)</tt>,
+где <tt><i>unspecified</i></tt> некоторое неопределенное значение.
+<a name="./binding:s25"></a>Остальные - это сокращенные формы для привязки
+переменных к процедурам; они идентичны следующему определению в терминах 
+<tt>lambda</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;<i>var</i><br>
+
+&nbsp;&nbsp;(lambda&nbsp;<i>formals</i><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...))</tt>
+</p><p>где <tt><i>formals</i></tt> являются <tt>(<i>var<sub>1</sub></i>&nbsp;...)</tt>, <tt><i>var<sub>r</sub></i></tt>,
+или <tt>(<i>var<sub>1</sub></i>&nbsp;<i>var<sub>2</sub></i>&nbsp;...&nbsp;.&nbsp;<i>var<sub>r</sub></i>)</tt> для
+третьего, четвертого и пятого форматов <tt>define</tt>.
+
+</p><p>
+Определения могут появляться в передней части тела библиотеки(<tt>library</tt>), где
+бы то нибыло среди форм тела программ верхнего уровня, а также вначале
+тела <tt>lambda</tt> или <tt>case-lambda</tt> или тела любой формы полученной из <tt>lambda</tt>,
+например, <tt>let</tt>, или <tt>letrec*</tt>.
+Любое тело, которое начинается с последовательности определений(define), трансформируется при расширении
+макросов в выражение <tt>letrec*</tt>, как описано на странице
+&nbsp;<a href="syntax.html#body-expansion">292</a>.
+
+</p><p>
+Синтаксис определений может появлятьс вместе с определением переменных везде,
+где могут появляться определения переменных; см. главу &nbsp;<a href="syntax.html#g133">8</a>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;x&nbsp;3)<br>
+
+x&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3
+<br>
+<br>
+(define&nbsp;f<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;(+&nbsp;x&nbsp;y)&nbsp;2)))<br>
+
+(f&nbsp;5&nbsp;4)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;18
+<br>
+<br>
+(define&nbsp;(sum-of-squares&nbsp;x&nbsp;y)<br>
+
+&nbsp;&nbsp;(+&nbsp;(*&nbsp;x&nbsp;x)&nbsp;(*&nbsp;y&nbsp;y)))<br>
+
+(sum-of-squares&nbsp;3&nbsp;4)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;25
+<br>
+<br>
+(define&nbsp;f<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;1)))<br>
+
+(let&nbsp;([x&nbsp;2])<br>
+
+&nbsp;&nbsp;(define&nbsp;f<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;y&nbsp;x)))<br>
+
+&nbsp;&nbsp;(f&nbsp;3))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5<br>
+
+(f&nbsp;3)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4</tt>
+</p><p>Набор определений можно сгруппировать, заключив его в
+форму <a name="./binding:s26"></a><tt>begin</tt>.
+Определения, сгруппированные таким образом, могут появляться везде, где могут
+появляться обычные определения переменных и синтаксиса.
+Они обрабатываются, как если бы они были написаны отдельно, т.е.
+без включения в форму <tt>begin</tt>.
+<a name="multi-define-syntax"></a>Эта функция позволяет синтаксическим расширениям
+расширяться в группы определений.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;multi-define-syntax<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;(var&nbsp;expr)&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(define-syntax&nbsp;var&nbsp;expr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...)]))<br>
+
+(let&nbsp;()<br>
+
+&nbsp;&nbsp;(define&nbsp;plus<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(zero?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(plus&nbsp;(sub1&nbsp;x)&nbsp;(add1&nbsp;y)))))<br>
+
+&nbsp;&nbsp;(multi-define-syntax<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(add1&nbsp;(syntax-rules&nbsp;()&nbsp;[(_&nbsp;e)&nbsp;(+&nbsp;e&nbsp;1)]))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(sub1&nbsp;(syntax-rules&nbsp;()&nbsp;[(_&nbsp;e)&nbsp;(-&nbsp;e&nbsp;1)])))<br>
+
+&nbsp;&nbsp;(plus&nbsp;7&nbsp;8))&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;15</tt>
+</p><p><a name="./binding:s27"></a>Многие реализации поддерживаю интерактивный "верхний уровень", в
+котором переменные и другие определения могут вводиться интерактивно или загружаться
+из файлов. Поведение этих определений верхнего уровня выходит за рамки
+Revised<sup>6</sup> Report, но до тех пор пока переменные верхнего уровня определяются до того
+как будут вычислены какие-либо ссылки на них или присваивания, поведение будет согласовано
+в большинстве реализаций.
+Так, например, ссылак на <tt>g</tt> в определении верхнего уровня <tt>f</tt> ниже это хорошо если
+<tt><i>g</i></tt> еще не определена, а <tt>g</tt>
+предполагается именовать переменную, которая будет определена в какой-то более поздней точке.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;f<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(g&nbsp;x)))</tt>
+</p><p>Если после этого следует определение <tt>g</tt>, до того как <tt>f</tt> 
+будет вычислено, предположение о том, что <tt>g</tt> будет определено как переменная,
+будет проверено правильно, и вызов  <tt>f</tt> будет работать так как ожидалось.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;g<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;x&nbsp;x)))<br>
+
+(f&nbsp;3)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;6</tt>
+</p><p>Если <tt>g</tt> было определено вместо этого как ключевое слово для синтаксического
+расширения, предположение о том, что <tt>g</tt> является свяазнной переменной является ложным,
+и если <tt>f</tt> не будет переопределено до его вызова, реализация может 
+вызвать исключение.
+
+</p><p>
+
+</p><h3><a name="g95"></a><a name="./binding:h7"></a>Section 4.7. Присваивание<a name="SECTASSIGNMENTS"></a></h3>
+
+<p>
+<a name="./binding:s28"></a><span class="formdef"><b>syntax</b>: <tt>(set!&nbsp;<i>var</i>&nbsp;<i>expr</i>)</tt></span>
+<br>
+<b>returns: </b>неопределено
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./binding:s29"></a><tt>set!</tt> не устанавливает новое связывание
+для <tt><i>var</i></tt>, а скорее изменяет значение существующего связывания.
+<a name="./binding:s30"></a>Сначала он вычисляет <tt><i>expr</i></tt>, затем
+присваивает <tt><i>var</i></tt> значение вычисленного выражения <tt><i>expr</i></tt>.
+Любая последующая ссылка на <tt><i>var</i></tt> в пределах области действия
+связывания вычисляется с новым значением.
+
+</p><p>
+Присваивания не так часто используются в Scheme как в большинстве других
+языков, но они полезны для реализации изменения состояния.<a name="./binding:s31"></a>
+
+</p><p>
+
+</p><p><tt>(define&nbsp;flip-flop<br>
+
+&nbsp;&nbsp;(let&nbsp;([state&nbsp;#f])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;state&nbsp;(not&nbsp;state))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state)))
+<br>
+<br>
+(flip-flop)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(flip-flop)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(flip-flop)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t</tt>
+</p><p>Присваивания также полезны для кеширования значений.
+В приведенном ниже примере используется метод называемый <i>memoization</i>,
+в котором процедура записывает значения, связанные со старыми входными значениями,
+поэтому не нужно их перевычислять, чтобы реализовать быструю версию, отличную 
+от экспотенциального двухрекурсивного определения
+функции <a name="./binding:s32"></a>Фибоначчи (см
+страницу&nbsp;<a href="further.html#fibonacci">69</a>).<a name="./binding:s33"></a>
+
+</p><p>
+
+</p><p><tt>(define&nbsp;memoize<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(proc)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([cache&nbsp;'()])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(assq&nbsp;x&nbsp;cache)&nbsp;=&gt;&nbsp;cdr]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([ans&nbsp;(proc&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;cache&nbsp;(cons&nbsp;(cons&nbsp;x&nbsp;ans)&nbsp;cache))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ans)])))))
+<br>
+<br>
+(define&nbsp;fibonacci<br>
+
+&nbsp;&nbsp;(memoize<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(&lt;&nbsp;n&nbsp;2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;(fibonacci&nbsp;(-&nbsp;n&nbsp;1))&nbsp;(fibonacci&nbsp;(-&nbsp;n&nbsp;2)))))))
+<br>
+<br>
+(fibonacci&nbsp;100)&nbsp;<img src="./binding_files/0.gif" alt="&lt;graphic&gt;">&nbsp;573147844013817084101</tt>
+</p><p>
+
+</p><hr class="copyright" align="left">
+<p>
+R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</it><br>
+Copyright © 2009 <a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">The MIT Press</a>.  Electronically reproduced by permission.<br>
+Illustrations © 2009 <a class="plain" href="http://hebert.kitp.ucsb.edu/">Jean-Pierre Hébert</a><br>
+ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>
+<a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">to order this book</a> / <a class="plain" href="canned/about.html">about this book</a>
+</p>
+<p><a class="plain" href="http://www.scheme.com/">http://www.scheme.com</a></p>
+
+</body></html>

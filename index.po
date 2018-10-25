@@ -1,0 +1,1031 @@
+#
+# NuINu <don't@send.my>, 2018.
+#
+#. extracted from index.html
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-10-16 11:16+0300\n"
+"PO-Revision-Date: 2018-10-17 15:14+0300\n"
+"Last-Translator: NuINu <don't@send.my>\n"
+"Language-Team: Russian <don't@send.my>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Gtranslator 2.91.7\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
+"4;\n"
+
+#: index.html:8
+msgid ""
+"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://"
+"www.w3.org/TR/html4/loose.dtd\">\n"
+"<!-- saved from url=(0025) -->\n"
+"<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
+"charset=windows-1252\">\n"
+"<title>The Scheme Programming Language, 4th Edition</title>\n"
+"<link href=\"index_files/tspl.css\" rel=\"stylesheet\" type=\"text/css\">\n"
+"</head>\n"
+"<body>"
+msgstr ""
+"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://"
+"www.w3.org/TR/html4/loose.dtd\">\n"
+"<!-- saved from url=(0025) -->\n"
+"<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
+"charset=utf8\">\n"
+"<title>Язык Программирования Scheme, 4th Edition</title>\n"
+"<link href=\"index_files/tspl.css\" rel=\"stylesheet\" type=\"text/css\">\n"
+"</head>\n"
+"<body>"
+
+#: index.html:21
+msgid ""
+"<p>\n"
+"</p><table>\n"
+"<tbody><tr><td style=\"text-align: center\" valign=\"center\">\n"
+"        <p><a style=\"color:white; text-decoration: none\" href=\"file:/home/"
+"bear/doc/prg/guile/canned/medium-cover.png\"><img src=\"index_files/small-"
+"cover.png\"></a></p></td>\n"
+"    <td>&nbsp;&nbsp;&nbsp;</td>\n"
+"    <td style=\"text-align: center\" valign=\"center\">\n"
+"         <p><span class=\"title\">The Scheme<br> Programming Language</"
+"span></p>\n"
+"         <p><span class=\"edition\">Fourth Edition</span></p>\n"
+"         <p><span class=\"author\">R. Kent Dybvig</span></p>\n"
+"         <p><span class=\"artist\">Illustrations by Jean-Pierre Hйbert</"
+"span></p></td></tr>\n"
+"</tbody></table>"
+msgstr ""
+"<p>\n"
+"</p><table>\n"
+"<tbody><tr><td style=\"text-align: center\" valign=\"center\">\n"
+"        <p><a style=\"color:white; text-decoration: none\" href=\"file:/home/"
+"bear/doc/prg/guile/canned/medium-cover.png\"><img src=\"index_files/small-"
+"cover.png\"></a></p></td>\n"
+"    <td>&nbsp;&nbsp;&nbsp;</td>\n"
+"    <td style=\"text-align: center\" valign=\"center\">\n"
+"         <p><span class=\"title\">Язык Программирования<br> Scheme</span></"
+"p>\n"
+"         <p><span class=\"edition\">Fourth Edition</span></p>\n"
+"         <p><span class=\"author\">R. Kent Dybvig</span></p>\n"
+"         <p><span class=\"artist\">Illustrations by Jean-Pierre Hйbert</"
+"span></p></td></tr>\n"
+"</tbody></table>"
+
+#: index.html:24
+msgctxt "index.html:24"
+msgid "<p>"
+msgstr ""
+
+#: index.html:35
+msgid ""
+"</p><p>\n"
+"</p><h1>Table of Contents</h1><ul class=\"tocchapter\">"
+msgstr ""
+"</p><p>\n"
+"</p><h1>Содержание</h1><ul class=\"tocchapter\">"
+
+#: index.html:41
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:preface.html#./preface:h0\"> Preface</"
+"a></b><p>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:preface.html#./preface:h0\"> "
+"Предисловие</a></b><p>"
+
+#: index.html:44
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:intro.html#./intro:h0\">Chapter "
+"1.  Introduction</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:intro.html#./intro:h0\">Глава "
+"1.  Введение</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:46
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:intro.html#./intro:h1\">Section 1.1.  "
+"Scheme Syntax</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:intro.html#./intro:h1\">Раздел 1.1.  "
+"Синтаксис Scheme</a></b>"
+
+#: index.html:48
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:intro.html#./intro:h2\">Section "
+"1.2.  Scheme Naming Conventions</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:intro.html#./intro:h2\">Раздел 1.2. "
+"Соглашение об Именах Scheme</a></b>"
+
+#: index.html:50
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:intro.html#./intro:h3\">Section "
+"1.3.  Typographical and Notational Conventions</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:intro.html#./intro:h3\">Раздел "
+"1.3.  Типографические и нотационные соглашения</a></b>"
+
+#: index.html:52
+msgctxt "index.html:52"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:55
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:start.html#./start:h0\">Chapter "
+"2.  Getting Started</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:start.html#./start:h0\">Глава "
+"2.  Начало</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:57
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:start.html#./start:h1\">Section 2.1.  "
+"Interacting with Scheme</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:start.html#./start:h1\">Раздел 2.1.  "
+"Взаимодействие со Scheme</a></b>"
+
+#: index.html:59
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h2\">Section "
+"2.2.  Simple Expressions</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h2\">Раздел "
+"2.2.  Простые Выражения</a></b>"
+
+#: index.html:61
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h3\">Section "
+"2.3.  Evaluating Scheme Expressions</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h3\">Раздел "
+"2.3.  Вычисление выражений Scheme</a></b>"
+
+#: index.html:63
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h4\">Section "
+"2.4.  Variables and Let Expressions</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h4\">Раздел "
+"2.4.  Переменные и Выражения Let</a></b>"
+
+#: index.html:65
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h5\">Section "
+"2.5.  Lambda Expressions</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h5\">Раздел "
+"2.5.  Lambda выражения</a></b>"
+
+#: index.html:67
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h6\">Section "
+"2.6.  Top-Level Definitions</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h6\">Раздел "
+"2.6.  Определения Верхнего Уровня </a></b>"
+
+#: index.html:69
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h7\">Section "
+"2.7.  Conditional Expressions</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h7\">Раздел "
+"2.7.  Условные Выражения</a></b>"
+
+#: index.html:71
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h8\">Section "
+"2.8.  Simple Recursion</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h8\">Раздел "
+"2.8.  Простая Рекурсия</a></b>"
+
+#: index.html:73
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h9\">Section "
+"2.9.  Assignment</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:start.html#./start:h9\">Раздел "
+"2.9.  Присваивание</a></b>"
+
+#: index.html:75
+msgctxt "index.html:75"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:78
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:further.html#./further:"
+"h0\">Chapter 3.  Going Further</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:further.html#./further:"
+"h0\">Глава 3.  Идем Дальше</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:80
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:further.html#./further:h1\">Section "
+"3.1.  Syntactic Extension</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:further.html#./further:h1\">Раздел 3.1.  "
+"Синтаксические Расширения</a></b>"
+
+#: index.html:82
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:further.html#./further:h2\">Section "
+"3.2.  More Recursion</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:further.html#./further:h2\">Раздел "
+"3.2.  Больше Рекурсии</a></b>"
+
+#: index.html:84
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:further.html#./further:h3\">Section "
+"3.3.  Continuations</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:further.html#./further:h3\">Раздел "
+"3.3.  Продолжнения</a></b>"
+
+#: index.html:86
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:further.html#./further:h4\">Section "
+"3.4.  Continuation Passing Style</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:further.html#./further:h4\">Раздел "
+"3.4.  Программирование в стиле передачи продолжений</a></b>"
+
+#: index.html:88
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:further.html#./further:h5\">Section "
+"3.5.  Internal Definitions</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:further.html#./further:h5\">Раздел "
+"3.5.  Внутренние определения</a></b>"
+
+#: index.html:90
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:further.html#./further:h6\">Section "
+"3.6.  Libraries</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:further.html#./further:h6\">Раздел "
+"3.6.  Библиотеки</a></b>"
+
+#: index.html:92
+msgctxt "index.html:92"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:95
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:"
+"h0\">Chapter 4.  Procedures and Variable Bindings</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:"
+"h0\">Глава 4.  Процедуры и Связывание Переменных</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:97
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:binding.html#./binding:h1\">Section "
+"4.1.  Variable References</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:binding.html#./binding:h1\">Раздел 4.1.  "
+"Переменные Ссылки</a></b>"
+
+#: index.html:99
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h2\">Section "
+"4.2.  Lambda</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h2\">Раздел "
+"4.2.  Lambda</a></b>"
+
+#: index.html:101
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h3\">Section "
+"4.3.  Case-Lambda</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h3\">Раздел "
+"4.3.  Условная-Лямбда(Case-Lambda)</a></b>"
+
+#: index.html:103
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h4\">Section "
+"4.4.  Local Binding</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h4\">Раздел "
+"4.4.  Локальное Связывание</a></b>"
+
+#: index.html:105
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h5\">Section "
+"4.5.  Multiple Values</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h5\">Раздел "
+"4.5.  Множественные Значения</a></b>"
+
+#: index.html:107
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h6\">Section "
+"4.6.  Variable Definitions</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h6\">Раздел "
+"4.6.  Определения Переменных</a></b>"
+
+#: index.html:109
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h7\">Section "
+"4.7.  Assignment</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:binding.html#./binding:h7\">Раздел "
+"4.7. Присваивание</a></b>"
+
+#: index.html:111
+msgctxt "index.html:111"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:114
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:control.html#./control:"
+"h0\">Chapter 5.  Control Operations</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:control.html#./control:"
+"h0\">Глава 5.  Управляющие Операции</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:116
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:control.html#./control:h1\">Section "
+"5.1.  Procedure Application</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:control.html#./control:h1\">Раздел 5.1.  "
+"Применение Процедуры</a></b>"
+
+#: index.html:118
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h2\">Section "
+"5.2.  Sequencing</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h2\">Раздел "
+"5.2.  Последовательное выполнение</a></b>"
+
+#: index.html:120
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h3\">Section "
+"5.3.  Conditionals</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h3\">Раздел "
+"5.3. Условные выражения</a></b>"
+
+#: index.html:122
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h4\">Section "
+"5.4.  Recursion and Iteration</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h4\">Раздел "
+"5.4. Рекурсия и итерация</a></b>"
+
+#: index.html:124
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h5\">Section "
+"5.5.  Mapping and Folding</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h5\">Раздел "
+"5.5.  Отображение(Mapping) и Суммирование(Folding)</a></b>"
+
+#: index.html:126
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h6\">Section "
+"5.6.  Continuations</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h6\">Раздел "
+"5.6.  Продолжения</a></b>"
+
+#: index.html:128
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h7\">Section "
+"5.7.  Delayed Evaluation</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h7\">Раздел "
+"5.7.  Отложенное выполнение</a></b>"
+
+#: index.html:130
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h8\">Section "
+"5.8.  Multiple Values</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h8\">Раздел "
+"5.8.  Множественные значения</a></b>"
+
+#: index.html:132
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h9\">Section "
+"5.9.  Eval</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:control.html#./control:h9\">Раздел "
+"5.9.  Вычислить(Eval)</a></b>"
+
+#: index.html:134
+msgctxt "index.html:134"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:137
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:"
+"h0\">Chapter 6.  Operations on Objects</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:"
+"h0\">Глава 6.  Операции над Объектами</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:139
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:objects.html#./objects:h1\">Section "
+"6.1.  Constants and Quotation</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:objects.html#./objects:h1\">Раздел 6.1.  "
+"Константы и Цитирование</a></b>"
+
+#: index.html:141
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h2\">Section "
+"6.2.  Generic Equivalence and Type Predicates</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h2\">Раздел "
+"6.2.  Общая Эквивалентность и Предикаты (проверки) Типа</a></b>"
+
+#: index.html:143
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h3\">Section "
+"6.3.  Lists and Pairs</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h3\">Раздел "
+"6.3.  Списки и Пары</a></b>"
+
+#: index.html:145
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h4\">Section "
+"6.4.  Numbers</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h4\">Раздел "
+"6.4.  Числа</a></b>"
+
+#: index.html:147
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h5\">Section "
+"6.5.  Fixnums</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h5\">Раздел "
+"6.5.  Фиксированные числа</a></b>"
+
+#: index.html:149
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h6\">Section "
+"6.6.  Flonums</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h6\">Раздел "
+"6.6.  Числа с плавающей точкой(Flonums)</a></b>"
+
+#: index.html:151
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h7\">Section "
+"6.7.  Characters</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h7\">Раздел "
+"6.7.  Символьные Знаки или просто Знаки(Characters)</a></b>"
+
+#: index.html:153
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h8\">Section "
+"6.8.  Strings</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h8\">Раздел "
+"6.8.  Строки</a></b>"
+
+#: index.html:155
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h9\">Section "
+"6.9.  Vectors</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h9\">Раздел "
+"6.9.  Вектора</a></b>"
+
+#: index.html:157
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:"
+"h10\">Section 6.10.  Bytevectors</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h10\">Раздел "
+"6.10.  Байтовые Вектора(байт-вектора)</a></b>"
+
+#: index.html:159
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:"
+"h11\">Section 6.11.  Symbols</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h11\">Раздел "
+"6.11.  Символы(Symbols)</a></b>"
+
+#: index.html:161
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:"
+"h12\">Section 6.12.  Booleans</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h12\">Раздел "
+"6.12.  Логический Тип(Booleans)</a></b>"
+
+#: index.html:163
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:"
+"h13\">Section 6.13.  Hashtables</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h13\">Раздел "
+"6.13.  Хеш-таблицы</a></b>"
+
+#: index.html:165
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:"
+"h14\">Section 6.14.  Enumerations</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:objects.html#./objects:h14\">Раздел "
+"6.14.  Перечисления</a></b>"
+
+#: index.html:167
+msgctxt "index.html:167"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:170
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:io.html#./io:h0\">Chapter 7.  "
+"Input and Output</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:io.html#./io:h0\">Глава 7.  "
+"Ввод и Вывод</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:172
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:io.html#./io:h1\">Section 7.1.  "
+"Transcoders</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:io.html#./io:h1\">Раздел 7.1. "
+"Перекодировщики</a></b>"
+
+#: index.html:174
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h2\">Section 7.2.  "
+"Opening Files</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h2\">Раздел 7.2.  "
+"Открытие Файлов</a></b>"
+
+#: index.html:176
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h3\">Section 7.3.  "
+"Standard Ports</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h3\">Раздел 7.3.  "
+"Стандартные Порты</a></b>"
+
+#: index.html:178
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h4\">Section 7.4.  "
+"String and Bytevector Ports</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h4\">Раздел 7.4.  "
+"Строковые(String) и Байт-векторные(Bytevector) Порты</a></b>"
+
+#: index.html:180
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h5\">Section 7.5.  "
+"Opening Custom Ports</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h5\">Раздел 7.5.  "
+"Открытие Пользовательских Портов</a></b>"
+
+#: index.html:182
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h6\">Section 7.6.  "
+"Port Operations</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h6\">Раздел 7.6.  "
+"Операции с Портом</a></b>"
+
+#: index.html:184
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h7\">Section 7.7.  "
+"Input Operations</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h7\">Раздел 7.7.  "
+"Операции Ввода</a></b>"
+
+#: index.html:186
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h8\">Section 7.8.  "
+"Output Operations</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h8\">Раздел 7.8.  "
+"Операции Вывода</a></b>"
+
+#: index.html:188
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h9\">Section 7.9.  "
+"Convenience I/O</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h9\">Раздел 7.9.  "
+"Удобный Ввод/Вывод</a></b>"
+
+#: index.html:190
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h10\">Section 7.10.  "
+"Filesystem Operations</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h10\">Раздел 7.10.  "
+"Операции файловой системы</a></b>"
+
+#: index.html:192
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h11\">Section 7.11.  "
+"Bytevector/String Conversions</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:io.html#./io:h11\">Раздел 7.11.  "
+"Преобразование байтовых-векторов/Строк</a></b>"
+
+#: index.html:194
+msgctxt "index.html:194"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:197
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:syntax.html#./syntax:"
+"h0\">Chapter 8.  Syntactic Extension</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:syntax.html#./syntax:h0\">Глава "
+"8.  Синтаксическое Расширение</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:199
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:syntax.html#./syntax:h1\">Section 8.1.  "
+"Keyword Bindings</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:syntax.html#./syntax:h1\">Раздел 8.1.  "
+"Связывание Ключевых Слов</a></b>"
+
+#: index.html:201
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:syntax.html#./syntax:h2\">Section "
+"8.2.  Syntax-Rules Transformers</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:syntax.html#./syntax:h2\">Раздел "
+"8.2.  Syntax-Rules Преобразователь</a></b>"
+
+#: index.html:203
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:syntax.html#./syntax:h3\">Section "
+"8.3.  Syntax-Case Transformers</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:syntax.html#./syntax:h3\">Раздел "
+"8.3.  Преобразователь Syntax-Case</a></b>"
+
+#: index.html:205
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:syntax.html#./syntax:h4\">Section "
+"8.4.  Examples</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:syntax.html#./syntax:h4\">Раздел "
+"8.4.  Примеры</a></b>"
+
+#: index.html:207
+msgctxt "index.html:207"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:210
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:records.html#./records:"
+"h0\">Chapter 9.  Records</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:records.html#./records:"
+"h0\">Глава 9.  Records</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:212
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:records.html#./records:h1\">Section "
+"9.1.  Defining Records</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:records.html#./records:h1\">Раздел 9.1.  "
+"Объявление(определение) Записей</a></b>"
+
+#: index.html:214
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:records.html#./records:h2\">Section "
+"9.2.  Procedural Interface</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:records.html#./records:h2\">Раздел "
+"9.2.  Процедурный Интефрейс</a></b>"
+
+#: index.html:216
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:records.html#./records:h3\">Section "
+"9.3.  Inspection</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:records.html#./records:h3\">Раздел "
+"9.3.  Инспекция</a></b>"
+
+#: index.html:218
+msgctxt "index.html:218"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:221
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:libraries.html#./libraries:"
+"h0\">Chapter 10.  Libraries and Top-Level Programs</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:libraries.html#./libraries:"
+"h0\">Глава 10.  Библиотеки и Программы Верхнего Уровня</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:223
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:libraries.html#./libraries:h1\">Section "
+"10.1.  Standard Libraries</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:libraries.html#./libraries:h1\">Раздел "
+"10.1.  Стандартные Библиотеки</a></b>"
+
+#: index.html:225
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:libraries.html#./libraries:"
+"h2\">Section 10.2.  Defining New Libraries</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:libraries.html#./libraries:"
+"h2\">Раздел 10.2.  Определение Новых Библиотек</a></b>"
+
+#: index.html:227
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:libraries.html#./libraries:"
+"h3\">Section 10.3.  Top-Level Programs</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:libraries.html#./libraries:"
+"h3\">Раздел 10.3.  Программы Верхнего Уровня</a></b>"
+
+#: index.html:229
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:libraries.html#./libraries:"
+"h4\">Section 10.4.  Examples</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:libraries.html#./libraries:"
+"h4\">Раздел 10.4.  Примеры</a></b>"
+
+#: index.html:231
+msgctxt "index.html:231"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:234
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:exceptions.html#./exceptions:"
+"h0\">Chapter 11.  Exceptions and Conditions</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:exceptions.html#./exceptions:"
+"h0\">Глава 11.  Исключения и Условия</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:236
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:exceptions.html#./exceptions:"
+"h1\">Section 11.1.  Raising and Handling Exceptions</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:exceptions.html#./exceptions:h1\">Раздел "
+"11.1.  Выброс(Генерация) и Обработка Исключений</a></b>"
+
+#: index.html:238
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:exceptions.html#./exceptions:"
+"h2\">Section 11.2.  Defining Condition Types</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:exceptions.html#./exceptions:"
+"h2\">Раздел 11.2.  Определение Типов Условий</a></b>"
+
+#: index.html:240
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:exceptions.html#./exceptions:"
+"h3\">Section 11.3.  Standard Condition Types</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:exceptions.html#./exceptions:"
+"h3\">Раздел 11.3.  Стандартные Типы Условий</a></b>"
+
+#: index.html:242
+msgctxt "index.html:242"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:245
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h0\">Chapter 12.  Extended Examples</a></b>\n"
+"<ul class=\"tocsection\">"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h0\">Глава 12.  Расширенные Примеры</a></b>\n"
+"<ul class=\"tocsection\">"
+
+#: index.html:247
+msgid ""
+"<li><b><a class=\"toc\" href=\"file:examples.html#./examples:h1\">Section "
+"12.1.  Matrix and Vector Multiplication</a></b>"
+msgstr ""
+"<li><b><a class=\"toc\" href=\"file:examples.html#./examples:h1\">Раздел "
+"12.1.  Умножение Матриц и Векторов</a></b>"
+
+#: index.html:249
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h2\">Section 12.2.  Sorting</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h2\">Раздел 12.2. Сортировка</a></b>"
+
+#: index.html:251
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h3\">Section 12.3.  A Set Constructor</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h3\">Раздел 12.3.  Конструктор Множеств</a></b>"
+
+#: index.html:253
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h4\">Section 12.4.  Word Frequency Counting</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h4\">Раздел 12.4.  Подсчет частоты слов</a></b>"
+
+#: index.html:255
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h5\">Section 12.5.  Scheme Printer</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h5\">Раздел 12.5.  Печатчик Scheme</a></b>"
+
+#: index.html:257
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h6\">Section 12.6.  Formatted Output</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h6\">Раздел 12.6.  Отформатированный Вывод</a></b>"
+
+#: index.html:259
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h7\">Section 12.7.  A Meta-Circular Interpreter for Scheme</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h7\">Раздел 12.7.  Мета-Циркулярный(Meta-Circular) интерпретатор для Scheme</"
+"a></b>"
+
+#: index.html:261
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h8\">Section 12.8.  Defining Abstract Objects</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h8\">Раздел 12.8.  Определение Абстрактных Объектов</a></b>"
+
+#: index.html:263
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h9\">Section 12.9.  Fast Fourier Transform</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h9\">Раздел 12.9.  Быстрое Преобразование Фурье(БПФ)</a></b>"
+
+#: index.html:265
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h10\">Section 12.10.  A Unification Algorithm</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h10\">Раздел 12.10.  Алгоритм унификации</a></b>"
+
+#: index.html:267
+msgid ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h11\">Section 12.11.  Multitasking with Engines</a></b>"
+msgstr ""
+"</li><li><b><a class=\"toc\" href=\"file:examples.html#./examples:"
+"h11\">Раздел 12.11.  Многозадачность с Движком(Engines)</a></b>"
+
+#: index.html:269
+msgctxt "index.html:269"
+msgid "</li></ul><p>"
+msgstr ""
+
+#: index.html:271
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:bibliography.html#./"
+"bibliography:h0\"> References</a></b><p>"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:bibliography.html#./"
+"bibliography:h0\"> Ссылки</a></b><p>"
+
+#: index.html:273
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:answers.html#./answers:h0\"> "
+"Answers to Selected Exercises</a></b><p>"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:answers.html#./answers:h0\"> "
+"Ответы к выбранным упражнениям</a></b><p>"
+
+#: index.html:275
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:grammar.html#./grammar:h0\"> "
+"Formal Syntax</a></b><p>"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:grammar.html#./grammar:h0\"> "
+"Формальный синтаксис</a></b><p>"
+
+#: index.html:277
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:summary.html#./summary:h0\"> "
+"Summary of Forms</a></b><p>"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:summary.html#./summary:h0\"> "
+"Сводная всех Форм</a></b><p>"
+
+#: index.html:289
+msgid ""
+"</p></li><li><b><a class=\"toc\" href=\"file:tspl_1.html#./tspl:h0\"> Index</"
+"a></b><p>\n"
+"</p></li></ul>\n"
+"<hr class=\"copyright\" align=\"left\">\n"
+"<p>\n"
+"R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</"
+"it><br>\n"
+"Copyright © 2009 <a class=\"plain\" href=\"http://mitpress.mit.edu/catalog/"
+"item/default.asp?ttype=2&amp;tid=11984\">The MIT Press</a>.  Electronically "
+"reproduced by permission.<br>\n"
+"Illustrations © 2009 <a class=\"plain\" href=\"http://hebert.kitp.ucsb.edu/"
+"\">Jean-Pierre Hйbert</a><br>\n"
+"ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>\n"
+"<a class=\"plain\" href=\"http://mitpress.mit.edu/catalog/item/default.asp?"
+"ttype=2&amp;tid=11984\">to order this book</a> / <a class=\"plain\" href="
+"\"file:canned/about.html\">about this book</a>\n"
+"</p>\n"
+"<p><a class=\"plain\" href=\"http://www.scheme.com/\">http://www.scheme.com</"
+"a></p>"
+msgstr ""
+"</p></li><li><b><a class=\"toc\" href=\"file:tspl_1.html#./tspl:h0\"> "
+"Индекс</a></b><p>\n"
+"</p></li></ul>\n"
+"<hr class=\"copyright\" align=\"left\">\n"
+"<p>\n"
+"R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</"
+"it><br>\n"
+"Copyright © 2009 <a class=\"plain\" href=\"http://mitpress.mit.edu/catalog/"
+"item/default.asp?ttype=2&amp;tid=11984\">The MIT Press</a>.  Electronically "
+"reproduced by permission.<br>\n"
+"Illustrations © 2009 <a class=\"plain\" href=\"http://hebert.kitp.ucsb.edu/"
+"\">Jean-Pierre Hйbert</a><br>\n"
+"ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>\n"
+"<a class=\"plain\" href=\"http://mitpress.mit.edu/catalog/item/default.asp?"
+"ttype=2&amp;tid=11984\">to order this book</a> / <a class=\"plain\" href="
+"\"file:canned/about.html\">about this book</a>\n"
+"</p>\n"
+"<p><a class=\"plain\" href=\"http://www.scheme.com/\">http://www.scheme.com</"
+"a></p>"
+
+#: index.html:292
+msgctxt "index.html:292"
+msgid "<p>"
+msgstr ""
+
+#: index.html:294
+msgid "</p></body></html>"
+msgstr ""

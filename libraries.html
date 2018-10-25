@@ -1,0 +1,824 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0054)libraries.html#./libraries:h0 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<title>Библиотеки и Программы Верхнего Уровня</title>
+<link href="./libraries_files/tspl.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a name="g142"></a>
+<a name="./libraries:h0"></a>
+
+<div>
+<img  src="./libraries_files/ch10.png">
+</div>
+<h1>Chapter 10. Библиотеки и Программы Верхнего Уровня<a name="CHPTLIBRARIES"></a></h1>
+
+<p>
+<a name="./libraries:s0"></a><a name="./libraries:s1"></a><i>Библиотеки</i> и
+<i>программы верхнего уровня</i> являются базовыми единицами переносимого кода
+в языке определенном Revised<sup>6</sup> Report on Scheme&nbsp;[<a class="citation" href="bibliography.html#g242">24</a>].
+Программы верхнего уровня могут импортировать из одной или нескольких библиотек, а библиотеки
+могут импортировать из других библиотек.
+
+</p><p>
+Библиотеки именуются с использованием скобочного синтаксиса, который
+включает последовательность идентификаторов, необязательно сопровождаемых
+версией; сама версия представляет собой форму в скобках, которая 
+включает последовательность подверсий, представленных как точные
+неотритцательные целые числа.
+Так например, <tt>(a)</tt>, <tt>(a&nbsp;b)</tt>, <tt>(a&nbsp;b&nbsp;())</tt>,
+and <tt>(a&nbsp;b&nbsp;(1&nbsp;2&nbsp;3))</tt> все это допустимые имена библиотек.
+Реализации обычно обрабатывают последовательность имен как путь, по которому
+может быть найден исходный или объектный код библиотеки, возможно, внедренный
+в некоторый стандартный набор мест в файловой системе хост-машины.
+
+</p><p>
+Реализация стандартного библиотечного механизма доступна с
+переносимой реализацией <tt>syntax-case</tt>
+на сайте <i>http://www.cs.indiana.edu/syntax-case/</i>.
+
+</p><p>
+
+</p><h3><a name="g143"></a><a name="./libraries:h1"></a>Section 10.1. Стандартные Библиотеки</h3>
+
+<p>
+Revised<sup>6</sup> Report&nbsp;[<a class="citation" href="bibliography.html#g242">24</a>] описывает
+базовую(основную) библиотеку
+
+</p><p>
+
+</p><p><tt>&nbsp;&nbsp;(rnrs&nbsp;base&nbsp;(6))</tt>
+</p><p>которая определяет наиболее часто используемые функции языка.
+В отдельном документе Стандартные Библиотеки&nbsp;[<a class="citation" href="bibliography.html#g244">26</a>],
+описаны библиотеки, перечисленные ниже.
+
+</p><p>
+
+</p><p><tt>&nbsp;&nbsp;(rnrs&nbsp;arithmetic&nbsp;bitwise&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;arithmetic&nbsp;fixnums&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;arithmetic&nbsp;flonums&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;bytevectors&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;conditions&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;control&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;enums&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;eval&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;exceptions&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;files&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;hashtables&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;io&nbsp;ports&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;io&nbsp;simple&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;lists&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;mutable-pairs&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;mutable-strings&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;programs&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;r5rs&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;records&nbsp;procedural&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;records&nbsp;syntactic&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;records&nbsp;inspection&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;sorting&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;syntax-case&nbsp;(6))<br>
+
+&nbsp;&nbsp;(rnrs&nbsp;unicode&nbsp;(6))</tt>
+</p><p>Еще одна библиотека описана в документе Стандартные Библиотеки(Standard Libraries),
+как составная библиотека
+
+</p><p>
+
+</p><p><tt>&nbsp;&nbsp;(rnrs&nbsp;(6))</tt>
+</p><p>которая экспортирует все привязки
+<tt>(rnrs&nbsp;base&nbsp;(6))</tt> вместе с привязками других библиотек,
+перечисленных выше, кроме тех, что указаны
+<tt>(rnrs&nbsp;eval&nbsp;(6))</tt>, <tt>(rnrs&nbsp;mutable-pairs&nbsp;(6))</tt>,
+<tt>(rnrs&nbsp;mutable-strings&nbsp;(6))</tt>, и <tt>(rnrs&nbsp;r5rs&nbsp;(6))</tt>.
+
+</p><p>
+Хотя каждая из этих библиотек имеет версию <tt>(6)</tt>,
+ссылки на них могут и в большинстве случаев должны опускать версию,
+например, на составную библиотеку следует ссылаться просто
+как <tt>(rnrs)</tt>.
+
+</p><p>
+
+</p><h3><a name="g144"></a><a name="./libraries:h2"></a>Section 10.2. Определение Новых Библиотек</h3>
+
+<p>
+Новые библиотеки определяются с помощью формы <tt>library</tt>, которая
+имеет следующий синтаксис.
+
+</p><p>
+
+</p><p><tt>(library&nbsp;<i>library-name</i><br>
+
+&nbsp;&nbsp;(export&nbsp;<i>export-spec</i>&nbsp;...)<br>
+
+&nbsp;&nbsp;(import&nbsp;<i>import-spec</i>&nbsp;...)<br>
+
+&nbsp;&nbsp;<i>library-body</i>)</tt>
+</p><p>Имя библиотеки <tt><i>library-name</i></tt> указывает имя и, возможно,
+версию. по которой библиотека идентифицируется формой <tt>import</tt> другой
+библиотеки или программы верхнего уровня.
+Он также служит в качестве своего рода пути, который реализация использует для
+поиска библиотеки через определенный процесс, зависящий от реализации,
+всякий раз, когда она должна быть загружена.
+Имя библиотеки <tt><i>library-name</i></tt> имеет одну из двух следующих форм:
+
+</p><p>
+
+</p><p><tt>(<i>identifier</i>&nbsp;<i>identifier</i>&nbsp;...)<br>
+
+(<i>identifier</i>&nbsp;<i>identifier</i>&nbsp;...&nbsp;<i>version</i>)</tt>
+</p><p><a name="./libraries:s2"></a>где <tt><i>version</i></tt> имеет следующий вид:
+
+</p><p>
+
+</p><p><tt>(<i>subversion</i>&nbsp;...)</tt>
+</p><p>и каждая <tt><i>subversion</i></tt> представляет собой точной неотритцательное
+целое число.
+Имя библиотеки без <tt><i>version</i></tt> обрабатывается так же, как
+имя библиотеки с пустой <tt><i>version</i></tt> <tt>()</tt>.
+Например, <tt>(list-tools&nbsp;setops)</tt> и
+<tt>(list-tools&nbsp;setops&nbsp;())</tt> эквивалентны и задают имя библиотеки без 
+версии, тогда как
+<tt>(list-tools&nbsp;setops&nbsp;(1&nbsp;2))</tt> задает имя библиотеки с версией,
+которую можно считать Версией&nbsp;1.2 библиотеки <tt>(list-tools&nbsp;setops)</tt>.
+
+</p><p>
+<a name="./libraries:s3"></a>Подформа <tt>export</tt> указывает 
+имена экспорта, и при необязательно, имена, под которыми они
+должны быть известны вне(снаружи) библиотеки.
+Каждая спецификация <tt><i>export-spec</i></tt> принимает
+одну из двух следующих форм:
+
+</p><p>
+
+</p><p><tt><i>identifier</i><br>
+
+(rename&nbsp;(<i>internal-name</i>&nbsp;<i>export-name</i>)&nbsp;...)</tt>
+</p><p>где каждое <tt><i>internal-name</i></tt> и <tt><i>export-name</i></tt> являются идентификаторами.
+Первая форма указывает единичный экспорт, <tt><i>identifier</i></tt>, имя экспорта
+которого совпадает с его внутренним именем.
+Второе имя представляет собой набор экспорта, каждый из экспортируемых имен
+указан явно и может отличаться от его внутреннего имени.
+
+</p><p>
+<a name="./libraries:s4"></a><a name="./libraries:s5"></a><a name="desc:import"></a>
+Подформа <tt>import</tt> именует другие библиотеки, от которых зависит новая
+библиотека и, возможно, набор импортируемых идентификаторов и имен, с помощью
+которых они должны быть известны внутри новой библиотеки.
+Она также указывает, когда привязки должны быть доступны для реализаций, требующих
+такой информации.
+Каждая <tt><i>import-spec</i></tt> принимает одну из двух следующих форм:
+
+</p><p>
+
+</p><p><tt><i>import-set</i><br>
+
+(for&nbsp;<i>import-set</i>&nbsp;<i>import-level</i>&nbsp;...)</tt>
+</p><p>где <tt><i>import-level</i></tt> является одним из следующих:
+
+</p><p>
+
+</p><p><tt>run<br>
+
+expand<br>
+
+(meta&nbsp;<i>level</i>)</tt>
+</p><p>и <tt><i>level</i></tt> представляет собой точное целое число.
+
+</p><p>
+<a name="./libraries:s6"></a>Синтаксис <tt>for</tt> указывает, когда
+импортируемые привязки могут использоваться библиотекой импорта и следовательно,
+когда реализация должна сделать привязки доступными.
+<tt>run</tt> и <tt>(meta&nbsp;0)</tt> эквивалентны и указывают, что на привязки,
+импортируемые из библиотеки, можно ссылаться во время выполнения выражений
+(право-стронние выражения <tt>define</tt> и выражения инициализации) в импортирующей
+библиотеке.
+<tt>expand</tt> и <tt>(meta&nbsp;1)</tt> эквивалентны и указывают, что на привязки,
+импортируемые из библиотеки, можно ссылаться в выражениях преобразования
+(<tt>define-syntax</tt>, <tt>let-syntax</tt>, или
+<tt>letrec-syntax</tt> правосторонние выражения) в импортирующей
+библиотеке.
+<tt>(meta&nbsp;2)</tt> указывает, что на привязки импортируемые из библиотеки,
+можно ссылаться в выражениях преобразования, которое появляется в в выражениях
+преобразования импортирующей библиотеки, и т.д. для более высоких
+уровней мета.
+Отритцательные мета уровни могут быть указаны и необходимы в определенных
+обстоятельствах, когда преобразователь расширяется в преобразователь
+для другого связывания ключевых слов, используемого на более низком мета
+уровне.
+
+</p><p>
+<a name="./libraries:s7"></a><a name="export-level"></a>
+Экспорт библиотеки может иметь не нулевой мета уровень <i>export</i>, и в этом случае
+эффективные уровень экспорта представляет собой сумму уровней,
+указанного <tt>for</tt> и экспортируемого уровня.
+При экспорте каждой стандартной библиотеки, короме <tt>(rnrs&nbsp;base)</tt>
+и <tt>(rnrs)</tt> уровень экспорта равен нулю.
+Для <tt>(rnrs&nbsp;base)</tt>, весь экспорт имеет уровень ноль,
+кроме <tt>syntax-rules</tt>, <tt>identifier-syntax</tt>, и их
+вспомогательных ключевых слов <tt>_</tt>, <tt>...</tt>, and <tt>set!</tt>.
+<tt>set!</tt> имеющих уровень экспорта ноль и один, в то время как другие
+имеют уровень экспорта один.
+Все экспортируемые библиотеки <tt>(rnrs)</tt> имеют уровень экспорта ноль и
+один.
+
+</p><p>
+Программисту может быть сложно указать уровни импорта, которые позволяют
+библиотеке или программе верхнего уровня компилироваться или запускаться
+должным образом.
+Более того, часто невозможно заставить привязки библиотек быть доступными
+когда они необходимы, не делая их доступными, в некоторых случаях, когда
+они не нужны.
+Например, невозможно сказать, что привязки во время выполнения библиотеки A
+необходимы когда расширяется библиотека B, не имея также привязки времени
+выполнения для  A, доступной при расширении импорта кода B.
+Создание доступных привязок включает в себя выполнение кода для правых
+сторон привязок и, возможно, выполнения выражений инициализации,
+поэтому когда невозможно указать привязки требуются точно, можно
+добавить их и на стадию компиляции, и на стадию выполнения программы.
+
+</p><p>
+Из-за этого, реализациям разрешено игнорировать уровни экспорта и обертку
+ <tt>for</tt> в <tt><i>import-set</i></tt> и вместо этого автоматически
+определять при расширении импортирующей библиотеки или программы верхнего
+уровня, когда привязки импортируемой библиотеки должны быть доступны,
+в зависимости от того, где фактически появляются ссылки на экспорт
+импортированной библиотеки.
+При использовании такой реализации обертку <tt>for</tt> использовать нельзя,
+т.е., все <tt><i>import-spec</i></tt> должны быть <tt><i>import-set</i></tt>.
+Однако, если код предназначен для использования с системами, которые автоматически
+не опредеяют, когда привязки библиотеки должны быть доступны, необходимо использовать
+<tt>for</tt> если привязки импортированной библиотеки не были бы
+доступны в нужное время.
+
+</p><p>
+<a name="./libraries:s8"></a><a name="./libraries:s9"></a><a name="./libraries:s10"></a><a name="./libraries:s11"></a><a name="./libraries:s12"></a> <tt><i>import-set</i></tt> принимает одну из следующих форм:
+
+</p><p>
+
+</p><p><tt><i>library-spec</i><br>
+
+(only&nbsp;<i>import-set</i>&nbsp;<i>identifier</i>&nbsp;...)<br>
+
+(except&nbsp;<i>import-set</i>&nbsp;<i>identifier</i>&nbsp;...)<br>
+
+(prefix&nbsp;<i>import-set</i>&nbsp;<i>prefix</i>)<br>
+
+(rename&nbsp;<i>import-set</i>&nbsp;(<i>import-name</i>&nbsp;<i>internal-name</i>)&nbsp;...)</tt>
+</p><p>где <tt><i>prefix</i></tt>, <tt><i>import-name</i></tt>, и <tt><i>internal-name</i></tt> являются идентификаторами.
+<tt><i>import-set</i></tt> это рекурсивная спецификация идентификаторов, которые должны
+быть импортированы из библиотеки и ,возможно, имена, под которыми они должны быть
+известны в библиотеке импорта.
+В основе рекурсивной структуры должна находиться <tt><i>library-spec</i></tt>,
+которая идентифицирует библиотеку и и импортирует все идентификаторы из этой библиотеки.
+Оболочка  <tt>only</tt> ограничивает импортируемые идентификаторы вложенные
+<tt><i>import-set</i></tt> указанным списком, оболочка <tt>except</tt> ограничивает
+импортируемые идентификаторы вложенные <tt><i>import-set</i></tt> теми, кто
+не указан в списке, оболочка <tt>prefix</tt> добавляет префикс к каждому импортируемому
+идентификатору вложенному <tt><i>import-set</i></tt>, и оболочка
+<tt>rename</tt> определяет внутренние имена для выбранных идентификаторов
+вложенных <tt><i>import-set</i></tt>, оставляя только имена импортируемых другими.
+Так, например <tt><i>import-set</i></tt>
+
+</p><p>
+
+</p><p><tt>(prefix<br>
+
+&nbsp;&nbsp;(only<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(rename&nbsp;(list-tools&nbsp;setops)&nbsp;(difference&nbsp;diff))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;union<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;diff)<br>
+
+&nbsp;&nbsp;set:)</tt>
+</p><p>импортирует только <tt>union</tt> и <tt>difference</tt> из библиотеки
+<tt>(list-tools&nbsp;setops)</tt>, переименовывая <tt>difference</tt> в
+<tt>diff</tt> оставляя имя для <tt>union</tt>, и добавляет префикс
+<tt>set:</tt> к двум именам, так что имена, по которым эти два импорта
+известны внутри импортированной библиотеки становятся
+<tt>set:union</tt> and <tt>set:diff</tt>.
+
+</p><p>
+<tt><i>library-spec</i></tt> принимает одну из следующих форм:
+
+</p><p>
+
+</p><p><tt><i>library-reference</i><br>
+
+(library&nbsp;<i>library-reference</i>)</tt>
+</p><p>где <tt><i>library-reference</i></tt> находиться в любой из следующих двух форм:
+
+</p><p>
+
+</p><p><tt>(<i>identifier</i>&nbsp;<i>identifier</i>&nbsp;...)<br>
+
+(<i>identifier</i>&nbsp;<i>identifier</i>&nbsp;...&nbsp;<i>version-reference</i>)</tt>
+</p><p>Заключение <tt><i>library-reference</i></tt> в оболочку <tt>library</tt> необходимо
+когда первый идентификатор в <tt><i>library-reference</i></tt> является
+<tt>for</tt>, <tt>library</tt>, <tt>only</tt>, <tt>except</tt>, <tt>prefix</tt>, или
+<tt>rename</tt>, чтобы отличить ее от <tt><i>import-spec</i></tt> или <tt><i>import-set</i></tt>
+идентифицированных одним из этих ключевых слов.
+
+</p><p>
+<a name="./libraries:s13"></a> <tt><i>version-reference</i></tt> определяет конкретную версию библиотеки
+или набор возможных версий.
+<tt><i>version-reference</i></tt> принимает одну из следующих форм:
+
+</p><p>
+
+</p><p><tt>(<i>subversion-reference<sub>1</sub></i>&nbsp;...&nbsp;<i>subversion-reference<sub>n</sub></i>)<br>
+
+(and&nbsp;<i>version-reference</i>&nbsp;...)<br>
+
+(or&nbsp;<i>version-reference</i>&nbsp;...)<br>
+
+(not&nbsp;<i>version-reference</i>)</tt>
+</p><p><tt><i>version-reference</i></tt> в первой форме соответствует <tt><i>version</i></tt> с
+не менее чем <i>n</i> элементов в каждой <tt><i>subversion-reference</i></tt> соответствует
+<tt><i>version</i></tt> соответствующей <tt><i>subversion</i></tt>.
+Форма <tt>and</tt> <tt><i>version-reference</i></tt> соответствует <tt><i>version</i></tt> если
+каждая ее подформа <tt><i>version-reference</i></tt> соответствует <tt><i>version</i></tt>.
+Форма <tt>or</tt> <tt><i>version-reference</i></tt> соответствует <tt><i>version</i></tt> если
+какая либо подформа <tt><i>version-reference</i></tt> соответствует <tt><i>version</i></tt>.
+Форма <tt>not</tt> <tt><i>version-reference</i></tt> соответствует <tt><i>version</i></tt> если
+ни одна из подформ <tt><i>version-reference</i></tt> не соответствуют <tt><i>version</i></tt>.
+
+</p><p>
+<tt><i>subversion-reference</i></tt> принимает одну из следующих форм:
+
+</p><p>
+
+</p><p><tt><i>subversion</i><br>
+
+(&gt;=&nbsp;<i>subversion</i>)<br>
+
+(&lt;=&nbsp;<i>subversion</i>)<br>
+
+(and&nbsp;<i>subversion-reference</i>&nbsp;...)<br>
+
+(or&nbsp;<i>subversion-reference</i>&nbsp;...)<br>
+
+(not&nbsp;<i>subversion-reference</i>)</tt>
+</p><p>Первая форма <tt><i>subversion-reference</i></tt> соответствует
+<tt><i>subversion</i></tt> если она идентична ей.
+<tt>&gt;=</tt> <tt><i>subversion-reference</i></tt> соответствует <tt><i>version</i></tt>
+<tt><i>subversion</i></tt> если  <tt><i>version</i></tt> <tt><i>subversion</i></tt> являются
+большими или равными <tt><i>subversion</i></tt> которая появляется в форме
+<tt>&gt;=</tt>.
+Аналогично <tt>&lt;=</tt> <tt><i>subversion-reference</i></tt> соответствует <tt><i>version</i></tt>'s
+<tt><i>subversion</i></tt> если <tt><i>version</i></tt>'s <tt><i>subversion</i></tt> являются меньшми
+или равными <tt><i>subversion</i></tt> которые появляются в форме
+<tt>&gt;=</tt>.
+Форма <tt>and</tt> <tt><i>subversion-reference</i></tt> соответствует
+<tt><i>version</i></tt>'s <tt><i>subversion</i></tt> если каждая из подформ
+<tt><i>subversion-reference</i></tt> соответствуют <tt><i>version</i></tt>'s
+<tt><i>subversion</i></tt>.
+Форма <tt>or</tt> <tt><i>subversion-reference</i></tt> соответствует<tt><i>version</i></tt>'s
+<tt><i>subversion</i></tt> если какая либо подформа<tt><i>subversion-reference</i></tt> соответствует
+<tt><i>version</i></tt>'s <tt><i>subversion</i></tt>.
+Форма <tt>not</tt> <tt><i>subversion-reference</i></tt> соответствует <tt><i>version</i></tt>'s
+<tt><i>subversion</i></tt> если ее подформа <tt><i>subversion-reference</i></tt> не соответствует
+<tt><i>version</i></tt>'s <tt><i>subversion</i></tt>.
+
+</p><p>
+Например, если доступны две версии библиотеки: одна с версией
+<tt>(1&nbsp;2)</tt> и другая с версией <tt>(1&nbsp;3&nbsp;1)</tt>, ссылке
+на версию <tt>()</tt> и <tt>(1)</tt> соответствуют обе,
+<tt>(1&nbsp;2)</tt> соответствует первая, но не вторая,
+<tt>(1&nbsp;3)</tt> соответствует вторая, но не первая,
+<tt>(1&nbsp;(&gt;=&nbsp;2))</tt> соответствуют обе, и
+<tt>(and&nbsp;(1&nbsp;(&gt;=&nbsp;3))&nbsp;(not&nbsp;(1&nbsp;3&nbsp;1)))</tt> не соответствует ни одна.
+
+</p><p>
+Когда ссылка на библиотеку идентифицирует более чем одну доступную библиотеку,
+выбирается одна из доступных библиотек в зависимости от реализации.
+
+</p><p>
+Библиотеки и программы верхнего уровня не должны прямо или косвенно определять
+импорт двух библиотек с одинаковыми именами, но с разными версиями.
+Чтобы избежать проблем, таких как несовместимые типы и реплицированное состояние,
+реализации рекомендуется, хотя это и не требуется, запрещать программам импортировать
+две версии одной и той же библиотеки.
+
+</p><p>
+<a name="./libraries:s14"></a>Тело библиотеки <tt><i>library-body</i></tt> 
+содержит определения экспортируемых идентификаторов, определения идентификаторов,
+не предназначенных для экспорта и выражения инициализации.
+Оно состоит из (возможно пустой) последовательности выражений инициализации.
+Когда формы <tt>begin</tt>, <tt>let-syntax</tt>, или <tt>letrec-syntax</tt> 
+встречаются в теле библиотеки до первого выражения, они соединяются в
+тело.
+Любая форма тела может быть выражена синтаксическим расширением, включая
+определения, только что упомянутые формы или выражения инициализации.
+Тело библиотеки расширяется также, как и  <tt>lambda</tt>
+или другое тело (стр.&nbsp;<a href="syntax.html#body-expansion">292</a>), и оно расширяется
+в эквивалент формы  <tt>letrec*</tt> так что определения и формы инициализации в теле
+вычисляются слева направо.
+
+</p><p>
+Каждый экспорт, указанный в форме <tt>export</tt> должен быть либо
+импортирован из другой библиотеки или определен в перделах <tt><i>library-body</i></tt>,
+в любом случае внутренним а не с внешним экспортируемым именем, если они
+отличаются друг от друга.
+
+</p><p>
+Каждый идентификатор, импортированный или определенный в библиотеке,
+должен иметь ровно одну привязку.
+Если он импортируется в библиотеку, он не должен определяться внутри
+библиотеки, и если  определен в теле библиотеки, он должен быть
+определен только один раз.
+Если импрортируется из двух библиотек, он должен иметь одинаковую
+привязку в обоих случаях, что может произойти только в том случае,
+если связывание происходит в одной из двух библиотек и реэкспортируется
+другой, или если привязка происходит в третьей библиотеке и реэкспортируется
+обоими.
+
+</p><p>
+<a name="./libraries:s15"></a>Идентификаторы, определенные в библиотеке и
+не экспортируемые библиотекой, не отображаются в коде, который встречается
+вне библиотеки.
+Однако синтаксическое расширение определенное внутри библиотеки, может расширяться
+в ссылку на такой идентификатор, так что расширенный код содержит ссылку на идентификатор;
+это называется <i>косвенным экспортом(indirect export)</i>.
+
+</p><p>
+<a name="./libraries:s16"></a>Экспортируемые переменные библиотеки <i>неизменяемы(immutable)</i> 
+как внутри библиотеки, так и снаружи, независимо от того, экспортированы они явно или неявно.
+Нарушение синтаксиса, если в левой части выражения <tt>set!</tt> внутри или снаружи
+экспортируемой библиотеки появиться явно экспортированная
+переменная.
+Также нарушением синтаксиса будет, если в левой части выражения <tt>set!</tt> появляется какая либо
+другая переменная определенная библиотекой экспортируемая косвенно.
+
+</p><p>
+Библиотеки загружаются, а код содержащийся в них вычисляется по принципу
+"по мере необходимости" основывась на реализации, определяющей 
+отношения импорта между библиотеками.
+Библиотечные выражения преобразования (правосторонние выражения в теле библиотеки
+формы <tt>define-syntax</tt>) могут быть вычислены в другое время из выражений
+тела библиотеки (правосторонние выражения в теле форм <tt>define</tt>, плюс
+выражения инициализации).
+Как минимум, выражения преобразования библиотеки должны вычисляться когда
+(если не раньше) ссылка на одно из экспортированных ключевых слов библиотеки
+обнаруживается при расширении другой библиотеки или программы верхнего уровня и
+тело выражения, в выражения тела должны вычисляться, когда (если не раньше)
+вычисляется ссылка на одну из экспортируемых библиотекой переменных, что
+может происходить либо при запуске программы с использованием библиотеки,
+либо при расширении другой библиотеки или программы верхнего уровня, если эта 
+ссылка вычисляется преобразователем вызываемым во время процесса расширения.
+Реализация может вычислять преобразователь из тела библиотеки так много раз,
+как это нравиться в процессе расширения  других библиотек. 
+В частности, она может вычислять выражения, равные нулю, если они на самом
+деле не нужны, ровно один раз или один раз для каждого мета-уровня расширения.
+Как правило, плохая идея для вычисления библиотечного преобразователя  или 
+выражеий тела для подключения внешних видимых побочных эфектов, например
+появления окна, поскольку время  в которое происходит эти побочные эффекты
+не определено.
+Локализованные эффекты, которые влияют только на инициализацию библиотеки,
+например создание таблицы, используемой библиотекой, обычно в порядке.
+
+</p><p>
+Примеры доступны в Разделе&nbsp;<a href="libraries.html#g146">10.4</a>.
+
+</p><p>
+
+</p><h3><a name="g145"></a><a name="./libraries:h3"></a>Section 10.3. Программы Верхнего Уровня<a name="SECTLIBPROGRAMS"></a></h3>
+
+<p>
+Программа верхнего уровня не является синтаксической формой как таковой,
+а скорее набором форм, которые ограничиваются границами файла.
+Программы верхнего уровня можно рассматривать как библиотечные
+формы без обертки <tt>library</tt>, имени библиотеки, и формы экспорта.
+Другое отличие состоит в том, что определения и выражения могут быть
+перемешаны в теле программы верхнего уровня, но не внутри тела библиотеки.
+Таким образом, синтаксис программы верхнего уровня - это просто форма  <tt>import</tt>,
+за которой следует последовательность определений и выражений:
+
+</p><p>
+
+</p><p><tt>(import&nbsp;<i>import-spec</i>&nbsp;...)<br>
+
+<i>definition-or-expression</i><br>
+
+...</tt>
+</p><p>Выражение, которое появляется в теле программы верхнего уровня перед одним
+или несколькими определениями, обрабатывается так, как если бы оно появилось
+в правой части для определения фиктивной переменной, которая не видна нигде
+в пределах программы.
+
+</p><p>
+<a name="./libraries:s17"></a><span class="formdef"><b>procedure</b>: <tt>(command-line)</tt></span>
+<br>
+<b>returns: </b>список строк, представляющих аргументы командной стороки
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;programs)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта процедура может использоваться в программе верхнего уровня для
+получения списка аргументов командной строки, переданных программе.
+
+</p><p>
+<a name="./libraries:s18"></a><span class="formdef"><b>procedure</b>: <tt>(exit)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(exit&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b>ничего не возвращает
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;programs)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта процедура может использоваться для выхода из программы верхнего уровня
+в операционную систему.
+Если <tt><i>obj</i></tt> не задан, выходное значение, возвращаемое операционной системе,
+должно указывать на нормальный выход.
+Если <tt><i>obj</i></tt> это ложь, выходное значение, возвращаемое операционной системе,
+должно указывать на ненормальный выход.
+В противном случае, <tt><i>obj</i></tt> преобразуется в выходное значение, соответствующее
+операционной системе.
+
+</p><p>
+
+</p><h3><a name="g146"></a><a name="./libraries:h4"></a>Section 10.4. Примеры<a name="SECTLIBEXAMPLES"></a></h3>
+
+<p>
+Пример ниже демонстрирует несколько особенностей синтаксиса <tt>library</tt>.
+Он определяет "Version 1" библиотеки <tt>(list-tools&nbsp;setops)</tt>, которая
+экспортирует два ключевых слова и несколько переменных.
+Библиотека импортирует библиотеку <tt>(rnrs&nbsp;base)</tt>, которая предоставляет
+все необходимое, кроме процедуры <tt>member</tt>, которая импортируется из
+ <tt>(rnrs&nbsp;lists)</tt>.
+Большинство переменных, экспортируемых библиотекой, связаны с процедурами,
+что типично.
+
+</p><p>
+Синтаксическое расширение <tt>set</tt> расширяется в ссылку на переменную
+<tt>list-&gt;set</tt>, и <tt>member?</tt> аналагоично расширяется в ссылку
+на переменную <tt>$member?</tt>.
+В то время как <tt>list-&gt;set</tt> явно экспортируется, с <tt>$member?</tt> это не так.
+Здесь происходит косвенный экспорт <tt>$member?</tt>.
+Процедура <tt>u-d-help</tt> не экспортируется явно, и поскольку
+ни одно из синтаксических расширений не разворачивается в ссылку на
+<tt>u-d-help</tt>, она также не экспортируется косвенно.
+Это означает, что она может быть присвоена, но в этом примере она
+не присваивается.
+
+</p><p>
+
+</p><p><tt>(library&nbsp;(list-tools&nbsp;setops&nbsp;(1))<br>
+
+&nbsp;&nbsp;(export&nbsp;set&nbsp;empty-set&nbsp;empty-set?&nbsp;list-&gt;set&nbsp;set-&gt;list<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;union&nbsp;intersection&nbsp;difference&nbsp;member?)<br>
+
+&nbsp;&nbsp;(import&nbsp;(rnrs&nbsp;base)&nbsp;(only&nbsp;(rnrs&nbsp;lists)&nbsp;member))
+<br>
+<br>
+&nbsp;&nbsp;(define-syntax&nbsp;set<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;x&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list-&gt;set&nbsp;(list&nbsp;x&nbsp;...))]))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;empty-set&nbsp;'())
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;empty-set?&nbsp;null?)
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;list-&gt;set<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;ls)&nbsp;'()]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(member&nbsp;(car&nbsp;ls)&nbsp;(cdr&nbsp;ls))&nbsp;(list-&gt;set&nbsp;(cdr&nbsp;ls))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(cons&nbsp;(car&nbsp;ls)&nbsp;(list-&gt;set&nbsp;(cdr&nbsp;ls)))])))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;set-&gt;list&nbsp;(lambda&nbsp;(set)&nbsp;set))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;u-d-help<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(s1&nbsp;s2&nbsp;ans)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([s1&nbsp;s1])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;s1)&nbsp;ans]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(member?&nbsp;(car&nbsp;s1)&nbsp;s2)&nbsp;(f&nbsp;(cdr&nbsp;s1))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(cons&nbsp;(car&nbsp;s1)&nbsp;(f&nbsp;(cdr&nbsp;s1)))]))))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;union<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(s1&nbsp;s2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(u-d-help&nbsp;s1&nbsp;s2&nbsp;s2)))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;intersection<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(s1&nbsp;s2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(null?&nbsp;s1)&nbsp;'()]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(member?&nbsp;(car&nbsp;s1)&nbsp;s2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(car&nbsp;s1)&nbsp;(intersection&nbsp;(cdr&nbsp;s1)&nbsp;s2))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(intersection&nbsp;(cdr&nbsp;s1)&nbsp;s2)])))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;difference<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(s1&nbsp;s2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(u-d-help&nbsp;s1&nbsp;s2&nbsp;'())))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;member-help?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;s)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(member&nbsp;x&nbsp;s)&nbsp;#t)))
+<br>
+<br>
+&nbsp;&nbsp;(define-syntax&nbsp;member?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;elt-expr&nbsp;set-expr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;elt-expr]&nbsp;[s&nbsp;set-expr])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(not&nbsp;(null?&nbsp;s))&nbsp;(member-help?&nbsp;x&nbsp;s)))])))</tt>
+</p><p>Следующая библиотека, <tt>(more-setops)</tt>, определяет несколько дополнительных
+наборов операций в терминах операций <tt>(list-tools&nbsp;setops)</tt>.
+Никакая версия не включена в ссылку на библиотеку
+<tt>(list-tools&nbsp;setops)</tt>; что эквивалентно пустой ссылке на версию,
+которая эквивалентна любой версии.
+Ключевое слово <tt>quoted-set</tt> является интересным, потому это преобразователь
+ссылки <tt>list-&gt;set</tt> из <tt>(list-tools&nbsp;setops)</tt> во время расширения.
+В результате, если другая библиотека или программа верхнего уровня, импортирует
+из <tt>(more-setops)</tt> ссылки <tt>quoted-set</tt>, выражения
+времени выполнения библиотеки <tt>(list-tools&nbsp;setops)</tt> должны быть
+вычислены когда другая библиотека или программа верхнего уровня расширется.
+С другой стороны, выражения времени выполнения библиотеки
+<tt>(list-tools&nbsp;setops)</tt> не должны вычисляться когда сама библиотека
+<tt>(more-setops)</tt> расширяется.
+
+</p><p>
+
+</p><p><tt>(library&nbsp;(more-setops)<br>
+
+&nbsp;&nbsp;(export&nbsp;quoted-set&nbsp;set-cons&nbsp;set-remove)<br>
+
+&nbsp;&nbsp;(import&nbsp;(list-tools&nbsp;setops)&nbsp;(rnrs&nbsp;base)&nbsp;(rnrs&nbsp;syntax-case))
+<br>
+<br>
+&nbsp;&nbsp;(define-syntax&nbsp;quoted-set<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-case&nbsp;x&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(k&nbsp;elt&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#`(quote<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#,(datum-&gt;syntax&nbsp;#'k<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list-&gt;set<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-&gt;datum&nbsp;#'(elt&nbsp;...)))))])))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;set-cons<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(opt&nbsp;optset)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(union&nbsp;(set&nbsp;opt)&nbsp;optset)))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;set-remove<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(opt&nbsp;optset)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(difference&nbsp;optset&nbsp;(set&nbsp;opt)))))</tt>
+</p><p>Если реализация не будет автоматически делать вывод, когда
+привязки должны быть доступны, форма <tt>import</tt> в библиотеке <tt>(more-setops)</tt>
+должна быть изменена, что бы указать, на каких мета уровнях импортируемые ей 
+привязки используются через  синтаксис <tt>for</tt> <tt><i>import-spec</i></tt> следующим образом:
+
+</p><p>
+
+</p><p><tt>(import<br>
+
+&nbsp;&nbsp;(for&nbsp;(list-tools&nbsp;setops)&nbsp;expand&nbsp;run)<br>
+
+&nbsp;&nbsp;(for&nbsp;(rnrs&nbsp;base)&nbsp;expand&nbsp;run)<br>
+
+&nbsp;&nbsp;(for&nbsp;(rnrs&nbsp;syntax-case)&nbsp;expand))</tt>
+</p><p>Чтобы завершить этот пример, краткая программа верхнего уровня ниже
+выполняет несколько экспортов из <tt>(list-tools&nbsp;setops)</tt> и <tt>(more-setops)</tt>.
+
+</p><p>
+
+</p><p><tt>(import&nbsp;(list-tools&nbsp;setops)&nbsp;(more-setops)&nbsp;(rnrs))<br>
+
+(define-syntax&nbsp;pr<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()&nbsp;<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;obj)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(write&nbsp;'obj)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(display&nbsp;"&nbsp;;=&gt;&nbsp;")<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(write&nbsp;obj)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(newline))]))<br>
+
+(define&nbsp;get-set1<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(quoted-set&nbsp;a&nbsp;b&nbsp;c&nbsp;d)))<br>
+
+(define&nbsp;set1&nbsp;(get-set1))<br>
+
+(define&nbsp;set2&nbsp;(quoted-set&nbsp;a&nbsp;c&nbsp;e))
+<br>
+<br>
+(pr&nbsp;(list&nbsp;set1&nbsp;set2))<br>
+
+(pr&nbsp;(eq?&nbsp;(get-set1)&nbsp;(get-set1)))<br>
+
+(pr&nbsp;(eq?&nbsp;(get-set1)&nbsp;(set&nbsp;'a&nbsp;'b&nbsp;'c&nbsp;'d)))<br>
+
+(pr&nbsp;(union&nbsp;set1&nbsp;set2))<br>
+
+(pr&nbsp;(intersection&nbsp;set1&nbsp;set2))<br>
+
+(pr&nbsp;(difference&nbsp;set1&nbsp;set2))<br>
+
+(pr&nbsp;(set-cons&nbsp;'a&nbsp;set2))<br>
+
+(pr&nbsp;(set-cons&nbsp;'b&nbsp;set2))<br>
+
+(pr&nbsp;(set-remove&nbsp;'a&nbsp;set2))</tt>
+</p><p>То, что запускаемая программа должна напечатать, остается как упражнение
+для читателя.
+
+</p><p>
+Дополнительная библиотека и примеры программ верхнего уровня приведены
+в Главе &nbsp;<a href="examples.html#g151">12</a>.
+
+</p><hr class="copyright" align="left">
+<p>
+R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</it><br>
+Copyright © 2009 <a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">The MIT Press</a>.  Electronically reproduced by permission.<br>
+Illustrations © 2009 <a class="plain" href="http://hebert.kitp.ucsb.edu/">Jean-Pierre Hébert</a><br>
+ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>
+<a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">to order this book</a> / <a class="plain" href="canned/about.html">about this book</a>
+</p>
+<p><a class="plain" href="http://www.scheme.com/">http://www.scheme.com</a></p>
+
+</body></html>

@@ -1,0 +1,2259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0050)control.html#./control:h0 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<title>Управляющие Операции</title>
+<link href="./control_files/tspl.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<a name="g96"></a>
+<a name="./control:h0"></a>
+
+<div>
+<img  src="./control_files/ch5.png">
+</div>
+<h1>Chapter 5. Управляющие Операции<a name="CHPTCONTROL"></a></h1>
+
+<p>
+В этой главе описываются синтаксические формы и процедуры, которые служат
+в качестве <a name="./control:s0"></a>структур управления в программах на Scheme.
+Первый раздел охватывает основную структуру управления, применение процедуры,
+а остальные разделы описывают последовательности, условное вычисление,
+рекурсию, отображение(mapping), продолжения, задержанное выполнение,
+множественные значения и выполение программ, созданных во время выполнения.
+
+</p><p>
+
+</p><h3><a name="g97"></a><a name="./control:h1"></a>Section 5.1. Применение Процедуры<a name="SECTAPPLICATION"></a></h3>
+
+<p>
+<a name="./control:s1"></a><span class="formdef"><b>syntax</b>: <tt>(<i>expr<sub>0</sub></i>&nbsp;<i>expr<sub>1</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>значение применения значения <tt><i>expr<sub>0</sub></i></tt> к значениям <tt><i>expr<sub>1</sub></i>&nbsp;...</tt>
+
+</p><p>Применение процедуры является самой базовой управляющей структурой Scheme.
+Любая структурная форма без ключевого слова в первой позиции задающего новый синтаксис это применение
+процедуры. Выражения <tt><i>expr<sub>0</sub></i></tt> и <tt><i>expr<sub>1</sub></i>&nbsp;...</tt> вычисляются;
+каждое должно вычисляться до единичного значения.
+После того как каждое из этих выражений будет вычислено, значение
+<tt><i>expr<sub>0</sub></i></tt> применяется к значениям <tt><i>expr<sub>1</sub></i>&nbsp;...</tt>.
+Если значение вычисления <tt><i>expr<sub>0</sub></i></tt> не является процедурой, или процедура
+не принимает количество продоставленных аргументов, вызывается исключение с условным типом
+<tt>&amp;assertion</tt>.
+
+</p><p>
+<a name="./control:s2"></a>Порядок, в котором вычисляются значения процедуры
+и выражения аргументов, не специфицирован.
+Он может быть слева на право, справа на лево или любым другим порядком.
+Вычисление гарантированно будет последовательным, однако: независимо от
+выбранного порядка, каждое выражение полностью вычисляется до того, как
+начнется вычисление следующего.
+
+</p><p>
+
+</p><p><tt>(+&nbsp;3&nbsp;4)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;7
+<br>
+<br>
+((if&nbsp;(odd?&nbsp;3)&nbsp;+&nbsp;-)&nbsp;6&nbsp;2)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;8
+<br>
+<br>
+((lambda&nbsp;(x)&nbsp;x)&nbsp;5)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5
+<br>
+<br>
+(let&nbsp;([f&nbsp;(lambda&nbsp;(x)&nbsp;(+&nbsp;x&nbsp;x))])<br>
+
+&nbsp;&nbsp;(f&nbsp;8))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;16</tt>
+</p><p><a name="./control:s3"></a><a name="desc:apply"></a>
+<span class="formdef"><b>procedure</b>: <tt>(apply&nbsp;<i>procedure</i>&nbsp;<i>obj</i>&nbsp;...&nbsp;<i>list</i>)</tt></span>
+<br>
+<b>returns: </b>значение применения процедуры <tt><i>procedure</i></tt> для <tt><i>obj</i>&nbsp;...</tt> и 
+списка элементов <tt><i>list</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>apply</tt> вызывает процедуру <tt><i>procedure</i></tt>, передавая
+первый <tt><i>obj</i></tt> как первый аргумент,
+второй <tt><i>obj</i></tt> как второй аргумент, и
+так далее для каждого объекта в <tt><i>obj</i>&nbsp;...</tt>, и передавая элементы
+списка <tt><i>list</i></tt> в порядке, как оставшиеся аргументы.
+Таким образом, <tt><i>procedure</i></tt> вызывается с таким количеством аргументов,
+равным количество <tt><i>objs</i></tt> плюс элеметы списка <tt><i>list</i></tt>.
+
+</p><p>
+<tt>apply</tt> полезен когда некоторые или все аргументы, которые должны
+быть переданы процедуре, находятся в списке, поскольку освобождает программиста
+от явного деструктурирования списка.
+
+</p><p>
+
+</p><p><tt>(apply&nbsp;+&nbsp;'(4&nbsp;5))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;9
+<br>
+<br>
+(apply&nbsp;min&nbsp;'(6&nbsp;8&nbsp;3&nbsp;2&nbsp;5))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2
+<br>
+<br>
+(apply&nbsp;min&nbsp;&nbsp;5&nbsp;1&nbsp;3&nbsp;'(6&nbsp;8&nbsp;3&nbsp;2&nbsp;5))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1
+<br>
+<br>
+(apply&nbsp;vector&nbsp;'a&nbsp;'b&nbsp;'(c&nbsp;d&nbsp;e))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(a&nbsp;b&nbsp;c&nbsp;d&nbsp;e)
+<br>
+<br>
+(define&nbsp;first<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;(lambda&nbsp;(x&nbsp;.&nbsp;y)&nbsp;x)&nbsp;ls)))<br>
+
+(define&nbsp;rest<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;(lambda&nbsp;(x&nbsp;.&nbsp;y)&nbsp;y)&nbsp;ls)))<br>
+
+(first&nbsp;'(a&nbsp;b&nbsp;c&nbsp;d))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a<br>
+
+(rest&nbsp;'(a&nbsp;b&nbsp;c&nbsp;d))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;c&nbsp;d)
+<br>
+<br>
+(apply&nbsp;append<br>
+
+&nbsp;&nbsp;'(1&nbsp;2&nbsp;3)<br>
+
+&nbsp;&nbsp;'((a&nbsp;b)&nbsp;(c&nbsp;d&nbsp;e)&nbsp;(f)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;3&nbsp;a&nbsp;b&nbsp;c&nbsp;d&nbsp;e&nbsp;f)</tt>
+</p><p>
+</p><h3><a name="g98"></a><a name="./control:h2"></a>Section 5.2. Последовательное выполнение<a name="SECTSEQUENCING"></a></h3>
+
+<p>
+<a name="./control:s4"></a><span class="formdef"><b>syntax</b>: <tt>(begin&nbsp;<i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>значения последнего подвыражения
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Выражения <tt><i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...</tt> оцениваются последовательно
+слева на право.
+<a name="./control:s5"></a><tt>begin</tt> используется для последовательности присвоений,
+ввода/вывода, или других операций, которые вызывают <a name="./control:s6"></a>побочные эффекты.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;x&nbsp;3)<br>
+
+(begin<br>
+
+&nbsp;&nbsp;(set!&nbsp;x&nbsp;(+&nbsp;x&nbsp;1))<br>
+
+&nbsp;&nbsp;(+&nbsp;x&nbsp;x))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;8</tt>
+</p><p>Форма <tt>begin</tt> может содержать ноль или больше определений вместо выражений
+ <tt><i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...</tt>, и в этом случаее
+это считает определением и может появляться только там, где определения действительны.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;()<br>
+
+&nbsp;&nbsp;(begin&nbsp;(define&nbsp;x&nbsp;3)&nbsp;(define&nbsp;y&nbsp;4))<br>
+
+&nbsp;&nbsp;(+&nbsp;x&nbsp;y))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;7</tt>
+</p><p>Эта форма <tt>begin</tt> в основном используется синтаксическими расширениями, которые должны
+быть расширены в несколько определений.
+(См. страницу&nbsp;<a href="binding.html#multi-define-syntax">101</a>.)
+
+</p><p>
+Тела многих синтаксических форм, в том числе <tt>lambda</tt>, <tt>case-lambda</tt>, <tt>let</tt>,
+<tt>let*</tt>, <tt>letrec</tt>, и <tt>letrec*</tt>, а также результирующие предложения <tt>cond</tt>,
+<tt>case</tt>, и <tt>do</tt>, рассматриваются так, как если бы они находились внутри 
+ <a name="./control:s7"></a>неявного <tt>begin</tt>; то есть выражения составляющие тело
+или результат предложения выполняются последовательно, и возвращают значения вычисления последнего
+выражения.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;swap-pair!<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([temp&nbsp;(car&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-car!&nbsp;x&nbsp;(cdr&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set-cdr!&nbsp;x&nbsp;temp)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x)))<br>
+
+(swap-pair!&nbsp;(cons&nbsp;'a&nbsp;'b))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;.&nbsp;a)</tt>
+</p><p>
+</p><h3><a name="g99"></a><a name="./control:h3"></a>Section 5.3. Условные выражения<a name="SECTCONDITIONALS"></a></h3>
+
+<p>
+<a name="./control:s8"></a><span class="formdef"><b>syntax</b>: <tt>(if&nbsp;<i>test</i>&nbsp;<i>consequent</i>&nbsp;<i>alternative</i>)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>(if&nbsp;<i>test</i>&nbsp;<i>consequent</i>)</tt></span>
+<br>
+<b>returns: </b>значения выражений <tt><i>consequent</i></tt> или <tt><i>alternative</i></tt> в зависимости
+от значения <tt><i>test</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./control:s9"></a>Подформы <tt><i>test</i></tt>, <tt><i>consequent</i></tt>, и <tt><i>alternative</i></tt> должны быть выражениями.
+Если <tt><i>test</i></tt> вычисляется с истинным значением (т.е что то иное чем <tt>#f</tt>),
+вычисляется <tt>consequent</tt> и возвращается его значение.
+иначе вычисляется <tt>alternative</tt> и возвращается его значение.
+Со второй, "одностроронней" формой, которая не имеет <tt><i>alternative</i></tt>,
+результат не определен, если результат вычисления <tt><i>test</i></tt> равен false.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([ls&nbsp;'(a&nbsp;b&nbsp;c)])<br>
+
+&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cdr&nbsp;ls)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;c)
+<br>
+<br>
+(let&nbsp;([ls&nbsp;'()])<br>
+
+&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cdr&nbsp;ls)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;()
+<br>
+<br>
+(let&nbsp;([abs<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(&lt;&nbsp;x&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(-&nbsp;0&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x))])<br>
+
+&nbsp;&nbsp;(abs&nbsp;-4))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4
+<br>
+<br>
+(let&nbsp;([x&nbsp;-4])<br>
+
+&nbsp;&nbsp;(if&nbsp;(&lt;&nbsp;x&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;'minus&nbsp;(-&nbsp;0&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;'plus&nbsp;4)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(minus&nbsp;4)</tt>
+</p><p><a name="./control:s10"></a><span class="formdef"><b>procedure</b>: <tt>(not&nbsp;<i>obj</i>)</tt></span>
+<br>
+<b>returns: </b><tt>#t</tt> если <tt><i>obj</i></tt> это ложь, <tt>#f</tt> иначе
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>not</tt> эквивалентен процедуре <tt>(lambda&nbsp;(x)&nbsp;(if&nbsp;x&nbsp;#f&nbsp;#t))</tt>.
+
+</p><p>
+
+</p><p><tt>(not&nbsp;#f)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(not&nbsp;#t)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(not&nbsp;'())&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(not&nbsp;(&lt;&nbsp;4&nbsp;5))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f</tt>
+</p><p><a name="./control:s11"></a><span class="formdef"><b>syntax</b>: <tt>(and&nbsp;<i>expr</i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>смотри ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если нет никаких подвыражений, то форма <tt>and</tt> вычисляется как <tt>#t</tt>.
+в противном случае <tt>and</tt> вычисляет каждое подвыражение последовательно слева
+на право, пока не останется одно подвыражение или какое то подвыражение
+вернет<tt>#f</tt>.
+Если останется одно подвыражение, оно вычисляется и его значения возвращаются.
+Если подвыражение возвращает <tt>#f</tt>, <tt>and</tt> возвращет <tt>#f</tt> без
+вычисления оставшихся подвыражений.
+Синтаксическое определение <tt>and</tt> находиться на странице&nbsp;<a href="further.html#defn:and">62</a>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;3])<br>
+
+&nbsp;&nbsp;(and&nbsp;(&gt;&nbsp;x&nbsp;2)&nbsp;(&lt;&nbsp;x&nbsp;4)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t
+<br>
+<br>
+(let&nbsp;([x&nbsp;5])<br>
+
+&nbsp;&nbsp;(and&nbsp;(&gt;&nbsp;x&nbsp;2)&nbsp;(&lt;&nbsp;x&nbsp;4)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f
+<br>
+<br>
+(and&nbsp;#f&nbsp;'(a&nbsp;b)&nbsp;'(c&nbsp;d))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(and&nbsp;'(a&nbsp;b)&nbsp;'(c&nbsp;d)&nbsp;'(e&nbsp;f))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(e&nbsp;f)</tt>
+</p><p><a name="./control:s12"></a><span class="formdef"><b>syntax</b>: <tt>(or&nbsp;<i>expr</i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>смотри ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Если подвыражений нет, форма <tt>or</tt> вычисляется как <tt>#f</tt>.
+В противном случае, <tt>or</tt> вычисляет каждое подвыражение последовательно
+слева на право, пока не останется только одндо подвыражение или некоторое
+подвыражение вернет значение отличное от <tt>#f</tt>.
+Если остается одно подвыражение, оно вычиляется и его значение возвращается.
+Если подвыражение возвращает значение, отличное от <tt>#f</tt>, <tt>or</tt> возвращает
+его без вычисления оставшихся подвыражений.
+Определение синтаксиса <tt>or</tt> приведено на странице&nbsp;<a href="further.html#defn:or">63</a>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;3])<br>
+
+&nbsp;&nbsp;(or&nbsp;(&lt;&nbsp;x&nbsp;2)&nbsp;(&gt;&nbsp;x&nbsp;4)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f
+<br>
+<br>
+(let&nbsp;([x&nbsp;5])<br>
+
+&nbsp;&nbsp;(or&nbsp;(&lt;&nbsp;x&nbsp;2)&nbsp;(&gt;&nbsp;x&nbsp;4)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t
+<br>
+<br>
+(or&nbsp;#f&nbsp;'(a&nbsp;b)&nbsp;'(c&nbsp;d))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b)</tt>
+</p><p><a name="./control:s13"></a><span class="formdef"><b>syntax</b>: <tt>(cond&nbsp;<i>clause<sub>1</sub></i>&nbsp;<i>clause<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>смотри ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Каждое предложение(<tt><i>clause</i></tt>), кроме последнего должно принимать
+одну из форм указанных <a name="./control:s14"></a> ниже.
+
+</p><p>
+
+</p><p><tt>(<i>test</i>)<br>
+
+(<i>test</i>&nbsp;<i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...)<br>
+
+(<i>test</i>&nbsp;=&gt;&nbsp;<i>expr</i>)</tt>
+</p><p>Последнее предложение может быть в любой из вышеуказнных форм, или это
+может быть форма "<a name="./control:s15"></a><tt>else</tt> clause".
+
+</p><p>
+
+</p><p><tt>(else&nbsp;<i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>Каждый <tt><i>test</i></tt> вычисляется по порядку, пока не будет вычислено
+истинное значение(true) или пока все тесты не будут вычислены.
+Если первое предложение(<tt><i>test</i></tt>), проверка которого соответствует истинному
+значению, находиться в виде формы, указанной выше, возвращается значение теста <tt><i>test</i></tt>.
+
+</p><p>
+Если первое предложение, чей <tt><i>test</i></tt> вычисляется в истину находиться во второй форме
+приведенной выше, выражения <tt><i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>...</tt> вычисляются
+последовательно и возвращаются значения последнего выражения.
+
+</p><p>
+Если первое предложение, чей <tt><i>test</i></tt> вычисляется в истину находиться
+в третьей форме, указанной выше, вычисляется выражение <tt><i>expr</i></tt>.
+Значение должно быть процедурой одного аргумента, которая применяется к значению
+<tt><i>test</i></tt>.
+Возвращается значение применения(выполнения) этой процедуры.
+
+</p><p>
+Если ни один из тестов не вычисляется в истинное значение и существует
+предложение <tt>else</tt>, выражения <tt><i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...</tt> 
+предложения <tt>else</tt> вычисляются последовательно и возвращаются значения вычисления последнего выражения.
+
+</p><p>
+Если ни один из тестов не вычисляется в истину и нет предложения <tt>else</tt>, 
+значение или значения не определены.
+
+</p><p>
+См. страницу &nbsp;<a href="syntax.html#defn:cond">305</a> для синтаксического определения
+<tt>cond</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;0])<br>
+
+&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(&lt;&nbsp;x&nbsp;0)&nbsp;(list&nbsp;'minus&nbsp;(abs&nbsp;x))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(&gt;&nbsp;x&nbsp;0)&nbsp;(list&nbsp;'plus&nbsp;x)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(list&nbsp;'zero&nbsp;x)]))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(zero&nbsp;0)
+<br>
+<br>
+(define&nbsp;select<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(not&nbsp;(symbol?&nbsp;x))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(assq&nbsp;x&nbsp;'((a&nbsp;.&nbsp;1)&nbsp;(b&nbsp;.&nbsp;2)&nbsp;(c&nbsp;.&nbsp;3)))&nbsp;=&gt;&nbsp;cdr]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;0])))
+<br>
+<br>
+(select&nbsp;3)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t<br>
+
+(select&nbsp;'b)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2<br>
+
+(select&nbsp;'e)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0</tt>
+</p><p><a name="./control:s16"></a><span class="formdef"><b>syntax</b>: <tt>else</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>=&gt;</tt></span>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs&nbsp;exceptions)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эти идентификаторы являются вспомогательными ключевыми словами для <tt>cond</tt>.
+Об они также служат для <tt>защиты</tt>, а
+<tt>else</tt> также служит вспомогательным ключевым словом для <tt>case</tt>.
+Ссылка на эти идентификаторы будет нарушением синтаксиса, за исключением
+контекста где они распознаются как вспомогательные ключевые слова.
+
+</p><p>
+<a name="./control:s17"></a><span class="formdef"><b>syntax</b>: <tt>(when&nbsp;<i>test-expr</i>&nbsp;<i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<span class="formdef"><b>syntax</b>: <tt>(unless&nbsp;<i>test-expr</i>&nbsp;<i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>see below
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;control)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Для <tt>when</tt>,
+если <tt><i>test-expr</i></tt> вычисляется в истинное значение, выражения
+<tt><i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...</tt> вычисляются последовательно,
+и значения последнего выражения возвращаются.
+Если <tt><i>test-expr</i></tt> вычисляется в ложь, ни одно из других выражений не вычисляется, и значение
+или значения <tt>when</tt> не определены.
+
+</p><p>
+Для <tt>unless</tt>,
+если <tt><i>test-expr</i></tt> вычисляется в ложь, выражения
+<tt><i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...</tt> вычисляются последовательно,
+и возвращаютс значения последнего выражения.
+Если <tt><i>test-expr</i></tt> вычисляется в истинное значение, ни одно из других выражений не вычисляется,
+а значение или значения <tt>unless</tt> неопределены.
+
+</p><p>
+Выражения <tt>when</tt> или <tt>unless</tt> обычно более ясные, чем
+соответствующее "одностороннее" выражение <tt>if</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;-4]&nbsp;[sign&nbsp;'plus])<br>
+
+&nbsp;&nbsp;(when&nbsp;(&lt;&nbsp;x&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;x&nbsp;(-&nbsp;0&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;sign&nbsp;'minus))<br>
+
+&nbsp;&nbsp;(list&nbsp;sign&nbsp;x))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(minus&nbsp;4)
+<br>
+<br>
+(define&nbsp;check-pair<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;(pair?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(syntax-violation&nbsp;'check-pair&nbsp;"invalid&nbsp;argument"&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;x))
+<br>
+<br>
+(check-pair&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)</tt>
+</p><p><tt>when</tt> можно определить следующим образом:
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;when<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e0&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;e0&nbsp;(begin&nbsp;e1&nbsp;e2&nbsp;...))]))</tt>
+</p><p><tt>unless</tt> можно определить следующим образом:
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;unless<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e0&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(not&nbsp;e0)&nbsp;(begin&nbsp;e1&nbsp;e2&nbsp;...))]))</tt>
+</p><p>или в терминах <tt>when</tt> следующим образом:
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;unless<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;e0&nbsp;e1&nbsp;e2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(when&nbsp;(not&nbsp;e0)&nbsp;e1&nbsp;e2&nbsp;...)]))</tt>
+</p><p><a name="./control:s18"></a><span class="formdef"><b>syntax</b>: <tt>(case&nbsp;<i>expr<sub>0</sub></i>&nbsp;<i>clause<sub>1</sub></i>&nbsp;<i>clause<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>смотри ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Каждое предложение, кроме последнего должно иметь следующую форму
+
+</p><p>
+
+</p><p><tt>((<i>key</i>&nbsp;...)&nbsp;<i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>где каждый <tt><i>key</i></tt> является элементом отличным от других ключей(key).
+Последнее предложение может иметь приведенную ниже форму или это может быть предложение
+<a name="./control:s19"></a><tt>else</tt> формы.
+
+</p><p>
+
+</p><p><tt>(else&nbsp;<i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...)</tt>
+</p><p><tt><i>expr<sub>0</sub></i></tt> вычисляется и результат сравнивается
+(используя <tt>eqv?</tt>) с ключами каждого предложения в порядке следования предложений.
+Если найдено предложение, содержащее соответствующий ключ, последовательрно вычисляются
+соответствующие выражения <tt><i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...</tt> и
+возвращаются значения последнего вычисленного выражения.
+
+</p><p>
+Если ни одно из предложений не содержит подходящий ключ и присутствует предложение <tt>else</tt>,
+последовательно вычисляются выражения <tt><i>expr<sub>1</sub></i>&nbsp;<i>expr<sub>2</sub></i>&nbsp;...</tt> из
+предложения <tt>else</tt> и возвращаются значения последнего выражения.
+
+</p><p>
+Если ни одно из предложений не содержит подходящего ключа и нет
+предложения <tt>else</tt>, значение или значения не определены.
+
+</p><p>
+См. страницу &nbsp;<a href="syntax.html#defn:case">306</a> для синтаксического определения <tt>case</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;4]&nbsp;[y&nbsp;5])<br>
+
+&nbsp;&nbsp;(case&nbsp;(+&nbsp;x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(1&nbsp;3&nbsp;5&nbsp;7&nbsp;9)&nbsp;'odd]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(0&nbsp;2&nbsp;4&nbsp;6&nbsp;8)&nbsp;'even]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;'out-of-range]))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;odd</tt>
+</p><p>
+</p><h3><a name="g100"></a><a name="./control:h4"></a>Section 5.4. Рекурсия и итерация<a name="SECTRECURSION"></a></h3>
+
+<p>
+<a name="./control:s20"></a><span class="formdef"><b>syntax</b>: <tt>(let&nbsp;<i>name</i>&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>значения последнего выражения тела(body)
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эта форма <tt>let</tt>, называемая <a name="./control:s21"></a><tt><i>именованным(named)</i></tt>
+<tt>let</tt>, представляет собой конструкцию <a name="./control:s22"></a>итерации и 
+<a name="./control:s23"></a>рекурсии.
+Она похожа на более распространенную форму <tt>let</tt>
+(см Раздел&nbsp;<a href="binding.html#g92">4.4</a>) в привязке
+перменных <tt><i>var</i>&nbsp;...</tt> к значениям <tt><i>expr</i>&nbsp;...</tt> внутри
+тела <tt><i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...</tt>, которая вычисляется и
+обрабатывается подобно телу <tt>lambda</tt> выражения.
+Кроме того, переменная <tt><i>name</i></tt> связывается внутри тела с процедурой, которая может быть
+вызвана для повторения или итерации; аргументы процедуры становятся новыми
+значениями переменных  <tt><i>var</i>&nbsp;...</tt>.
+
+</p><p>
+Форму выражения именнованного <tt>let</tt>
+
+</p><p>
+
+</p><p><tt>(let&nbsp;<i>name</i>&nbsp;((<i>var</i>&nbsp;<i>expr</i>)&nbsp;...)<br>
+
+&nbsp;&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)</tt>
+</p><p>можно переписать используя <tt>letrec</tt> следующим образом.
+
+</p><p>
+
+</p><p><tt>((letrec&nbsp;((<i>name</i>&nbsp;(lambda&nbsp;(<i>var</i>&nbsp;...)&nbsp;<i>body<sub>1</sub></i>&nbsp;<i>body<sub>2</sub></i>&nbsp;...)))<br>
+
+&nbsp;&nbsp;&nbsp;<i>name</i>)<br>
+
+&nbsp;<i>expr</i>&nbsp;...)</tt>
+</p><p>Синтаксическое определение <tt>let</tt> которое реализует это преобразование
+и обрабатывает неименованный <tt>let</tt> также можно найти на страница
+&nbsp;<a href="syntax.html#defn:let">312</a>.
+
+</p><p>
+Процедура <a name="./control:s24"></a><tt>divisors</tt> определенная ниже использует именованный <tt>let</tt> 
+для вычисления нетривиальных делителей неотритцательных целых чисел.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;divisors<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([i&nbsp;2])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(&gt;=&nbsp;i&nbsp;n)&nbsp;'()]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(integer?&nbsp;(/&nbsp;n&nbsp;i))&nbsp;(cons&nbsp;i&nbsp;(f&nbsp;(+&nbsp;i&nbsp;1)))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(f&nbsp;(+&nbsp;i&nbsp;1))]))))
+<br>
+<br>
+(divisors&nbsp;5)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;()<br>
+
+(divisors&nbsp;32)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(2&nbsp;4&nbsp;8&nbsp;16)</tt>
+</p><p>Вышеуказанная версия является рекурсивной, но не хвостовой рекурсией(потребляет стек) когда делитель
+найден и хвостовой рекурсией когда делитель не найден.
+Версия ниже полностью рекурсивна хвостовой рекурсией(не увеличивает стек).
+Она создает список в обратном порядке, но это легко исправить, путем переворачивания
+списка при выходе.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;divisors<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([i&nbsp;2]&nbsp;[ls&nbsp;'()])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(&gt;=&nbsp;i&nbsp;n)&nbsp;ls]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(integer?&nbsp;(/&nbsp;n&nbsp;i))&nbsp;(f&nbsp;(+&nbsp;i&nbsp;1)&nbsp;(cons&nbsp;i&nbsp;ls))]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[else&nbsp;(f&nbsp;(+&nbsp;i&nbsp;1)&nbsp;ls)]))))</tt>
+</p><p><a name="./control:s25"></a><span class="formdef"><b>syntax</b>: <tt>(do&nbsp;((<i>var</i>&nbsp;<i>init</i>&nbsp;<i>update</i>)&nbsp;...)&nbsp;(<i>test</i>&nbsp;<i>result</i>&nbsp;...)&nbsp;<i>expr</i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>значения последнего выражения <tt><i>result</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;control)</tt>, <tt>(rnrs)</tt>
+
+</p><p><tt>do</tt> позволяет кратко выразить ограниченную форму <a name="./control:s26"></a>итерации.
+Переменные <tt><i>var</i>&nbsp;...</tt> сначала связываются к значениям
+<tt><i>init</i>&nbsp;...</tt> и затем связываются снова на каждой последующей итерации
+к значениям выражений <tt><i>update</i>&nbsp;...</tt>.
+Вырважения <tt><i>test</i></tt>, 
+<tt><i>update</i>&nbsp;...</tt>,
+<tt><i>expr</i>&nbsp;...</tt>, и
+<tt><i>result</i>&nbsp;...</tt>
+находятся в области действия привязок устанавливаемых
+для переменных <tt><i>var</i>&nbsp;...</tt>.
+
+</p><p>
+На каждом шаге, проверяется и вычисляется выражение <tt><i>test</i></tt>.
+Если значение <tt><i>test</i></tt> это истина, итерация прекращается,
+выражения <tt><i>result</i>&nbsp;...</tt> вычисляются в заданной последовательности,
+и возвращается значения последнего выражения.
+Если нет выражений result, значение или значения выражения <tt>do</tt>
+не определено.
+
+</p><p>
+Если значение <tt><i>test</i></tt> ложно, выражения <tt><i>expr</i>&nbsp;...</tt>
+вычисляются в заданной последовательности, выражения <tt><i>update</i>&nbsp;...</tt> вычисляются,
+новые связи для переменных <tt><i>var</i>&nbsp;...</tt> создаются со значениями выражений 
+<tt><i>update</i>&nbsp;...</tt> и итерация продолжается.
+
+</p><p>
+Выражения <tt><i>expr</i>&nbsp;...</tt> вычисляются только для эффективности
+и часто полностью опускаются. Любое выражение <tt><i>update</i></tt> может быть
+опущено, и в этом случае эффект будет таким же, как если бы <tt><i>update</i></tt> 
+было бы просто соответствующим значением <tt><i>var</i></tt>.
+
+</p><p>
+Хотя циклические конструкции в большинстве языков требуют, чтобы
+итераторы цикла обновлялись путем присваивания, <tt>do</tt> требует
+чтобы итераторы цикла <tt><i>var</i>&nbsp;...</tt> изменялись путем
+пересвязывания с новыми значениями.
+Фактически, никакие побочные эффекты не участвуют в вычислении выражения
+<tt>do</tt> если они явно не выполняются его подвыражениями.
+
+</p><p>
+Смотри страницу&nbsp;<a href="syntax.html#defn:do">313</a> для синтаксического определения <tt>do</tt>.
+
+</p><p>
+Определения <a name="./control:s27"></a><tt>factorial</tt> и <a name="./control:s28"></a><tt>fibonacci</tt> ниже -
+это прямое преобразование версий хвосто-рекурсивных процедур построенных с применением конструкций 
+именованных-<tt>let</tt> ,
+приведенных в Разделе &nbsp;<a href="further.html#g55">3.2</a>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;factorial<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([i&nbsp;n&nbsp;(-&nbsp;i&nbsp;1)]&nbsp;[a&nbsp;1&nbsp;(*&nbsp;a&nbsp;i)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((zero?&nbsp;i)&nbsp;a))))
+<br>
+<br>
+(factorial&nbsp;10)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3628800
+<br>
+<br>
+(define&nbsp;fibonacci<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(=&nbsp;n&nbsp;0)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([i&nbsp;n&nbsp;(-&nbsp;i&nbsp;1)]&nbsp;[a1&nbsp;1&nbsp;(+&nbsp;a1&nbsp;a2)]&nbsp;[a2&nbsp;0&nbsp;a1])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((=&nbsp;i&nbsp;1)&nbsp;a1)))))
+<br>
+<br>
+(fibonacci&nbsp;6)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;8</tt>
+</p><p>Определение <a name="./control:s29"></a><tt>divisors</tt> ниже похоже на
+хвосто-рекурсивное определение <tt>divisors</tt> данное
+с применением именованного <tt>let</tt> выше.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;divisors<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(n)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([i&nbsp;2&nbsp;(+&nbsp;i&nbsp;1)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ls&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(integer?&nbsp;(/&nbsp;n&nbsp;i))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;i&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ls)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((&gt;=&nbsp;i&nbsp;n)&nbsp;ls))))</tt>
+</p><p>Определение <tt>scale-vector!</tt> ниже, которое маштабирует каждый
+элемент вектора <i>v</i> константой <i>k</i>, демонстрирует не пустое тело
+<tt>do</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;scale-vector!<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(v&nbsp;k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([n&nbsp;(vector-length&nbsp;v)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([i&nbsp;0&nbsp;(+&nbsp;i&nbsp;1)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((=&nbsp;i&nbsp;n))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(vector-set!&nbsp;v&nbsp;i&nbsp;(*&nbsp;(vector-ref&nbsp;v&nbsp;i)&nbsp;k))))))
+<br>
+<br>
+(define&nbsp;vec&nbsp;(vector&nbsp;1&nbsp;2&nbsp;3&nbsp;4&nbsp;5))<br>
+
+(scale-vector!&nbsp;vec&nbsp;2)<br>
+
+vec&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(2&nbsp;4&nbsp;6&nbsp;8&nbsp;10)</tt>
+</p><p>
+</p><h3><a name="g101"></a><a name="./control:h5"></a>Section 5.5. Отображение(Mapping) и Суммирование(Folding)</h3>
+
+<p>
+Когда программа должна выполнится рекурсивно или итеративно для каждого
+элемента списка, часто удобно использовать операторы отображения(mapping)
+или суммирования(folding).
+Эти операторы абстрагируются от нулевых проверок и явной рекурсии, применяя
+процедуру к элементам списка один за другим.
+Для векторов и строк также доступны несколько операторов отображения.
+
+</p><p>
+<a name="./control:s30"></a><span class="formdef"><b>procedure</b>: <tt>(map&nbsp;<i>procedure</i>&nbsp;<i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>список результатов
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./control:s31"></a><a name="./control:s32"></a><tt>map</tt> применяет <tt><i>procedure</i></tt> к
+соответствующим элементам списков <tt><i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...</tt> и возвращает список полученных значений.
+Списки <tt><i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...</tt> должны иметь одинаковую длину.
+<tt><i>procedure</i></tt> должна принимать столько аргументов, сколько есть списков, должна возвращать
+одно значение, и не должна изменять аргументы списки <tt><i>list</i></tt>.
+
+</p><p>
+
+</p><p><tt>(map&nbsp;abs&nbsp;'(1&nbsp;-2&nbsp;3&nbsp;-4&nbsp;5&nbsp;-6))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6)
+<br>
+<br>
+(map&nbsp;(lambda&nbsp;(x&nbsp;y)&nbsp;(*&nbsp;x&nbsp;y))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(8&nbsp;7&nbsp;6&nbsp;5))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(8&nbsp;14&nbsp;18&nbsp;20)</tt>
+</p><p>Хотя порядок, в котором происходят сами применения, не указан, порядок значений в 
+выходном списке, совпадает с порядком соответствующих значений во входных списках.
+
+</p><p>
+Процедура отображения(<tt>map</tt>) может быть определена следующим образом.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;map<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(f&nbsp;ls&nbsp;.&nbsp;more)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;more)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;map1&nbsp;([ls&nbsp;ls])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(f&nbsp;(car&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map1&nbsp;(cdr&nbsp;ls)))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;map-more&nbsp;([ls&nbsp;ls]&nbsp;[more&nbsp;more])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;f&nbsp;(car&nbsp;ls)&nbsp;(map&nbsp;car&nbsp;more))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map-more&nbsp;(cdr&nbsp;ls)&nbsp;(map&nbsp;cdr&nbsp;more))))))))</tt>
+</p><p>Эта версия <tt>map</tt> не проверяет ошибки; <tt>f</tt> считается процедурой, а другие
+аргументы считаются правильными списками одинаковой длины.
+Интересной особенностью данного определения является то, что <tt>map</tt> использует себя
+чтобы получить cars и cdrs из списка входных списков; это работает
+из за особой обработки случая с когда входом является один списк.
+
+</p><p>
+<a name="./control:s33"></a><a name="desc:for-each"></a>
+<span class="formdef"><b>procedure</b>: <tt>(for-each&nbsp;<i>procedure</i>&nbsp;<i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./control:s34"></a><a name="./control:s35"></a><tt>for-each</tt> похож на <tt>map</tt>,
+за исключением того, что <tt>for-each</tt> не создает и не возвращает список результирующих значений,
+и <tt>for-each</tt> гарантирует, что применение заданной процедуры произойдет в порядке следования
+элементов слева на право.
+<tt><i>procedure</i></tt> должна принимать столько аргументов, сколько есть списков, и
+не должна изменять аргументы <tt><i>list</i></tt>.
+<tt>for-each</tt> может быть определена без проверки ошибок, следующим образом.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;for-each<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(f&nbsp;ls&nbsp;.&nbsp;more)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([ls&nbsp;ls&nbsp;(cdr&nbsp;ls)]&nbsp;[more&nbsp;more&nbsp;(map&nbsp;cdr&nbsp;more)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((null?&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;f&nbsp;(car&nbsp;ls)&nbsp;(map&nbsp;car&nbsp;more)))))
+<br>
+<br>
+(let&nbsp;([same-count&nbsp;0])<br>
+
+&nbsp;&nbsp;(for-each<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(when&nbsp;(=&nbsp;x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;same-count&nbsp;(+&nbsp;same-count&nbsp;1))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;'(2&nbsp;3&nbsp;3&nbsp;4&nbsp;7&nbsp;6))<br>
+
+&nbsp;&nbsp;same-count)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3</tt>
+</p><p><a name="./control:s36"></a><span class="formdef"><b>procedure</b>: <tt>(exists&nbsp;<i>procedure</i>&nbsp;<i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>смотри ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;lists)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Списки <tt><i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...</tt> должны иметь одинаковую
+длину.
+<tt><i>procedure</i></tt> должна принимать столько аргументов, сколько есть списков, и не должна изменять
+аргументы <tt><i>list</i></tt>.
+Ели списки пустые, <tt>exists</tt> возвращает <tt>#f</tt>.
+В противном случае, <tt>exists</tt> применяет <tt><i>procedure</i></tt> к соответствующим элементам
+списков <tt><i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...</tt> последовательно, пока
+списки имеют хотя бы один элемент или <tt><i>procedure</i></tt> возвратити значение истины <tt><i>t</i></tt>.
+В первом случае, <tt>exists</tt> применяет хвостовым вызовом <tt><i>procedure</i></tt>, применяя ее
+к оставшимся элементам каждого списка. В последнем случаее, <tt>exists</tt> возвращает <tt><i>t</i></tt>.
+
+</p><p>
+
+</p><p><tt>(exists&nbsp;symbol?&nbsp;'(1.0&nbsp;#\a&nbsp;"hi"&nbsp;'()))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f
+<br>
+<br>
+(exists&nbsp;member<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(a&nbsp;b&nbsp;c)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'((c&nbsp;b)&nbsp;(b&nbsp;a)&nbsp;(a&nbsp;c)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;a)
+<br>
+<br>
+(exists&nbsp;(lambda&nbsp;(x&nbsp;y&nbsp;z)&nbsp;(=&nbsp;(+&nbsp;x&nbsp;y)&nbsp;z))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(1.2&nbsp;2.3&nbsp;3.4&nbsp;4.5)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(2.3&nbsp;4.4&nbsp;6.4&nbsp;8.6))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t</tt>
+</p><p><tt>exists</tt> может быть определена(несколько не эффективно и без обработки ошибок) следующим образом:
+
+</p><p>
+
+</p><p><tt>(define&nbsp;exists<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(f&nbsp;ls&nbsp;.&nbsp;more)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(not&nbsp;(null?&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;exists&nbsp;([x&nbsp;(car&nbsp;ls)]&nbsp;[ls&nbsp;(cdr&nbsp;ls)]&nbsp;[more&nbsp;more])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;f&nbsp;x&nbsp;(map&nbsp;car&nbsp;more))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(apply&nbsp;f&nbsp;x&nbsp;(map&nbsp;car&nbsp;more))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(exists&nbsp;(car&nbsp;ls)&nbsp;(cdr&nbsp;ls)&nbsp;(map&nbsp;cdr&nbsp;more))))))))</tt>
+</p><p><a name="./control:s37"></a><span class="formdef"><b>procedure</b>: <tt>(for-all&nbsp;<i>procedure</i>&nbsp;<i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>смотри ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;lists)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Списки <tt><i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...</tt> должны иметь одинаковую
+длину.
+<tt><i>procedure</i></tt> должна принимать столько аргументов, сколько есть списков и не должна
+изменять аргументы <tt><i>list</i></tt>.
+Если списки пустые, <tt>for-all</tt> возвращает <tt>#t</tt>.
+Впротивном случае, <tt>for-all</tt> применяет <tt><i>procedure</i></tt> к соответствующим элементам списков
+<tt><i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...</tt> последовательно, пока
+списки не будут иметь только один элемент слева или <tt><i>procedure</i></tt> вернет <tt>#f</tt>.
+В первом случае, <tt>for-all</tt> выполнить хвостовой вызов <tt><i>procedure</i></tt>, применяя ее к
+оставшемуся элементу каждого списка. В последнем случае, <tt>for-all</tt> возвращает <tt>#f</tt>.
+
+</p><p>
+
+</p><p><tt>(for-all&nbsp;symbol?&nbsp;'(a&nbsp;b&nbsp;c&nbsp;d))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t
+<br>
+<br>
+(for-all&nbsp;=<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(1.0&nbsp;2.0&nbsp;3.0&nbsp;4.0))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#t
+<br>
+<br>
+(for-all&nbsp;(lambda&nbsp;(x&nbsp;y&nbsp;z)&nbsp;(=&nbsp;(+&nbsp;x&nbsp;y)&nbsp;z))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(1.2&nbsp;2.3&nbsp;3.4&nbsp;4.5)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'(2.2&nbsp;4.3&nbsp;6.5&nbsp;8.5))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f</tt>
+</p><p><tt>for-all</tt> можно определить (несколько неэффективно и без обработки ошибок) следующим образом:
+
+</p><p>
+
+</p><p><tt>(define&nbsp;for-all<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(f&nbsp;ls&nbsp;.&nbsp;more)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;for-all&nbsp;([x&nbsp;(car&nbsp;ls)]&nbsp;[ls&nbsp;(cdr&nbsp;ls)]&nbsp;[more&nbsp;more])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(null?&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;f&nbsp;x&nbsp;(map&nbsp;car&nbsp;more))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(apply&nbsp;f&nbsp;x&nbsp;(map&nbsp;car&nbsp;more))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(for-all&nbsp;(car&nbsp;ls)&nbsp;(cdr&nbsp;ls)&nbsp;(map&nbsp;cdr&nbsp;more))))))))</tt>
+</p><p><a name="./control:s38"></a><span class="formdef"><b>procedure</b>: <tt>(fold-left&nbsp;<i>procedure</i>&nbsp;<i>obj</i>&nbsp;<i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>смотри ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;lists)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./control:s39"></a><a name="./control:s40"></a>Все аргументы <tt><i>list</i></tt> должны
+иметь одинаковую длину.
+<tt><i>procedure</i></tt> должна принимать одним аргументом больше, чем число аргументов списков <tt><i>list</i></tt>
+и возвращаеть единичное значение.
+Она не должна изменять аргументы <tt><i>list</i></tt>.
+
+</p><p>
+<tt>fold-left</tt> возвращает <tt><i>obj</i></tt> если аргументы <tt><i>list</i></tt> являются пустыми.
+Если они не пусты, <tt>fold-left</tt> применяет <tt><i>procedure</i></tt> к
+<tt><i>obj</i></tt> и началу(cars) списков <tt><i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...</tt>,
+затем рекурсивно повторяя со значением возвращаенным процедурой <tt><i>procedure</i></tt> вместо <tt><i>obj</i></tt> и
+остатком(cdr) от каждого списка <tt><i>list</i></tt> вместо <tt><i>list</i></tt>.
+
+</p><p>
+
+</p><p><tt>(fold-left&nbsp;cons&nbsp;'()&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;((((()&nbsp;.&nbsp;1)&nbsp;.&nbsp;2)&nbsp;.&nbsp;3)&nbsp;.&nbsp;4)
+<br>
+<br>
+(fold-left<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(a&nbsp;x)&nbsp;(+&nbsp;a&nbsp;(*&nbsp;x&nbsp;x)))<br>
+
+&nbsp;&nbsp;0&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;55
+<br>
+<br>
+(fold-left<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(a&nbsp;.&nbsp;args)&nbsp;(append&nbsp;args&nbsp;a))<br>
+
+&nbsp;&nbsp;'(question)<br>
+
+&nbsp;&nbsp;'(that&nbsp;not&nbsp;to)<br>
+
+&nbsp;&nbsp;'(is&nbsp;to&nbsp;be)<br>
+
+&nbsp;&nbsp;'(the&nbsp;be:&nbsp;or))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(to&nbsp;be&nbsp;or&nbsp;not&nbsp;to&nbsp;be:&nbsp;that&nbsp;is&nbsp;the&nbsp;question)</tt>
+</p><p><a name="./control:s41"></a><span class="formdef"><b>procedure</b>: <tt>(fold-right&nbsp;<i>procedure</i>&nbsp;<i>obj</i>&nbsp;<i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>смотри ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;lists)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./control:s42"></a><a name="./control:s43"></a>Все аргументы <tt><i>list</i></tt> должны иметь
+одинаковую длину.
+<tt><i>procedure</i></tt> должна принимать на один аргумент больше чем число аргументов списков <tt><i>list</i></tt>
+и возвращать единичное значение.
+Она не должна изменть аргументы <tt><i>list</i></tt>.
+
+</p><p>
+<tt>fold-right</tt> возвращает <tt><i>obj</i></tt> если списоки аргументов <tt><i>list</i></tt> пустые.
+Если они не пустые, <tt>fold-right</tt> рекурсивно повторяется с остатком(cdr) от каждого списка
+<tt><i>list</i></tt> замещающим сам <tt><i>list</i></tt>, затем применяет
+<tt><i>procedure</i></tt> к началу(cars) списков <tt><i>list<sub>1</sub></i>&nbsp;<i>list<sub>2</sub></i>&nbsp;...</tt> и возвращает результат рекурсии.
+
+</p><p>
+
+</p><p><tt>(fold-right&nbsp;cons&nbsp;'()&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2&nbsp;3&nbsp;4)
+<br>
+<br>
+(fold-right<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;a)&nbsp;(+&nbsp;a&nbsp;(*&nbsp;x&nbsp;x)))<br>
+
+&nbsp;&nbsp;0&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;55
+<br>
+<br>
+(fold-right<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y&nbsp;a)&nbsp;(cons*&nbsp;x&nbsp;y&nbsp;a))&nbsp;&nbsp;&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(parting&nbsp;is&nbsp;such&nbsp;sweet&nbsp;sorrow<br>
+
+&nbsp;&nbsp;'((with&nbsp;apologies))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./control_files/ghostRightarrow.gif">&nbsp;&nbsp;gotta&nbsp;go&nbsp;see&nbsp;ya&nbsp;tomorrow<br>
+
+&nbsp;&nbsp;'(parting&nbsp;such&nbsp;sorrow&nbsp;go&nbsp;ya)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./control_files/ghostRightarrow.gif">&nbsp;&nbsp;(with&nbsp;apologies))<br>
+
+&nbsp;&nbsp;'(is&nbsp;sweet&nbsp;gotta&nbsp;see&nbsp;tomorrow))</tt>
+</p><p><a name="./control:s44"></a><span class="formdef"><b>procedure</b>: <tt>(vector-map&nbsp;<i>procedure</i>&nbsp;<i>vector<sub>1</sub></i>&nbsp;<i>vector<sub>1</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>вектор результатов
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./control:s45"></a><a name="./control:s46"></a><tt>vector-map</tt> применяет <tt><i>procedure</i></tt> к соответствующим элементам векторов <tt><i>vector<sub>1</sub></i>&nbsp;<i>vector<sub>2</sub></i>&nbsp;...</tt> 
+и возвращает вектор результирующих значений.
+Вектора <tt><i>vector<sub>1</sub></i>&nbsp;<i>vector<sub>2</sub></i>&nbsp;...</tt> должны иметь одинаковую длину,
+и <tt><i>procedure</i></tt> должна принимать столько аргументов, сколько есть векторов, и 
+возвращать единичное значение.
+
+</p><p>
+
+</p><p><tt>(vector-map&nbsp;abs&nbsp;'#(1&nbsp;-2&nbsp;3&nbsp;-4&nbsp;5&nbsp;-6))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6)<br>
+
+(vector-map&nbsp;(lambda&nbsp;(x&nbsp;y)&nbsp;(*&nbsp;x&nbsp;y))<br>
+
+&nbsp;&nbsp;'#(1&nbsp;2&nbsp;3&nbsp;4)<br>
+
+&nbsp;&nbsp;'#(8&nbsp;7&nbsp;6&nbsp;5))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#(8&nbsp;14&nbsp;18&nbsp;20)</tt>
+</p><p>Хотя порядок, в котором происходит применение процедуры, не указан,
+порядок значений в выходном векторе совпадает соответствующим порядком значений
+во входных векторах.
+
+</p><p>
+<a name="./control:s47"></a><span class="formdef"><b>procedure</b>: <tt>(vector-for-each&nbsp;<i>procedure</i>&nbsp;<i>vector<sub>1</sub></i>&nbsp;<i>vector<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./control:s48"></a><a name="./control:s49"></a><tt>vector-for-each</tt> похож на <tt>vector-map</tt> за исключением того, что
+<tt>vector-for-each</tt> не создает и не возвращет вектор значений, и  <tt>vector-for-each</tt>
+гарантирует выполнение применения процедуры последовательно по элементам слева на право.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([same-count&nbsp;0])<br>
+
+&nbsp;&nbsp;(vector-for-each<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(when&nbsp;(=&nbsp;x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;same-count&nbsp;(+&nbsp;same-count&nbsp;1))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;'#(1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;'#(2&nbsp;3&nbsp;3&nbsp;4&nbsp;7&nbsp;6))<br>
+
+&nbsp;&nbsp;same-count)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3</tt>
+</p><p><a name="./control:s50"></a><span class="formdef"><b>procedure</b>: <tt>(string-for-each&nbsp;<i>procedure</i>&nbsp;<i>string<sub>1</sub></i>&nbsp;<i>string<sub>2</sub></i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>unspecified
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./control:s51"></a><a name="./control:s52"></a><tt>string-for-each</tt> похожа на
+<tt>for-each</tt> и <tt>vector-for-each</tt>
+за исключением того, что входы представляют собой стороки, а не списки или векторы.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([ls&nbsp;'()])<br>
+
+&nbsp;&nbsp;(string-for-each<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;r&nbsp;(set!&nbsp;ls&nbsp;(cons&nbsp;r&nbsp;ls)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;"abcd"<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;"===="<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;"1234")<br>
+
+&nbsp;&nbsp;(map&nbsp;list-&gt;string&nbsp;(reverse&nbsp;ls)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;("a=1"&nbsp;"b=2"&nbsp;"c=3"&nbsp;"d=4")</tt>
+</p><p>
+</p><h3><a name="g102"></a><a name="./control:h6"></a>Section 5.6. Продолжения<a name="SECTCONTINUATIONS"></a></h3>
+
+<p>
+Продолжения в Scheme это процедуры, которые представляют собой оставшуюся
+часть вычисления из данной точки в вычислении.
+Они могут быть получены с помощью функции <tt>call-with-current-continuation</tt>, имя которой
+можно сократить до <a name="./control:s53"></a><tt>call/cc</tt>.
+
+</p><p>
+<a name="./control:s54"></a><span class="formdef"><b>procedure</b>: <tt>(call/cc&nbsp;<i>procedure</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(call-with-current-continuation&nbsp;<i>procedure</i>)</tt></span>
+<br>
+<b>returns: </b>смотри ниже
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Эти процедуры одинаковы.
+Более короткое имя часто используется по той очевидной причине, что для его ввода требуется
+меньшее количество нажатий клавиш.
+
+</p><p>
+<tt>call/cc</tt> получает свое продолжение и передает его <tt><i>procedure</i></tt>,
+которая должна принимать один аргумент.
+Само продолжение представлено процедурой.
+Каждый раз, когда эта процедура(Продолжение) применяется к нулю или большему количеству значений, она 
+возвращает эти значения продолжая применение процедуры <tt>call/cc</tt>.
+То есть, когда вызывается процедура Продолжение, она возвращает свои аргументы
+как значения применения функции <tt>call/cc</tt>.
+
+</p><p>
+Если <tt><i>procedure</i></tt> возвращается нормально при передаче процедуре продолжения,
+значения возвращаемые <tt>call/cc</tt> являются значениями возвращаемыми процедурой <tt><i>procedure</i></tt>.
+
+</p><p>
+Продолжения позволяют реализовать <a name="./control:s55"></a>нелокальные выходы,
+откат&nbsp;[<a class="citation" href="bibliography.html#g232">14</a>,<a class="citation" href="bibliography.html#g247">29</a>],
+сопрограммы&nbsp;[<a class="citation" href="bibliography.html#g234">16</a>], и
+мультизадачность&nbsp;[<a class="citation" href="bibliography.html#g228">10</a>,<a class="citation" href="bibliography.html#g250">32</a>].
+
+</p><p>
+Пример ниже илюстрирует использование продолжения для выполнения нелокального
+выхода из цикла.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;member<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(break)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([ls&nbsp;ls&nbsp;(cdr&nbsp;ls)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((null?&nbsp;ls)&nbsp;#f)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(when&nbsp;(equal?&nbsp;x&nbsp;(car&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(break&nbsp;ls)))))))
+<br>
+<br>
+(member&nbsp;'d&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#f<br>
+
+(member&nbsp;'b&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;c)</tt>
+</p><p>Дополнительные примеры приведены в Разделах&nbsp;<a href="further.html#g63">3.3</a>
+и&nbsp;<a href="examples.html#g208">12.11</a>.
+
+</p><p>
+Текущее продолжение обычно представляется внутренне как стек записей
+активаций процедур, и получение продолжения включает инкапсуляцию
+стека в процедурный объект.
+Так как инкапсулируемый стек имеет неопределенный размер, должен использоваться
+некоторый механизм для сохранения содержимого стека на неопределенный срок.
+Это можно сделать с удивительной легкостью и эффективностью и без влияния
+на программы которые не используют продолжения.
+см.&nbsp;[<a class="citation" href="bibliography.html#g235">17</a>].
+
+</p><p>
+<a name="./control:s56"></a><a name="desc:dynamic-wind"></a>
+<span class="formdef"><b>procedure</b>: <tt>(dynamic-wind&nbsp;<i>in</i>&nbsp;<i>body</i>&nbsp;<i>out</i>)</tt></span>
+<br>
+<b>returns: </b>значения, полученные в результате применения <tt><i>body</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p><a name="./control:s57"></a><tt>dynamic-wind</tt> предлагает "защиту" от вызова продолжения.
+Он полезен для выполнения задач, которые должны выполняться когда управление передается или покидает <tt><i>body</i></tt>, как обычно, так и с помощью применения продолжений.
+
+</p><p>
+Три аргумента <tt><i>in</i></tt>, <tt><i>body</i></tt>, и <tt><i>out</i></tt> должны быть процедурами
+и должны принимать ноль аргументов, т.е. они должны быть <a name="./control:s58"></a><tt><i>thunks</i></tt>.
+Перед применением <tt><i>body</i></tt>, и каждый раз когда управление передается в <tt><i>body</i></tt> 
+вследствии применения продолжения созданного внутри <tt><i>body</i></tt>, применяется thunk <tt><i>in</i></tt>.
+При нормальном выходе из <tt><i>body</i></tt> и каждый раз когда управление покидает <tt><i>body</i></tt> 
+при применении продолжения созданного вне <tt><i>body</i></tt>, применяется thunk <tt><i>out</i></tt>.
+
+</p><p>
+Таким образом, гарантируется, что <tt><i>in</i></tt> вызывается хотя бы один раз. Кроме того, если
+<tt><i>body</i></tt> когда либо выполняет возврат(выход), хотябы один раз вызывается <tt><i>out</i></tt>.
+
+</p><p>
+В следующем примере демонстрируется использование <tt>dynamic-wind</tt>, чтобы
+убедиться, что входной порт закрывается после обработки, независимо от того,
+завершенали обработка полностью нормально.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([p&nbsp;(open-input-file&nbsp;"input-file")])<br>
+
+&nbsp;&nbsp;(dynamic-wind<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;#f)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(process&nbsp;p))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(close-port&nbsp;p))))</tt>
+</p><p><a name="./control:s59"></a>Common Lisp предоставляет аналогичное
+средство (<tt>unwind-protect</tt>) для защиты от <a name="./control:s60"></a>нелокальных выходов.
+Этого достаточно.
+Однако функция <tt>unwind-protect</tt> обеспечивает только эквивалент <tt><i>out</i></tt>, поскольку,
+Common Lisp не поддерживает полностью общие продолжения.
+Вот как можно было бы определить <tt>unwind-protect</tt> через <tt>dynamic-wind</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;unwind-protect<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;body&nbsp;cleanup&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(dynamic-wind<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;#f)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;body)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;cleanup&nbsp;...))]))
+<br>
+<br>
+((call/cc<br>
+
+&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;'a])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(unwind-protect<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(k&nbsp;(lambda&nbsp;()&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;x&nbsp;'b))))))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;b</tt>
+</p><p>Некоторые реализации Scheme поддерживают управляемую форму присваивания
+известную как <a name="./control:s61"></a><i>fluid
+binding(флюидное связывание)</i>, в которой переменная принимает временное значение
+во время данного вычисления и возвращается к старому значению после завершения
+вычисления.
+Синтаксическая форма <tt>fluid-let</tt> определенная ниже в терминах <tt>dynamic-wind</tt>
+позволяет выполнить флюидное связывание(fluid binding) для одной переменной <tt>x</tt> 
+к значению выражения <tt>e</tt> внутри тела <tt>b1&nbsp;b2&nbsp;...</tt>.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;fluid-let<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;((x&nbsp;e))&nbsp;b1&nbsp;b2&nbsp;...)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([y&nbsp;e])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([swap&nbsp;(lambda&nbsp;()&nbsp;(let&nbsp;([t&nbsp;x])&nbsp;(set!&nbsp;x&nbsp;y)&nbsp;(set!&nbsp;y&nbsp;t)))])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(dynamic-wind&nbsp;swap&nbsp;(lambda&nbsp;()&nbsp;b1&nbsp;b2&nbsp;...)&nbsp;swap)))]))</tt>
+</p><p>Реализации, которые поддерживают <tt>fluid-let</tt> обычно расширяют ее, чтобы позволить
+проводить связывание неопределенного количества пар <tt>(x&nbsp;e)</tt>, как и <tt>let</tt>.
+
+</p><p>
+Если никакие продолжения не вызываются в теле <tt>fluid-let</tt>,
+поведение будет такое же, как если бы переменной просто присваивалось
+новое значение при входе в тело и присваивалось старое значение при
+возврате.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;3])<br>
+
+&nbsp;&nbsp;(+&nbsp;(fluid-let&nbsp;([x&nbsp;5])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;8</tt>
+</p><p>Переменная связанная fluid-bound, также возвращается к старому значению если вызывается продолжение
+сознанное вне выражения <tt>fluid-let</tt>.
+
+</p><p>
+
+</p><p><tt>(let&nbsp;([x&nbsp;'a])<br>
+
+&nbsp;&nbsp;(let&nbsp;([f&nbsp;(lambda&nbsp;()&nbsp;x)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fluid-let&nbsp;([x&nbsp;'b])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(k&nbsp;(f)))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(f))))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(b&nbsp;.&nbsp;a)</tt>
+</p><p>Если управление покидает тело <tt>fluid-let</tt>, как обычно или
+путем вызова продолжения, и управление возвращается в тело путем
+вызова продолжения, временное значение переменной связанной fluid-bound,
+востанавливается.
+Кроме того, любые изменения во временном значении сохраняются и отражаются
+при повторном входе управления в тело.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;reenter&nbsp;#f)<br>
+
+(define&nbsp;x&nbsp;0)<br>
+
+(fluid-let&nbsp;([x&nbsp;1])<br>
+
+&nbsp;&nbsp;(call/cc&nbsp;(lambda&nbsp;(k)&nbsp;(set!&nbsp;reenter&nbsp;k)))<br>
+
+&nbsp;&nbsp;(set!&nbsp;x&nbsp;(+&nbsp;x&nbsp;1))<br>
+
+&nbsp;&nbsp;x)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2<br>
+
+x&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0<br>
+
+(reenter&nbsp;'*)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;3<br>
+
+(reenter&nbsp;'*)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4<br>
+
+x&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0</tt>
+</p><p>Ниже приведена библиотека, показывающая как <tt>dynamic-wind</tt> может
+быть реализован, если он еще не встроен.
+В дополнение к определению <tt>dynamic-wind</tt>, код определяет
+версию <a name="./control:s62"></a><tt>call/cc</tt>
+которая выполняет свою роль для поддержки <tt>dynamic-wind</tt>.
+
+</p><p>
+
+</p><p><tt>(library&nbsp;(dynamic-wind)<br>
+
+&nbsp;&nbsp;(export&nbsp;dynamic-wind&nbsp;call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(rename&nbsp;(call/cc&nbsp;call-with-current-continuation)))<br>
+
+&nbsp;&nbsp;(import&nbsp;(rename&nbsp;(except&nbsp;(rnrs)&nbsp;dynamic-wind)&nbsp;(call/cc&nbsp;rnrs:call/cc)))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;winders&nbsp;'())
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;common-tail<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([lx&nbsp;(length&nbsp;x)]&nbsp;[ly&nbsp;(length&nbsp;y)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(do&nbsp;([x&nbsp;(if&nbsp;(&gt;&nbsp;lx&nbsp;ly)&nbsp;(list-tail&nbsp;x&nbsp;(-&nbsp;lx&nbsp;ly))&nbsp;x)&nbsp;(cdr&nbsp;x)]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[y&nbsp;(if&nbsp;(&gt;&nbsp;ly&nbsp;lx)&nbsp;(list-tail&nbsp;y&nbsp;(-&nbsp;ly&nbsp;lx))&nbsp;y)&nbsp;(cdr&nbsp;y)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((eq?&nbsp;x&nbsp;y)&nbsp;x)))))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;do-wind<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(new)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([tail&nbsp;(common-tail&nbsp;new&nbsp;winders)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([ls&nbsp;winders])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(not&nbsp;(eq?&nbsp;ls&nbsp;tail))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;winders&nbsp;(cdr&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((cdar&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(f&nbsp;(cdr&nbsp;ls)))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;f&nbsp;([ls&nbsp;new])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(not&nbsp;(eq?&nbsp;ls&nbsp;tail))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(f&nbsp;(cdr&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((caar&nbsp;ls))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;winders&nbsp;ls)))))))</tt>
+</p><p>
+</p><p><tt>&nbsp;&nbsp;(define&nbsp;call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(f)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(rnrs:call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(f&nbsp;(let&nbsp;([save&nbsp;winders])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;(eq?&nbsp;save&nbsp;winders)&nbsp;(do-wind&nbsp;save))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(k&nbsp;x))))))))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;dynamic-wind<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(in&nbsp;body&nbsp;out)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(in)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;winders&nbsp;(cons&nbsp;(cons&nbsp;in&nbsp;out)&nbsp;winders))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let-values&nbsp;([ans*&nbsp;(body)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;winders&nbsp;(cdr&nbsp;winders))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(out)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;values&nbsp;ans*)))))</tt>
+</p><p>Вместе, <tt>dynamic-wind</tt> и <tt>call/cc</tt> управляют списком
+<a name="./control:s63"></a><i>winders</i>.
+winder это пара <i>in</i> и <i>out</i> thunk-ов установленных
+вызовом <tt>dynamic-wind</tt>.
+Всякий раз когда вызывается <tt>dynamic-wind</tt>, вызывается и thunk <i>in</i>,
+новый winder содежит <i>in</i> и <i>out</i> thunk-и
+размещаемые в списке winder, когда вызывается thunk <i>body</i>,
+его winder удаляется из списка winder, и вызывается его thunk <i>out</i>.
+Этот порядок гарантирует, что winder находиться в списке winder-ов только
+когда управление вошло <i>in</i> и еще не вышло <i>out</i>.
+Всякий раз когда получается продолжение, список winders сохраняется, и
+всякий раз когда продолжение вызывается, сохраненный список winders 
+востанавливается.
+Во время востановления, вызывается thunk <i>out</i> для каждого winder-а
+из текущего списка winders, который также не включен в сохраненный
+список winders, за которым следует thunk <i>in</i> для каждого winder сохраненного
+в списке winders которых нет в текущем списке winders.
+Список winders обновляется постепенно, что бы снова обеспечить что winder находиться в текущем
+списке winders только в том случае, если управление было передано в thunk <i>in</i> 
+и не входило в thunk <i>out</i>.
+
+</p><p>
+Проверка <tt>(not&nbsp;(eq?&nbsp;save&nbsp;winders))</tt> выполняемая в <tt>call/cc</tt>
+не является строго необходимой, но делает вызов продолжения менее дорогостоящим, если
+список сохраненных winders совпадает с текущим списком winders.
+
+</p><p>
+
+</p><h3><a name="g103"></a><a name="./control:h7"></a>Section 5.7. Отложенное выполнение<a name="SECTDELAYED"></a></h3>
+
+<p>
+Синтакисческая форма <tt>delay</tt> и процедура <tt>force</tt> могут использоваться
+в комбинации для реализации <a name="./control:s64"></a><i>ленивого вычисления(lazy evaluation)</i>.
+Выражение, подлежащее ленивому вычислению, не вычисляется до тех пор, пока его значение
+не потребуется, и после его вычисления никогда не перевычисляется.
+
+</p><p>
+<a name="./control:s65"></a><span class="formdef"><b>syntax</b>: <tt>(delay&nbsp;<i>expr</i>)</tt></span>
+<br>
+<b>returns: </b>обещание(promise)
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(force&nbsp;<i>promise</i>)</tt></span>
+<br>
+<b>returns: </b>результат принудительного выполнения <tt><i>обещания(promise)</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;r5rs)</tt>
+
+</p><p>В первый раз когда созданное обещание(promise) с помощью <tt>delay</tt> принудительно
+выполняется <i>forced</i> (с
+<tt>force</tt>), оно вычисляет выражение <tt><i>expr</i></tt>, "запоминая" полученное
+значение.
+После этого, каждый раз, когда обещание(promise) принудительно вычисляется, оно возвращает
+запомненное значение, вместо перевычисления <tt><i>expr</i></tt>.
+
+</p><p>
+<tt>delay</tt> и <tt>force</tt> обычно используются только при отсутствии
+побочных эффектов, например, присвоений, так что порядок вычислений
+не имеет значения.
+
+</p><p>
+Преимущество использования <tt>delay</tt> и <tt>force</tt> заключается
+в том, что можно было бы вообще избежать какого-либо количества вычислений,
+если оно будет отложено пока точно не потребуется.
+Отсроченное вычисление может использоваться для построения концептуально
+бесконечных списков  или <a name="./control:s66"></a><i>потоков(streams)</i>.
+Пример ниже показывает, как абстракция потока может быть построена с помощью
+<tt>delay</tt> и <tt>force</tt>.
+Поток(stream) это обещание(promise) которое, когда вызывается(force), возвращает
+пару, чей хвост(cdr) является потоком.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;stream-car<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(s)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;(force&nbsp;s))))
+<br>
+<br>
+(define&nbsp;stream-cdr<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(s)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(cdr&nbsp;(force&nbsp;s))))
+<br>
+<br>
+(define&nbsp;counters<br>
+
+&nbsp;&nbsp;(let&nbsp;next&nbsp;([n&nbsp;1])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(delay&nbsp;(cons&nbsp;n&nbsp;(next&nbsp;(+&nbsp;n&nbsp;1))))))
+<br>
+<br>
+(stream-car&nbsp;counters)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1
+<br>
+<br>
+(stream-car&nbsp;(stream-cdr&nbsp;counters))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2
+<br>
+<br>
+(define&nbsp;stream-add<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(s1&nbsp;s2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(delay&nbsp;(cons<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;(stream-car&nbsp;s1)&nbsp;(stream-car&nbsp;s2))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(stream-add&nbsp;(stream-cdr&nbsp;s1)&nbsp;(stream-cdr&nbsp;s2))))))
+<br>
+<br>
+(define&nbsp;even-counters<br>
+
+&nbsp;&nbsp;(stream-add&nbsp;counters&nbsp;counters))
+<br>
+<br>
+(stream-car&nbsp;even-counters)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;2
+<br>
+<br>
+(stream-car&nbsp;(stream-cdr&nbsp;even-counters))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4</tt>
+</p><p><tt>delay</tt> - задержка может быть определена как
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;delay<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;expr)&nbsp;(make-promise&nbsp;(lambda&nbsp;()&nbsp;expr))]))</tt>
+</p><p>где <a name="./control:s67"></a><tt>make-promise</tt> может быть определена следующим
+обарзом.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;make-promise<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([val&nbsp;#f]&nbsp;[set?&nbsp;#f])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;set?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;(p)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;set?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;val&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;set?&nbsp;#t))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;val))))</tt>
+</p><p>С этим определениме <tt>delay</tt>, <tt>force</tt> это просто вызов обещания(promise)
+для принудительного выполнения или получения сохраненного значения.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;force<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(promise)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(promise)))</tt>
+</p><p>Вторая проверка переменной <tt>set?</tt> в <tt>make-promise</tt> необходима
+в случае, если результат принудительного применения <tt><i>p</i></tt>, обещания
+рекрсивно.
+Поскольку обещание(promise) всегда должно возвращать одно и тоже значение, возвращается
+результат первого применения <tt><i>p</i></tt>.
+
+</p><p>
+Будь то <tt>delay</tt> или <tt>force</tt> обработка
+множественного возврата значений не определена; приведенная выше реализация
+этого не делает, но последующая версия делает это с помощью
+ <tt>call-with-values</tt> и <tt>apply</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;make-promise<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([vals&nbsp;#f]&nbsp;[set?&nbsp;#f])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;set?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(call-with-values&nbsp;p<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;x<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;set?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;vals&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(set!&nbsp;set?&nbsp;#t)))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;values&nbsp;vals)))))
+<br>
+<br>
+(define&nbsp;p&nbsp;(delay&nbsp;(values&nbsp;1&nbsp;2&nbsp;3)))<br>
+
+(force&nbsp;p)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./control_files/ghostRightarrow.gif">&nbsp;2<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./control_files/ghostRightarrow.gif">&nbsp;3<br>
+
+(call-with-values&nbsp;(lambda&nbsp;()&nbsp;(force&nbsp;p))&nbsp;+)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;6</tt>
+</p><p>Ни одна из реализаций не является совершенно правильной, поскльку <tt>force</tt> должна
+возбуждать исключение с типом условия <tt>&amp;assertion</tt> если аргумент не является
+обещанием(promise).
+Так как различение процедур созданных <tt>make-promise</tt> от
+других процедур невозможно, <tt>force</tt> не может сделать это корректно.
+Следующая реализация <tt>make-promise</tt> и <tt>force</tt>
+представлют обещания(promises) как записи с типом <tt>promise</tt> позволяющие
+<tt>force</tt> выполнять требуемую проверку.
+
+</p><p>
+
+</p><p><tt>(define-record-type&nbsp;promise<br>
+
+&nbsp;&nbsp;(fields&nbsp;(immutable&nbsp;p)&nbsp;(mutable&nbsp;vals)&nbsp;(mutable&nbsp;set?))<br>
+
+&nbsp;&nbsp;(protocol&nbsp;(lambda&nbsp;(new)&nbsp;(lambda&nbsp;(p)&nbsp;(new&nbsp;p&nbsp;#f&nbsp;#f)))))
+<br>
+<br>
+(define&nbsp;force<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(promise)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;(promise?&nbsp;promise)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assertion-violation&nbsp;'promise&nbsp;"invalid&nbsp;argument"&nbsp;promise))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;(promise-set?&nbsp;promise)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(call-with-values&nbsp;(promise-p&nbsp;promise)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;x<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(unless&nbsp;(promise-set?&nbsp;promise)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(promise-vals-set!&nbsp;promise&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(promise-set?-set!&nbsp;promise&nbsp;#t)))))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;values&nbsp;(promise-vals&nbsp;promise))))</tt>
+</p><p>
+</p><h3><a name="g104"></a><a name="./control:h8"></a>Section 5.8. Множественные значения<a name="SECTMRVS"></a></h3>
+
+<p>
+Хотя все примитивы Scheme и большинство пользовательских процедур возвращают ровно
+одно значение, некоторые проблемы программирования лучше всего решать путем возврата
+нуля значений, более чем одно значение, или даже переменного количества значений.
+Например, процедура которая разбивает список значений на два подсписка, должна
+возвращать два значения.
+Хотя производитель данных может упаковать их в структуру данных для того, чтобы
+потребитель мог их извлечь, часто бывает проще использовать встроенный интерфейс
+с множеством значений.
+Этот интерфейс состоит из двух процедур:
+<a name="./control:s68"></a><tt>values</tt>
+и
+<a name="./control:s69"></a><tt>call-with-values</tt>.
+Первый из них создает множественные значения, а последний связывает 
+процедуры, которые производят значения множественных значений с процедурами
+которые их потребляют.
+
+</p><p>
+<a name="./control:s70"></a><span class="formdef"><b>procedure</b>: <tt>(values&nbsp;<i>obj</i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b><tt><i>obj</i>&nbsp;...</tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>Процедура <tt>values</tt> принимает любое количество аргументов и
+просто передает(возвращает) аргументы в его продолжение.
+
+</p><p>
+
+</p><p><tt>(values)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;"><br>
+<br>
+(values&nbsp;1)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1
+<br>
+<br>
+(values&nbsp;1&nbsp;2&nbsp;3)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./control_files/ghostRightarrow.gif">&nbsp;2<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./control_files/ghostRightarrow.gif">&nbsp;3
+<br>
+<br>
+(define&nbsp;head&amp;tail<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(values&nbsp;(car&nbsp;ls)&nbsp;(cdr&nbsp;ls))))
+<br>
+<br>
+(head&amp;tail&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./control_files/ghostRightarrow.gif">&nbsp;(b&nbsp;c)</tt>
+</p><p><a name="./control:s71"></a><span class="formdef"><b>procedure</b>: <tt>(call-with-values&nbsp;<i>producer</i>&nbsp;<i>consumer</i>)</tt></span>
+<br>
+<b>returns: </b>see below
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;base)</tt>, <tt>(rnrs)</tt>
+
+</p><p>производитель(<tt><i>producer</i></tt>) и потребитель(<tt><i>consumer</i></tt>) должны быть
+процедурами.
+<tt>call-with-values</tt> применяет <tt><i>consumer</i></tt> к значениям возвращаемым
+вызванным без аргументов производителем(<tt><i>producer</i></tt>).
+
+</p><p>
+
+</p><p><tt>(call-with-values<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(values&nbsp;'bond&nbsp;'james))<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)&nbsp;(cons&nbsp;y&nbsp;x)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(james&nbsp;.&nbsp;bond)
+<br>
+<br>
+(call-with-values&nbsp;values&nbsp;list)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;'()</tt>
+</p><p>Во втором примере сами значения(<tt>values</tt>) служат производителем.
+Он не получает никаих аргументов и не возвращает никаких значений.
+Таким образом, <tt>list</tt> не применяется ни каким аргументам и поэтому возвращает
+пустой список.
+
+</p><p>
+Процедура <a name="./control:s72"></a><tt>dxdy</tt> определенная ниже вычисляет изменение
+координат <tt><i>x</i></tt> и <tt><i>y</i></tt> для пары точек, координаты которых
+представлены парами <tt>(<i>x</i>&nbsp;.&nbsp;<i>y</i>)</tt>.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;dxdy<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p1&nbsp;p2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(values&nbsp;(-&nbsp;(car&nbsp;p2)&nbsp;(car&nbsp;p1))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(-&nbsp;(cdr&nbsp;p2)&nbsp;(cdr&nbsp;p1)))))
+<br>
+<br>
+(dxdy&nbsp;'(0&nbsp;.&nbsp;0)&nbsp;'(0&nbsp;.&nbsp;5))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./control_files/ghostRightarrow.gif">&nbsp;5</tt>
+</p><p><tt>dxdy</tt> можно использовать для вычисления длины и наклона сегмента,
+представленного двумя конечными точками.
+<a name="./control:s73"></a><a name="./control:s74"></a>
+
+</p><p>
+
+</p><p><tt>(define&nbsp;segment-length<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p1&nbsp;p2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(call-with-values<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(dxdy&nbsp;p1&nbsp;p2))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(dx&nbsp;dy)&nbsp;(sqrt&nbsp;(+&nbsp;(*&nbsp;dx&nbsp;dx)&nbsp;(*&nbsp;dy&nbsp;dy)))))))
+<br>
+<br>
+(define&nbsp;segment-slope<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p1&nbsp;p2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(call-with-values<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(dxdy&nbsp;p1&nbsp;p2))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(dx&nbsp;dy)&nbsp;(/&nbsp;dy&nbsp;dx)))))
+<br>
+<br>
+(segment-length&nbsp;'(1&nbsp;.&nbsp;4)&nbsp;'(4&nbsp;.&nbsp;8))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5<br>
+
+(segment-slope&nbsp;'(1&nbsp;.&nbsp;4)&nbsp;'(4&nbsp;.&nbsp;8))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4/3</tt>
+</p><p>Разумеется, мы можем объединить их, чтобы сформировать процедуру, которая возвращает два значения.
+<a name="./control:s75"></a>
+
+</p><p>
+
+</p><p><tt>(define&nbsp;describe-segment<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(p1&nbsp;p2)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(call-with-values<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(dxdy&nbsp;p1&nbsp;p2))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(dx&nbsp;dy)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(values<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(sqrt&nbsp;(+&nbsp;(*&nbsp;dx&nbsp;dx)&nbsp;(*&nbsp;dy&nbsp;dy)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(/&nbsp;dy&nbsp;dx))))))
+<br>
+<br>
+(describe-segment&nbsp;'(1&nbsp;.&nbsp;4)&nbsp;'(4&nbsp;.&nbsp;8))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;5<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4/3</tt>
+</p><p>В приведенном ниже примере используется несколько значений для нераздельного
+разбиения списка на два подсписка перемежающихся элементов.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;split<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(ls)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(or&nbsp;(null?&nbsp;ls)&nbsp;(null?&nbsp;(cdr&nbsp;ls)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(values&nbsp;ls&nbsp;'())<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(call-with-values<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(split&nbsp;(cddr&nbsp;ls)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(odds&nbsp;evens)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(values&nbsp;(cons&nbsp;(car&nbsp;ls)&nbsp;odds)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;(cadr&nbsp;ls)&nbsp;evens)))))))
+<br>
+<br>
+(split&nbsp;'(a&nbsp;b&nbsp;c&nbsp;d&nbsp;e&nbsp;f))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;c&nbsp;e)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="./control_files/ghostRightarrow.gif">&nbsp;(b&nbsp;d&nbsp;f)</tt>
+</p><p>На каждом уровне рекурсии процедура <a name="./control:s76"></a><tt>split</tt> возвращает 
+два значения:  список элементов с нечетным номером из списка аргументов и список элементов с 
+четными номерами.
+
+</p><p>
+Продолжение вызывающее <tt>values</tt> необязательно должно быть одним
+установленным вызовом <tt>call-with-values</tt>, а также не должны использоваться только
+<tt>values</tt> чтобы вернуться к продолжению, установленному вызовом <tt>call-with-values</tt>.
+В частности, <tt>(values&nbsp;<i>e</i>)</tt> и <tt><i>e</i></tt> являются эквивалентными выражениями.
+Например:
+
+</p><p>
+
+</p><p><tt>(+&nbsp;(values&nbsp;2)&nbsp;4)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;6
+<br>
+<br>
+(if&nbsp;(values&nbsp;#t)&nbsp;1&nbsp;2)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;1
+<br>
+<br>
+(call-with-values<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()&nbsp;4)<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x)&nbsp;x))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4</tt>
+</p><p>Аналогично, <tt>values</tt> может использоваться для передачи любого количества значений в продолжение,
+которое игнорирует значения, как в следующем примере:
+
+</p><p>
+
+</p><p><tt>(begin&nbsp;(values&nbsp;1&nbsp;2&nbsp;3)&nbsp;4)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;4</tt>
+</p><p>Поскольку продолжение может принимать ноль или более одного значения, продолжения, полученные
+с помощью <a name="./control:s77"></a><tt>call/cc</tt> могут принимать ноль или более одного
+аргумента.
+
+</p><p>
+
+</p><p><tt>(call-with-values<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(call/cc&nbsp;(lambda&nbsp;(k)&nbsp;(k&nbsp;2&nbsp;3))))<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)&nbsp;(list&nbsp;x&nbsp;y)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(2&nbsp;3)</tt>
+</p><p>Поведение не определено, когда продолжение, ожидающее ровно
+одно значение, получает ноль значений или больше чем одно значение.
+Например, поведение каждого из последующих выражений не определено.
+В некоторых реализациях возникает исключение, в то время как другие
+молча подавляют дополнительные значения или задают значения по умолчанию
+для отсутствующих значений.
+
+</p><p>
+
+</p><p><tt>(if&nbsp;(values&nbsp;1&nbsp;2)&nbsp;'x&nbsp;'y)
+<br>
+<br>
+(+&nbsp;(values)&nbsp;5)</tt>
+</p><p>Программы, которые хотят заставить игнорировать лишние значения в определенных
+контекстах могут просто сделать явный вызов <tt>call-with-values</tt>.
+Синтаксическая форма, которую мы можем назвать <tt>first</tt>, может быть определена для 
+абстрагирования отбрасывания более чем одного значения, когда требуется
+только одно значение.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;first<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;expr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(call-with-values<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;()&nbsp;expr)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;.&nbsp;y)&nbsp;x))]))
+<br>
+<br>
+(if&nbsp;(first&nbsp;(values&nbsp;#t&nbsp;#f))&nbsp;'a&nbsp;'b)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;a</tt>
+</p><p>Поскольку реализации требует вызова исключения с типом условия <tt>&amp;assertion</tt>
+если процедура не принимает количество переданных ему аргументов, каждое из следующих
+выражений вызывает исключение.
+
+</p><p>
+
+</p><p><tt>(call-with-values<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(values&nbsp;2&nbsp;3&nbsp;4))<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)&nbsp;x))
+<br>
+<br>
+(call-with-values<br>
+
+&nbsp;&nbsp;(lambda&nbsp;()&nbsp;(call/cc&nbsp;(lambda&nbsp;(k)&nbsp;(k&nbsp;0))))<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(x&nbsp;y)&nbsp;x))</tt>
+</p><p>Поскольку производитель(<tt><i>producer</i></tt>) чаще всего представляет собой <tt>lambda</tt> выражение,
+часто удобно использовать синтаксическое расширение, которое подавляет лямбда-выражение в интересах удобочитаемости.
+
+</p><p>
+
+</p><p><tt>(define-syntax&nbsp;with-values<br>
+
+&nbsp;&nbsp;(syntax-rules&nbsp;()<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;[(_&nbsp;expr&nbsp;consumer)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(call-with-values&nbsp;(lambda&nbsp;()&nbsp;expr)&nbsp;consumer)]))
+<br>
+<br>
+(with-values&nbsp;(values&nbsp;1&nbsp;2)&nbsp;list)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(1&nbsp;2)<br>
+
+(with-values&nbsp;(split&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4))<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(odds&nbsp;evens)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;evens))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(2&nbsp;4)</tt>
+</p><p>Если потребитель(<tt><i>consumer</i></tt>) также является <tt>lambda</tt> выражением,
+варианты с множественными значениями  <tt>let</tt> и <tt>let*</tt> определенные
+в разделе&nbsp;<a href="binding.html#g93">4.5</a> обычно более удобны.
+<a name="./control:s78"></a><a name="./control:s79"></a>
+
+</p><p>
+
+</p><p><tt>(let-values&nbsp;([(odds&nbsp;evens)&nbsp;(split&nbsp;'(1&nbsp;2&nbsp;3&nbsp;4))])<br>
+
+&nbsp;&nbsp;evens)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(2&nbsp;4)
+<br>
+<br>
+(let-values&nbsp;([ls&nbsp;(values&nbsp;'a&nbsp;'b&nbsp;'c)])<br>
+
+&nbsp;&nbsp;ls)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(a&nbsp;b&nbsp;c)</tt>
+</p><p>Многие стандартные синтаксические формы и процедуры передают множественные значения.
+Большинство из них являются "автоматическими", в том смысле, что реализация не должна делать ничего
+особенного, чтобы это произошло.
+Обычное расширение <tt>let</tt> в прямой 
+<tt>lambda</tt> вызов автоматически распространяется на множественное значение,
+создаваемых телом  <tt>let</tt>.
+Другие операторы должны быть закодированы специально для передачи нескольких значений.
+Например, процедура <tt>call-with-port</tt> (страница&nbsp;<a href="io.html#g127">7.6</a>),
+вызывает аргумент процедуры, затем закрывает аргумент порт перед возвратом значений процедуры,
+поэтому она должна временно сохранять значения.
+Это легко достигается с помощью <tt>let-values</tt>,
+<tt>apply</tt>, и <tt>values</tt>:
+
+</p><p>
+
+</p><p><tt>(define&nbsp;call-with-port<a name="defn:call-with-port"></a><br>
+
+&nbsp;&nbsp;(lambda&nbsp;(port&nbsp;proc)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(let-values&nbsp;([val*&nbsp;(proc&nbsp;port)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(close-port&nbsp;port)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;values&nbsp;val*))))</tt>
+</p><p>Если здесь слишком много накладных расходов, когда позвращается
+единичное значение, код может испольовать <tt>call-with-values</tt> и
+ <tt>case-lambda</tt> для более эффективной обработки единичного значения:
+
+</p><p>
+
+</p><p><tt>(define&nbsp;call-with-port<br>
+
+&nbsp;&nbsp;(lambda&nbsp;(port&nbsp;proc)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(call-with-values&nbsp;(lambda&nbsp;()&nbsp;(proc&nbsp;port))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(case-lambda<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(val)&nbsp;(close-port&nbsp;port)&nbsp;val]<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[val*&nbsp;(close-port&nbsp;port)&nbsp;(apply&nbsp;values&nbsp;val*)]))))</tt>
+</p><p>Определения <tt>values</tt> и <tt>call-with-values</tt> (и
+сопутствующее переопределение <tt>call/cc</tt>) в приведенной ниже библиотеке
+демонстрируют, что интерфейс с возвратом множественных значений может быть
+реализован на Scheme, если он еще небыл встроен.
+Тем не менее, проверка ошибок не может быть выполнена для случая, когда более 
+одного значения возвращаются в контекст
+принимающий единичное значение, например в тестовую часть выражения <tt>if</tt>.
+
+</p><p>
+
+</p><p><tt>(library&nbsp;(mrvs)<br>
+
+&nbsp;&nbsp;(export&nbsp;call-with-values&nbsp;values&nbsp;call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(rename&nbsp;(call/cc&nbsp;call-with-current-continuation)))<br>
+
+&nbsp;&nbsp;(import<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(rename<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(except&nbsp;(rnrs)&nbsp;values&nbsp;call-with-values)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(call/cc&nbsp;rnrs:call/cc)))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;magic&nbsp;(cons&nbsp;'multiple&nbsp;'values))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;magic?<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(pair?&nbsp;x)&nbsp;(eq?&nbsp;(car&nbsp;x)&nbsp;magic))))</tt>
+</p><p>
+</p><p><tt>&nbsp;&nbsp;(define&nbsp;call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(p)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(rnrs:call/cc<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(k)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(p&nbsp;(lambda&nbsp;args<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(k&nbsp;(apply&nbsp;values&nbsp;args))))))))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;values<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;args<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(and&nbsp;(not&nbsp;(null?&nbsp;args))&nbsp;(null?&nbsp;(cdr&nbsp;args)))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;args)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;magic&nbsp;args))))
+<br>
+<br>
+&nbsp;&nbsp;(define&nbsp;call-with-values<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(producer&nbsp;consumer)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;([x&nbsp;(producer)])<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(magic?&nbsp;x)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply&nbsp;consumer&nbsp;(cdr&nbsp;x))<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(consumer&nbsp;x))))))</tt>
+</p><p>Множественные значения могут быть реализованы более эффективно
+&nbsp;[<a class="citation" href="bibliography.html#g220">2</a>], но этот код
+служит для иллюстрации значения операторов и может быть использован для
+для предоставления множественных значений в старых, нестандартных реализациях,
+которые их не поддерживают.
+
+</p><p>
+
+</p><h3><a name="g105"></a><a name="./control:h9"></a>Section 5.9. Вычислить(Eval)<a name="SECTEVAL"></a></h3>
+
+<p>
+Scheme процедура <tt>eval</tt> позволяет программистам писать программы,
+которые строят и вычисляют другие программы.
+Этой способностью выполнять <i>мета-программирование</i> во время выполнения не нужно
+злоупотреблять без необходимости.
+
+</p><p>
+<a name="./control:s80"></a><span class="formdef"><b>procedure</b>: <tt>(eval&nbsp;<i>obj</i>&nbsp;<i>environment</i>)</tt></span>
+<br>
+<b>returns: </b>значение выражения Scheme, представляющие объект <tt><i>obj</i></tt> в среде <tt><i>environment</i></tt>
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;eval)</tt>
+
+</p><p>Если <tt><i>obj</i></tt> не представляет собой синтаксически допустимое выражение,
+ <tt>eval</tt> вызывает исключение с типом условия <tt>&amp;syntax</tt>.
+Окружение(среда), возвращаемая <tt>environment</tt>,
+<tt>scheme-report-environment</tt>, и <tt>null-environment</tt> является
+неизменяемой.
+Таким образом, <tt>eval</tt> также вызывает исключение с типом условия
+<tt>&amp;syntax</tt> если в выражении появляется присвоение любой из
+переменных окружения.
+
+</p><p>
+
+</p><p><tt>(define&nbsp;cons&nbsp;'not-cons)<br>
+
+(eval&nbsp;'(let&nbsp;([x&nbsp;3])&nbsp;(cons&nbsp;x&nbsp;4))&nbsp;(environment&nbsp;'(rnrs)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(3&nbsp;.&nbsp;4)
+<br>
+<br>
+(define&nbsp;lambda&nbsp;'not-lambda)<br>
+
+(eval&nbsp;'(lambda&nbsp;(x)&nbsp;x)&nbsp;(environment&nbsp;'(rnrs)))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;#&lt;procedure&gt;
+<br>
+<br>
+(eval&nbsp;'(cons&nbsp;3&nbsp;4)&nbsp;(environment))&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;<i>exception</i></tt>
+</p><p><a name="./control:s81"></a><span class="formdef"><b>procedure</b>: <tt>(environment&nbsp;<i>import-spec</i>&nbsp;...)</tt></span>
+<br>
+<b>returns: </b>окружение(среда)
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;eval)</tt>
+
+</p><p><tt>environment</tt> возвращает окружение, образованное из объединения
+привязок заданных спецификациями  импортирования(import-spec).
+Каждая <tt><i>import-spec</i></tt> должна быть s-выражением, представляющим допустимый
+спецификатор импорта(import specifier) (см. Главу&nbsp;<a href="libraries.html#g142">10</a>).
+
+</p><p>
+
+</p><p><tt>(define&nbsp;env&nbsp;(environment&nbsp;'(rnrs)&nbsp;'(prefix&nbsp;(rnrs&nbsp;lists)&nbsp;$)))<br>
+
+(eval&nbsp;'($cons*&nbsp;3&nbsp;4&nbsp;(*&nbsp;5&nbsp;8))&nbsp;env)&nbsp;<img src="./control_files/0.gif" alt="&lt;graphic&gt;">&nbsp;(3&nbsp;4&nbsp;.&nbsp;40)</tt>
+</p><p><a name="./control:s82"></a><span class="formdef"><b>procedure</b>: <tt>(null-environment&nbsp;<i>version</i>)</tt></span>
+<br>
+<span class="formdef"><b>procedure</b>: <tt>(scheme-report-environment&nbsp;<i>version</i>)</tt></span>
+<br>
+<b>returns: </b>окружение совместимое с R5RS
+<br>
+<b>libraries: </b><tt>(rnrs&nbsp;r5rs)</tt>
+
+</p><p><tt><i>version</i></tt> должна быть точным целым числом <tt>5</tt>.
+
+</p><p>
+<tt>null-environment</tt> возвращает среду, содержащую привязки
+для ключевых слов, значения которых определены в Revised<sup>5</sup> 
+Report on Scheme, а также привязки для вспомогательных ключевых слов
+ <tt>else</tt>, <tt>=&gt;</tt>, <tt>...</tt>,
+и <tt>_</tt>.
+
+</p><p>
+<tt>scheme-report-environment</tt> возвращает окружение содержащее те же 
+привязки, что и в окружении возвращемым <tt>null-environment</tt>, а также
+привязки для переменных, значения которых определены в Revised<sup>5</sup> Report on
+Scheme, за исключением тех, которые не определены в Revised<sup>6</sup> Report:
+<tt>load</tt>, <tt>interaction-environment</tt>,
+<tt>transcript-on</tt>, <tt>transcript-off</tt>, и
+<tt>char-ready?</tt>.
+
+</p><p>
+Привязки для каждого идентификатора в окружающей среде, возвращаемых этими
+процедурами являются привязками соответствующей библиотеки Revised<sup>6</sup> Report,
+поэтому это не обеспечивает полную обратную совместимость, даже если привязки исключенных
+идентификаторов не используются.
+
+</p><hr class="copyright" align="left">
+<p>
+R. Kent Dybvig / <it>The Scheme Programming Language, Fourth Edition</it><br>
+Copyright © 2009 <a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">The MIT Press</a>.  Electronically reproduced by permission.<br>
+Illustrations © 2009 <a class="plain" href="http://hebert.kitp.ucsb.edu/">Jean-Pierre Hébert</a><br>
+ISBN 978-0-262-51298-5 / LOC QA76.73.S34D93<br>
+<a class="plain" href="http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&amp;tid=11984">to order this book</a> / <a class="plain" href="canned/about.html">about this book</a>
+</p>
+<p><a class="plain" href="http://www.scheme.com/">http://www.scheme.com</a></p>
+
+</body></html>
